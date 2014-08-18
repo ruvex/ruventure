@@ -271,6 +271,7 @@ var NRS = (function(NRS, $, undefined) {
 					$(window).on("hashchange", NRS.checkLocationHash);
 
 					NRS.getInitialTransactions();
+					MGW.initAfterLogin();
 				});
 			});
 		});
