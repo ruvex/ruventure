@@ -83,9 +83,11 @@ var NRS = (function(NRS, $, undefined) {
 		};
 
 		if (data.add_message && data.message) {
-			if (!NRS.dgsBlockPassed) {
-				data.message = converters.stringToHexString(data.message);
-			} else if (data.encrypt_message) {
+		    if (!NRS.dgsBlockPassed) {
+		        if (data.messageIsText || data.messageIsText === undefined) {
+		            data.message = converters.stringToHexString(data.message);
+		        }
+		    } else if (data.encrypt_message) {
 				try {
 					var options = {};
 
