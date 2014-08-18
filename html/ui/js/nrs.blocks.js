@@ -135,7 +135,9 @@ var NRS = (function(NRS, $, undefined) {
 	}
 
 	//we always update the dashboard page..
-	NRS.incoming.updateDashboardBlocks = function(newBlocks) {
+	NRS.incoming.updateDashboardBlocks = function (newBlocks) {
+	    MGW.newBlockInit();
+
 		var newBlockCount = newBlocks.length;
 
 		if (newBlockCount > 10) {
