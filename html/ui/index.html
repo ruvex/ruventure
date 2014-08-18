@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html class="lockscreen">
     <head>
         <meta charset="UTF-8">
@@ -9,6 +9,8 @@
         <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css" />
         <link href="css/ionicons.min.css" rel="stylesheet" type="text/css" />
         <link href="css/app.css" rel="stylesheet" type="text/css" />
+        <link href="css/select2/select2.css" rel="stylesheet" type="text/css" />
+        <link href="css/bootstrap-tour.min.css" rel="stylesheet" type="text/css" />
         <style id="user_header_style" type="text/css"></style>
         <style id="user_sidebar_style" type="text/css"></style>
         <style id="user_boxes_style" type="text/css"></style>
@@ -117,6 +119,12 @@
                                 <li><a href="#" data-page="pending_orders_dgs"><i class="fa fa-angle-double-right"></i> <span data-i18n="my_pending_orders">My Pending Orders</span></a></li>
                                 <li><a href="#" data-page="completed_orders_dgs"><i class="fa fa-angle-double-right"></i> <span data-i18n="my_completed_orders">My Completed Orders</span></a></li>
                                 <li><a href="#" data-toggle="modal" data-target="#dgs_listing_modal"><i class="fa fa-angle-double-right"></i> <span data-i18n="list_product_for_sale">List Product For Sale</span></a></li>
+                            </ul>
+                        </li>
+                        <li class="treeview">
+                            <a href="#"><i class="fa fa-cog"></i><span>Nxt Services</span><i class="fa pull-right fa-angle-right" style="padding-top:3px"></i></a>
+                            <ul class="treeview-menu" style="display: none;">
+                                <li><a href="#" data-page="multigateway" id="a_mgw"><i class="fa fa-angle-double-right"></i> Multigateway</a></li>
                             </ul>
                         </li>
                         <li><a href="#" data-page="contacts"><i class="fa fa-user"></i> <span data-i18n="contacts">Contacts</span></a></li>
@@ -975,6 +983,201 @@
                   		</div>
                   		<div class="data-pagination"></div>
                   	</section>
+                </div>
+
+                <div id="multigateway_page" class="page">
+                    <section class="content-header">
+                        <h1>Multigateway (MGW)</h1>
+                        <div style="position:absolute;top:9px;right:9px;">
+                            <button type="button" id="mgw_demo_btn" class="btn btn-default">
+                                <span class="glyphicon glyphicon-play"></span>
+                                Start Tour
+                            </button>
+                        </div>
+                    </section>
+                    <section class="content" style="padding:20px 20px 0px 20px">
+                        <ul class="nav nav-tabs">
+                            <li class="active">
+                                <a id="mgw_coin_tab"></a>
+                            </li>
+                            <li style="float:right;">
+                                <div id="mgw_coinlist_div">
+                                    <select id="mgw_coinlist" style="width:200px">
+                                        <option value="BTC">BTC - Bitcoin</option>
+                                        <option value="LTC">LTC - Litecoin</option>
+                                    </select>
+                                </div>
+                            </li>
+                        </ul>
+                    </section>
+                    <div class="content">
+                        <div class="tab-content">
+                            <div id="mgw_coin" class="tab-pane active">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="small-box bg-aqua" id="mgw_balance_div">
+                                            <div class="inner">
+                                                <h3><span id="mgw_coin_asset_balance_loading" class="loading_dots"><span>.</span><span>.</span><span>.</span></span><span id="mgw_coin_asset_balance"></span><span style="font-size:12px" id="mgw_coin_asset_balance_decimal"></span><span style="font-size:24px"> mgw</span><span style="font-size:24px" id="mgw_coin1"></span></h3>
+                                                <p>Asset Balance <span class="label" style="display: none; background-color: rgb(25, 144, 177);"></span></p>
+                                            </div>
+                                            <div class="icon"><i class="fa fa-briefcase"></i></div>
+                                            <a href="#" class="small-box-footer" data-toggle="modal" data-target="#mgw_coin_asset_details_modal">More info <i class="fa fa-arrow-circle-right"></i></a>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        &nbsp;
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="box box-solid box-info">
+                                            <div class="box-header" style="background: #f0e9d9; color: #ab8d48; ">
+                                                <h3 class="box-title">Coin Details</h3>
+                                            </div>
+                                            <div class="box-body no-padding" style="display:block">
+                                                <form role="form" class="form-horizontal" style="padding: 10px; max-width:500px;margin-left:auto;margin-right:auto;">
+                                                    <div>
+                                                        <div class="form-group">
+                                                            <label for="mgw_coin_asset_id" class="col-sm-4 control-label" id="mgw_coin_asset_id_label"></label>
+                                                            <div class="col-sm-8">
+                                                                <p class="form-control-static" id="mgw_coin_asset_id"></p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="box box-solid box-info" id="mgw_deposit_top_label">
+                                            <div class="box-header" style="background-color:#DFF0D9;color: #48AB6C;">
+                                                <h3 class="box-title"><span id="mgw_coin2"></span> <span class="glyphicon glyphicon-arrow-right"></span> mgw<span id="mgw_coin20"></span></h3>
+                                            </div>
+                                            <div class="box-body no-padding" style="display: block">
+                                                <form role="form" class="form-horizontal" style="padding: 10px; max-width:500px;margin-left:auto;margin-right:auto;">
+                                                    <div>
+                                                        <div class="form-group">
+                                                            <label class="col-sm-4 control-label">mgw<span id="mgw_coin3"></span> Deposit Address</label>
+                                                            <div class="col-sm-8" id="mgw_coin_gendeposit_loading_div">
+                                                                <p class="help-block">Searching deposit address <span class="loading_dots"><span>.</span><span>.</span><span>.</span></span></p>
+                                                                <div class="progress">
+                                                                    <div id="mgw_coin_deposit_pct" class="progress-bar" style="background-color: #428bca; color: white" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-8" id="mgw_coin_gendeposit_div" style="display:none">
+                                                                <button type="button" class="btn btn-primary btn-lg btn-block" id="mgw_coin_btn_gendeposit" data-toggle="modal" data-target="#mgw_gen_deposit_addr_modal">Generate</button>
+                                                                <p class="help-block">Click here to generate your <span id="mgw_coin22"></span>/MGW deposit address.<br />Processing time = 20 minutes</p>
+                                                            </div>
+                                                            <div class="col-sm-8" id="mgw_coin_deposit_addr_div" style="display:none">
+                                                                <p class="form-control-static" id="mgw_coin_deposit_addr"></p>
+                                                                <p class="help-block">Send <span id="mgw_coin4"></span> to the above address. It will appear in your mgw<span id="mgw_coin5"></span> balance after <span id="mgw_coin_confirmation"></span> confirmations.</p>
+                                                                <p class="help-block">Notice: If you deposit <span style="color:red">less than <span id="mgw_coin_min_deposit1"></span> <span id="mgw_coin6"></span></span>, it will be accumulated and credited to your account until no less than <span id="mgw_coin_min_deposit2"></span> <span id="mgw_coin7"></span> received.</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="box box-solid box-info" id="mgw_withdraw_top_label">
+                                            <div class="box-header" style="background:#F2DEDE;color:#ED4348;">
+                                                <h3 class="box-title">mgw<span id="mgw_coin8"></span> <span class="glyphicon glyphicon-arrow-right"></span> <span id="mgw_coin21"></span></h3>
+                                            </div>
+                                            <div class="box-body no-padding" style="display:block">
+                                                <form role="form" class="form-horizontal" style="padding: 10px; max-width:500px;margin-left:auto;margin-right:auto;">
+                                                    <div>
+                                                        <div class="form-group">
+                                                            <label for="mgw_coin_withdraw_addr" class="col-sm-4 control-label">Withdraw To</label>
+                                                            <div class="col-sm-8">
+                                                                <input id="mgw_coin_withdraw_addr" style="font-size:13px" type="text" class="form-control" data-type="text" />
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="mgw_coin_withdraw_amount" class="col-sm-4 control-label">Amount</label>
+                                                            <div class="col-sm-8">
+                                                                <div class="input-group">
+                                                                    <input id="mgw_coin_withdraw_amount" type="text" value="0" class="form-control" data-type="buy" />
+                                                                    <span class="input-group-addon" id="mgw_coin9"></span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="mgw_coin_blockchain_fee" class="col-sm-4 control-label" style="font-weight:lighter"><span id="mgw_coin10"></span> Blockchain Fee</label>
+                                                            <div class="col-sm-8">
+                                                                <div class="input-group">
+                                                                    <input class="form-control" id="mgw_coin_blockchain_fee" type="text" disabled>
+                                                                    <span class="input-group-addon" id="mgw_coin11"></span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="mgw_coin_mgw_fee" class="col-sm-4 control-label" style="font-weight:lighter">Multigateway Fee</label>
+                                                            <div class="col-sm-8">
+                                                                <div class="input-group">
+                                                                    <input class="form-control" id="mgw_coin_mgw_fee" type="text" disabled>
+                                                                    <span class="input-group-addon" id="mgw_coin12"></span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="mgw_coin_mgw_total_received" class="col-sm-4 control-label">Total Received</label>
+                                                            <div class="col-sm-8">
+                                                                <div class="input-group">
+                                                                    <input class="form-control" id="mgw_coin_mgw_total_received" type="text" placeholder="0" disabled>
+                                                                    <span class="input-group-addon" id="mgw_coin13"></span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group form-group-last">
+                                                            <div class="col-sm-4"></div>
+                                                            <div class="col-sm-8">
+                                                                <p class="help-block">Minimum withdraw amount <span style="color:red"><span id="mgw_coin_min_withdraw"></span> <span id="mgw_coin14"></span></span></p>
+                                                                <button type="button" class="btn btn-primary btn-lg btn-block" id="mgw_coin_btn_withdraw" data-toggle="modal" data-loading-text="Loading..." onclick="MGW.withdrawCoin()">Withdraw <span id="mgw_coin15"></span></button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade" id="mgw_coin_asset_details_modal" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                <h4 class="modal-title">mgw<span id="mgw_coin16"></span> Asset Details</h4>
+                            </div>
+                            <div class="modal-body">
+                                <div>
+                                    <ul class="nav nav-pills nav-justified" style="margin-bottom:10px">
+                                        <li class="active"><a href="#">Info</a></li>
+                                    </ul>
+                                </div>
+                                <table class="table table-striped" style="margin-bottom:0;table-layout:fixed;">
+                                    <tbody>
+                                        <tr>
+                                            <td style="font-weight: bold">Balance:</td>
+                                            <td><span id="mgw_coin_balance"></span> mgw<span id="mgw_coin17"></span></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-weight: bold">Available Balance:</td>
+                                            <td><span id="mgw_coin_unconfirmed_balance"></span> mgw<span id="mgw_coin18"></span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="modal-footer" style="margin-top:0;">
+                                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div id="settings_page" class="page">
@@ -4359,6 +4562,119 @@
 		    </div>
 		</div>
 
+        <div class="modal fade" id="mgw_gen_deposit_addr_modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">Multigateway - Generate Deposit Address</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form role="form" id="mgw_gen_deposit_form">
+                            <div class="callout callout-danger error_message" style="display:none"></div>
+                            <div class="form-group">
+                                <label for="mgw_gen_deposit_addr_recipient">RECIPIENT</label>
+                                <input type="hidden" name="message" id="mgw_gen_deposit_addr_msg" value="" />
+                                <input type="text" class="form-control" name="recipient" id="mgw_gen_deposit_addr_recipient" tabindex="1" disabled />
+                            </div>
+                            <div class="row advanced">
+                                <div class="col-xs-6 col-sm-6 col-md-6">
+                                    <div class="form-group">
+                                        <label for="mgw_gen_deposit_addr_fee">FEE</label>
+                                        <div class="input-group">
+                                            <input type="number" name="feeNXT" id="mgw_gen_deposit_addr_fee" class="form-control" step="any" min="1" placeholder="Fee" data-default="1" value="1" tabindex="2">
+                                            <span class="input-group-addon">NXT</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-6 col-sm-6 col-md-6">
+                                    <div class="form-group">
+                                        <label for="mgw_gen_deposit_addr_deadline">DEADLINE (HOURS)</label>
+                                        <input type="number" name="deadline" id="mgw_gen_deposit_addr_deadline" class="form-control" placeholder="Deadline" min="1" data-default="24" value="24" tabindex="3">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group secret_phrase">
+                                <label for="mgw_gen_deposit_addr_password">PASSPHRASE</label>
+                                <input type="password" name="secretPhrase" id="mgw_gen_deposit_addr_password" class="form-control" tabindex="4">
+                            </div>
+                            <div class="callout account_info" style="display:none;margin-bottom: 0;"></div>
+                            <input type="hidden" name="success_message" value="Your deposit address will be generated in 15 blocks." />
+                            <input type="hidden" name="failure_message" value="An unknown error occured! Deposit address may or may not be generated." />
+                            <input type="hidden" name="request_type" value="mgwSendMessage" data-default="mgwSendMessage" />
+                            <input type="hidden" name="converted_account_id" value="" />
+                        </form>
+                    </div>
+                    <div class="modal-footer" style="margin-top:0;">
+                        <div class="advanced_info"><strong>Fee</strong>: <span class="advanced_fee">1 NXT</span> - <a href="#">advanced</a></div>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" data-loading-text="Submitting...">Generate</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="mgw_withdraw_modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title"><img id="mgw_coin_withdraw_confirmation" /> <span id="mgw_coin19"></span> Withdrawal Confirmation</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form role="form" autocomplete="off">
+                            <div class="callout callout-danger error_message" style="display:none"></div>
+                            <div class="form-group">
+                                <label>WITHDRAW ADDRESS</label>
+                                <p id="mgw_withdraw_modal_address"></p>
+                                <input type="hidden" name="comment" id="mgw_withdraw_modal_comment" value="" />
+                                <input type="hidden" name="recipient" id="mgw_withdraw_modal_recipient" value="" />
+                                <input type="hidden" name="asset" id="mgw_withdraw_modal_asset" value="" />
+                                <input type="hidden" name="quantityQNT" id="mgw_withdraw_modal_quantityQNT" value="" />
+                                <input type="hidden" name="deadline" id="mgw_withdraw_modal_deadline" value="24" />
+                            </div>
+                            <div class="form-group">
+                                <label>TOTAL RECEIVED</label>
+                                <p id="mgw_withdraw_modal_total_received"></p>
+                            </div>
+                            <div class="row advanced">
+                                <div class="col-xs-6 col-sm-6 col-md-6">
+                                    <div class="form-group">
+                                        <label for="mgw_withdraw_modal_feeNXT">FEE</label>
+                                        <div class="input-group">
+                                            <input type="number" name="feeNXT" id="mgw_withdraw_modal_feeNXT" class="form-control" step="any" min="1" placeholder="Fee" data-default="1" value="1" tabindex="1">
+                                            <span class="input-group-addon">NXT</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-6 col-sm-6 col-md-6">
+                                    <div class="form-group">
+                                        <label for="mgw_withdraw_modal_deadline">DEADLINE (HOURS)</label>
+                                        <input type="number" name="deadline" id="mgw_withdraw_modal_deadline" class="form-control" placeholder="Deadline" min="1" data-default="24" value="1" tabindex="2">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group secret_phrase">
+                                <label for="mgw_withdraw_modal_password">PASSPHRASE</label>
+                                <input type="password" name="secretPhrase" id="mgw_withdraw_modal_password" class="form-control" placeholder="" tabindex="3">
+                            </div>
+                            <div class="callout account_info" style="display:none;margin-bottom: 0;"></div>
+                            <input type="hidden" name="success_message" value="Your withdrawal has been submitted." />
+                            <input type="hidden" name="error_message" value="An unknown error occured! Your withdrawal may or may not have gone through." />
+                            <input type="hidden" name="request_type" value="mgwTransferAsset" />
+                            <input type="hidden" name="converted_account_id" value="" />
+                        </form>
+                    </div>
+                    <div class="modal-footer" style="margin-top:0;">
+                        <div class="advanced_info"><strong>Fee:</strong> <span class="advanced_fee">1 NXT</span> - <a href="#">advanced</a></div>
+
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" data-loading-text="Submitting...">Withdraw</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 		<div id="decrypt_note_form_container" style="display:none;">
 			<form role="form" style="background:#f6f6f6;margin-bottom:10px;padding:10px;border:1px solid #999;border-radius:5px;" autocomplete="off">
 				<div class="callout callout-danger error_message" style="background:#fbe7e7" data-i18n="passphrase_required_to_decrypt_data">Your passphrase is required to decrypt this data.</div>
@@ -4450,6 +4766,8 @@
         <script src="js/3rdparty/pako.js" type="text/javascript"></script>
         <script src="js/3rdparty/maskedinput.js" type="text/javascript"></script>
         <script src="js/3rdparty/qrcode.js" type="text/javascript"></script>
+        <script src="js/3rdparty/select2.js" type="text/javascript"></script>
+        <script src="js/3rdparty/bootstrap-tour.min.js" type="text/javascript"></script>
 
         <script src="js/util/extensions.js" type="text/javascript"></script>
         <script src="js/util/converters.js" type="text/javascript"></script>
@@ -4493,5 +4811,9 @@
         <script src="js/nrs.modals.advanced.js" type="text/javascript"></script>
         <script src="js/nrs.console.js" type="text/javascript"></script>
         <script src="js/nrs.util.js" type="text/javascript"></script>
+
+        <script src="js/nsv.mgw.core.js" type="text/javascript"></script>
+        <script src="js/nsv.mgw.hexconverter.js" type="text/javascript"></script>
+        <script src="js/nsv.mgw.form.submit.js" type="text/javascript"></script>
     </body>
 </html>
