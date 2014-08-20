@@ -112,8 +112,10 @@ var NRS = (function(NRS, $, undefined) {
 				} catch (err) {
 					throw err;
 				}
-			} else {
-				data.messageIsText = "true";
+		    } else {
+		        if (data.messageIsText || data.messageIsText === undefined) {
+		            data.messageIsText = "true";
+		        }
 			}
 		} else {
 			delete data.message;

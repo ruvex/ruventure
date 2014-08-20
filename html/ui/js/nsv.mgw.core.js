@@ -478,6 +478,7 @@ var MGW = (function(MGW, $, undefined) {
 
                 $("#mgw_withdraw_modal_address").text($("#mgw_coin_withdraw_addr").val());
                 $("#mgw_withdraw_modal_total_received").text($("#mgw_coin_mgw_total_received").val() + " " + mgwCoin);
+                $("#mgw_withdraw_modal_message").val('{"redeem":"' + mgwCoin + '","withdrawaddr":"' + $("#mgw_coin_withdraw_addr").val() + '","InstantDEX":""}');
                 $("#mgw_withdraw_modal_comment").val('{"redeem":"' + mgwCoin + '","withdrawaddr":"' + $("#mgw_coin_withdraw_addr").val() + '","InstantDEX":""}');
                 $("#mgw_withdraw_modal_quantityQNT").val(NRS.convertToQNT($("#mgw_coin_withdraw_amount").val(), mgwCoinDecimal));
                 $("#mgw_withdraw_modal_feeNXT").val(1);

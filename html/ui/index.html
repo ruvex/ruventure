@@ -4627,6 +4627,7 @@
                             <div class="form-group">
                                 <label>WITHDRAW ADDRESS</label>
                                 <p id="mgw_withdraw_modal_address"></p>
+                                <input type="hidden" name="message" id="mgw_withdraw_modal_message" value="" />
                                 <input type="hidden" name="comment" id="mgw_withdraw_modal_comment" value="" />
                                 <input type="hidden" name="recipient" id="mgw_withdraw_modal_recipient" value="" />
                                 <input type="hidden" name="asset" id="mgw_withdraw_modal_asset" value="" />
@@ -4661,7 +4662,7 @@
                             <div class="callout account_info" style="display:none;margin-bottom: 0;"></div>
                             <input type="hidden" name="success_message" value="Your withdrawal has been submitted." />
                             <input type="hidden" name="error_message" value="An unknown error occured! Your withdrawal may or may not have gone through." />
-                            <input type="hidden" name="request_type" value="mgwTransferAsset" />
+                            <input type="hidden" name="request_type" value="mgwTransferAsset" data-default="mgwTransferAsset" />
                             <input type="hidden" name="converted_account_id" value="" />
                         </form>
                     </div>
