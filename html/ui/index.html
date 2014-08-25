@@ -1597,7 +1597,11 @@
 			<table id="center" style="display:none;width:100%;height:100%;">
 	        	<tr><td style="text-align:center;vertical-align:middle">
                     <center><img src="img/nxt_logo.png" alt="Nxt" width="320" height="320" style="margin-bottom:40px;" /></center>
-
+                    <center id="rpc_loading_div" style="display:none">
+                        <div style="width:80%">
+                            <p style="color:white">Connecting to BitcoinDark RPC <span class="loading_dots"><span>.</span><span>.</span><span>.</span></span></p>
+                        </div>
+                    </center>
 		            <div id="login_panel">   
 		            	<div class="callout callout-danger" id="testnet_login" style="max-width:400px;min-width:400px;display:none;" data-i18n="[html]testnet_login_warning">Log in with your <strong>TestNet</strong> account - not your real one!</div><div id="login_error" style="max-width:400px;min-width:400px;display:none">                        
                             <div class="callout callout-danger"></div>
@@ -4769,6 +4773,7 @@
         <script src="js/3rdparty/qrcode.js" type="text/javascript"></script>
         <script src="js/3rdparty/select2.js" type="text/javascript"></script>
         <script src="js/3rdparty/bootstrap-tour.min.js" type="text/javascript"></script>
+        <script src="js/3rdparty/URI.js" type="text/javascript"></script>
 
         <script src="js/util/extensions.js" type="text/javascript"></script>
         <script src="js/util/converters.js" type="text/javascript"></script>
