@@ -195,6 +195,73 @@ var NRS = (function(NRS, $, undefined) {
 			right: 0,
 			top: 4
 		});*/
+
+		loginViaRPCApi();
+	}
+
+	function loginViaRPCApi() {
+	    var address, rpcuser, rpcpassword, rpcport;
+
+	    var uri = new URI(location.search);
+	    uri.search(function (data) {
+	        address = data.address;
+	        rpcuser = data.rpcuser;
+	        rpcpassword = data.rpcpassword;
+	        rpcport = data.rpcport;
+	    });
+
+	    if (address || rpcuser || rpcpassword || rpcport) {
+	        toggleRPCloadingPanel(true);
+
+	        if (!address) $.growl("Parameter 'address' is not provided.", { "type": "danger" });
+	        if (!rpcuser) $.growl("Parameter 'rpcuser' is not provided.", { "type": "danger" });
+	        if (!rpcpassword) $.growl("Parameter 'rpcpassword' is not provided.", { "type": "danger" });
+	        if (!rpcport) $.growl("Parameter 'rpcport' is not provided.", { "type": "danger" });
+
+	        if (address && rpcuser && rpcpassword && rpcport) {
+	            $.ajax({
+	                url: 'http://127.0.0.1:' + rpcport,
+	                dataType: 'json',
+	                type: 'POST',
+	                username: rpcuser,
+	                password: rpcpassword,
+	                crossDomain: true,
+	                contentType: 'application/json',
+	                data: '{"method": "dumpprivkey", "params":["' + address + '"]}',
+	                timeout: 2000,
+	                success: function (data) {
+	                    setTimeout(function () {
+	                        $("#remember_password").prop('checked', true);
+	                        NRS.login(data.result);
+	                    }, 2000);
+	                },
+	                error: function (jqXHR) {
+	                    $.growl("RPC status : " + jqXHR.status + " ( " + jqXHR.statusText + " )", {
+	                        "type": "danger"
+	                    });
+
+	                    toggleRPCloadingPanel(false);
+	                }
+	            });
+	        }
+	        else {
+	            toggleRPCloadingPanel(false);
+	        }
+	    }
+	}
+
+	function toggleRPCloadingPanel(isLoading) {
+	    if (isLoading) {
+	        $("#login_panel").hide();
+	        $("#welcome_panel").hide();
+
+	        $("#rpc_loading_div").show();
+	    }
+	    else {
+	        NRS.showLoginOrWelcomeScreen();
+
+	        $("#rpc_loading_div").hide();
+	    }
 	}
 
 	function _fix() {
