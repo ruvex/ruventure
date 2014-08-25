@@ -336,7 +336,7 @@ var NRS = (function(NRS, $, undefined) {
 		} else {
 			NRS.setDecryptionPassword("");
 			NRS.setPassword("");
-			window.location.reload();
+			window.location = window.location.pathname;
 		}
 	}
 
