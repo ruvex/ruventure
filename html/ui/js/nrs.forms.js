@@ -55,91 +55,91 @@ var NRS = (function(NRS, $, undefined) {
 		}
 	}
 
-	NRS.addMessageData = function (data, requestType) {
-	    if (requestType == "sendMessage") {
-	        data.add_message = true;
-	    }
+	NRS.addMessageData = function(data, requestType) {
+		if (requestType == "sendMessage") {
+			data.add_message = true;
+		}
 
-	    if (!data.add_message && !data.add_note_to_self) {
-	        delete data.message;
-	        delete data.note_to_self;
-	        delete data.encrypt_message;
-	        delete data.add_message;
-	        delete data.add_note_to_self;
+		if (!data.add_message && !data.add_note_to_self) {
+			delete data.message;
+			delete data.note_to_self;
+			delete data.encrypt_message;
+			delete data.add_message;
+			delete data.add_note_to_self;
 
-	        return data;
-	    } else if (!data.add_message) {
-	        delete data.message;
-	        delete data.encrypt_message;
-	        delete data.add_message;
-	    } else if (!data.add_note_to_self) {
-	        delete data.note_to_self;
-	        delete data.add_note_to_self;
-	    }
+			return data;
+		} else if (!data.add_message) {
+			delete data.message;
+			delete data.encrypt_message;
+			delete data.add_message;
+		} else if (!data.add_note_to_self) {
+			delete data.note_to_self;
+			delete data.add_note_to_self;
+		}
 
-	    data["_extra"] = {
-	        "message": data.message,
-	        "note_to_self": data.note_to_self
-	    };
+		data["_extra"] = {
+			"message": data.message,
+			"note_to_self": data.note_to_self
+		};
 
-	    if (data.add_message && data.message) {
-	        if (data.encrypt_message) {
-	            try {
-	                var options = {};
+		if (data.add_message && data.message) {
+			if (data.encrypt_message) {
+				try {
+					var options = {};
 
-	                if (data.recipient) {
-	                    options.account = data.recipient;
-	                } else if (data.encryptedMessageRecipient) {
-	                    options.account = data.encryptedMessageRecipient;
-	                    delete data.encryptedMessageRecipient;
-	                }
+					if (data.recipient) {
+						options.account = data.recipient;
+					} else if (data.encryptedMessageRecipient) {
+						options.account = data.encryptedMessageRecipient;
+						delete data.encryptedMessageRecipient;
+					}
 
-	                if (data.recipientPublicKey) {
-	                    options.publicKey = data.recipientPublicKey;
-	                }
+					if (data.recipientPublicKey) {
+						options.publicKey = data.recipientPublicKey;
+					}
 
-	                var encrypted = NRS.encryptNote(data.message, options, data.secretPhrase);
+					var encrypted = NRS.encryptNote(data.message, options, data.secretPhrase);
 
-	                data.encryptedMessageData = encrypted.message;
-	                data.encryptedMessageNonce = encrypted.nonce;
-	                data.messageToEncryptIsText = "true";
+					data.encryptedMessageData = encrypted.message;
+					data.encryptedMessageNonce = encrypted.nonce;
+					data.messageToEncryptIsText = "true";
 
-	                delete data.message;
-	            } catch (err) {
-	                throw err;
-	            }
-	        } else {
-	            data.messageIsText = "true";
-	        }
-	    } else {
-	        delete data.message;
-	    }
+					delete data.message;
+				} catch (err) {
+					throw err;
+				}
+			} else {
+				data.messageIsText = "true";
+			}
+		} else {
+			delete data.message;
+		}
 
-	    if (data.add_note_to_self && data.note_to_self) {
-	        try {
-	            var options = {};
+		if (data.add_note_to_self && data.note_to_self) {
+			try {
+				var options = {};
 
-	            var encrypted = NRS.encryptNote(data.note_to_self, {
-	                "publicKey": converters.hexStringToByteArray(NRS.generatePublicKey(data.secretPhrase))
-	            }, data.secretPhrase);
+				var encrypted = NRS.encryptNote(data.note_to_self, {
+					"publicKey": converters.hexStringToByteArray(NRS.generatePublicKey(data.secretPhrase))
+				}, data.secretPhrase);
 
-	            data.encryptToSelfMessageData = encrypted.message;
-	            data.encryptToSelfMessageNonce = encrypted.nonce;
-	            data.messageToEncryptToSelfIsText = "true";
+				data.encryptToSelfMessageData = encrypted.message;
+				data.encryptToSelfMessageNonce = encrypted.nonce;
+				data.messageToEncryptToSelfIsText = "true";
 
-	            delete data.note_to_self;
-	        } catch (err) {
-	            throw err;
-	        }
-	    } else {
-	        delete data.note_to_self;
-	    }
+				delete data.note_to_self;
+			} catch (err) {
+				throw err;
+			}
+		} else {
+			delete data.note_to_self;
+		}
 
-	    delete data.add_message;
-	    delete data.encrypt_message;
-	    delete data.add_note_to_self;
+		delete data.add_message;
+		delete data.encrypt_message;
+		delete data.add_note_to_self;
 
-	    return data;
+		return data;
 	}
 
 	NRS.submitForm = function($modal, $btn) {
