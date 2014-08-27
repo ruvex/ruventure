@@ -1,4 +1,5 @@
-var MGW = (function(MGW, $, undefined) {
+//MGWversion 1.4.5
+var MGW = (function (MGW, $, undefined) {
     var isSearchingAM = false;
 
     var mgwCoinDetails = [
