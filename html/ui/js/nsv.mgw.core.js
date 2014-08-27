@@ -26,7 +26,7 @@ var MGW = (function(MGW, $, undefined) {
     ];
 
     var mgwCoinDepositJson = [
-    { "coin": "BTC", "jsonAM": '{"BTC":"","LTC":"","DOGE":"","DRK":"","CGB":""}', "gateway": "faeedbba" },
+    { "coin": "BTC", "jsonAM": '{"BTC":"","LTC":"","DOGE":"","DRK":"","CGB":"","BTCD":""}', "gateway": "faeedbba" },
     { "coin": "LTC", "jsonAM": '{"BTC":"","LTC":"","DOGE":"","DRK":"","CGB":""}', "gateway": "faeedbba" },
     { "coin": "BTCD", "jsonAM": '{"BTC":"","LTC":"","DOGE":"","DRK":"","CGB":"","BTCD":""}', "gateway": "faeedbba" }
     ];
