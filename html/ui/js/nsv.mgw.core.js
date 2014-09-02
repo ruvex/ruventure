@@ -1,4 +1,5 @@
-var MGW = (function(MGW, $, undefined) {
+//MGWversion 1.4.5
+var MGW = (function (MGW, $, undefined) {
     var isSearchingAM = false;
 
     var mgwCoinDetails = [
@@ -26,7 +27,7 @@ var MGW = (function(MGW, $, undefined) {
     ];
 
     var mgwCoinDepositJson = [
-    { "coin": "BTC", "jsonAM": '{"BTC":"","LTC":"","DOGE":"","DRK":"","CGB":""}', "gateway": "faeedbba" },
+    { "coin": "BTC", "jsonAM": '{"BTC":"","LTC":"","DOGE":"","DRK":"","CGB":"","BTCD":""}', "gateway": "faeedbba" },
     { "coin": "LTC", "jsonAM": '{"BTC":"","LTC":"","DOGE":"","DRK":"","CGB":""}', "gateway": "faeedbba" },
     { "coin": "BTCD", "jsonAM": '{"BTC":"","LTC":"","DOGE":"","DRK":"","CGB":"","BTCD":""}', "gateway": "faeedbba" }
     ];
@@ -489,6 +490,7 @@ var MGW = (function(MGW, $, undefined) {
                 $("#mgw_withdraw_modal_quantityQNT").val(NRS.convertToQNT($("#mgw_coin_withdraw_amount").val(), mgwCoinDecimal));
                 $("#mgw_withdraw_modal_feeNXT").val(1);
                 $("#mgw_withdraw_modal_deadline").val(24);
+                $("#mgw_withdraw_modal_add_message").prop('checked', true);
 
                 $("#mgw_withdraw_modal_recipient").val(resultMGW[0].accountRS);
                 $("#mgw_withdraw_modal_asset").val(resultCoinDetails[0].assetID);
