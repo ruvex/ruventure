@@ -1,4 +1,4 @@
-//MGWversion 1.4.5
+//MGWversion 1.4.6
 var MGW = (function (MGW, $, undefined) {
     var isSearchingAM = false;
 
@@ -178,7 +178,7 @@ var MGW = (function (MGW, $, undefined) {
     }
     MGW.initDepositAddr = function (bIsStartSearch) {
         var result = $.grep(mgwCoinDepositAddr, function (_mgwCoin) { return _mgwCoin.coin == mgwCoin });
-        var resultmgw = $.grep(mgwCoinMultigateway, function (_mgwCoinMgw) { return _mgwCoinMgw.coin == mgwCoin });
+        var resultTXID = [];
 
         if (!isSearchingAM) {
             if (bIsStartSearch) {
@@ -189,19 +189,35 @@ var MGW = (function (MGW, $, undefined) {
                     $("#mgw_coin_deposit_addr_div").hide();
                 }
 
-                $.getJSON('/nxt?requestType=getAccountTransactionIds&account=' + resultmgw[0].accountRS + '&timestamp=0&type=1&subtype=0', function (result) {
-                    if (result.hasOwnProperty('transactionIds')) {
-                        var txID = result.transactionIds;
-                        var array = txID.toString().split(',');
+                var mgwAccount = MGW.getMGWdistinctAccount();
 
-                        MGW.loopAM(array, 0);
-                    }
+                $.each(mgwAccount, function (mgwAccountIndex, mgwAccountValue) {
+                    $.ajax({
+                        url: '/nxt?requestType=getAccountTransactionIds&account=' + mgwAccountValue + '&timestamp=0&type=1&subtype=0',
+                        dataType: 'json',
+                        async: false,
+                        success: function (result) {
+                            $.each(result["transactionIds"], function (txidIndex, txidValue) {
+                                resultTXID.push(txidValue);
+                            });
+                        }
+                    });
                 });
+
+                MGW.loopAM(resultTXID, 0);
             }
             else {
                 MGW.initDepositAddrDone();
             }
         }
+    }
+    MGW.getMGWdistinctAccount = function () {
+        var result = [];
+
+        $.each(mgwCoinMultigateway, function (i, v) {
+            if ($.inArray(v["accountRS"], result) == -1) result.push(v["accountRS"]);
+        });
+        return result;
     }
     MGW.initDepositAddrDone = function () {
         var result = $.grep(mgwCoinDepositAddr, function (_mgwCoin) { return _mgwCoin.coin == mgwCoin });
