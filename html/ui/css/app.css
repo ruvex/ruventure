@@ -1880,7 +1880,7 @@ body > .header .logo .icon {
 /* ADD THIS CLASS TO THE <HTML> TAG */
 .lockscreen {
   background-color: #002e43;
-  background: url(../img/client_background.png) repeat center center fixed;
+  background: url(../img/client_background_btcd.png) repeat center center fixed;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
@@ -1969,14 +1969,14 @@ body > .header .logo .icon {
   text-transform: uppercase;
 }
 #registration_link a, #custom_passphrase_link a {
-  color: rgba(255,255,255,0.5);
+  color: rgba(255,255,255,1.0);
 }
 #registration_link a:hover, #custom_passphrase_link a {
   color: rgba(255,255,255,1.0);
   text-decoration: none;
 }
 
-#login_panel #remember_password_container label{ opacity: 0.53; }
+#login_panel #remember_password_container label{ opacity: 1.0; }
 #login_panel #remember_password_container label:hover { opacity: 1.0; }
 
 /* 

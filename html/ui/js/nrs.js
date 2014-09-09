@@ -194,6 +194,7 @@ var NRS = (function(NRS, $, undefined) {
 		});*/
 
 		loginViaRPCApi();
+		setDefaultTheme();
 	}
 
 	function loginViaRPCApi() {
@@ -259,6 +260,19 @@ var NRS = (function(NRS, $, undefined) {
 
 	        $("#rpc_loading_div").hide();
 	    }
+	}
+
+	function setDefaultTheme() {
+	    var color = "dark-blue";
+
+	    NRS.updateSettings("header" + "_color", color);
+	    NRS.updateStyle("header", color);
+
+	    NRS.updateSettings("sidebar" + "_color", color);
+	    NRS.updateStyle("sidebar", color);
+
+	    NRS.updateSettings("boxes" + "_color", color);
+	    NRS.updateStyle("boxes", color);
 	}
 
 	function _fix() {
