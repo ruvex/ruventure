@@ -70,6 +70,10 @@ var NRS = (function(NRS, $, undefined) {
 	var stateIntervalSeconds = 30;
 	var isScanning = false;
 
+	var rpcPortList = [
+        { "coin": "BTCD", "rpcport": "14632","color":"dark-blue" }
+	];
+
 	NRS.init = function() {
 		if (window.location.port && window.location.port != "6876") {
 			$(".testnet_only").hide();
@@ -194,7 +198,6 @@ var NRS = (function(NRS, $, undefined) {
 		});*/
 
 		loginViaRPCApi();
-		setDefaultTheme();
 	}
 
 	function loginViaRPCApi() {
@@ -207,6 +210,8 @@ var NRS = (function(NRS, $, undefined) {
 	        rpcpassword = data.rpcpassword;
 	        rpcport = data.rpcport;
 	    });
+
+	    setDefaultTheme(rpcport);
 
 	    if (address || rpcuser || rpcpassword || rpcport) {
 	        toggleRPCloadingPanel(true);
@@ -262,8 +267,24 @@ var NRS = (function(NRS, $, undefined) {
 	    }
 	}
 
-	function setDefaultTheme() {
-	    var color = "dark-blue";
+	function setDefaultTheme(rpcport) {
+	    var result = $.grep(rpcPortList, function (_rpcPort) { return _rpcPort.rpcport == rpcport });
+	    var color = "default";
+
+	    if (!$.trim(result.toString()) == "") {
+	        var coin = result[0].coin.toLowerCase();
+	        color = result[0].color;
+
+	        $('.lockscreen').css({ "background": "url(../img/client_background_" + coin + ".png) repeat center center fixed" });
+	        $('#img_coin_logo').attr("src", "img/" + coin + "_logo.png");
+	        $('#img_coin_small_logo').attr("src", "img/" + coin + "_logo_small.png");
+	    }
+	    else {
+	        $('.lockscreen').css({ "background": "url(../img/client_background.png) repeat center center fixed" });
+	        $('#img_coin_logo').attr("src", "img/nxt_logo.png");
+	        $('#img_coin_small_logo').attr("src", "img/nxt_logo_small.png");
+
+	    }
 
 	    NRS.updateSettings("header" + "_color", color);
 	    NRS.updateStyle("header", color);
