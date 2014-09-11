@@ -1954,7 +1954,7 @@ body > .header .logo .icon {
 /* Contains the password input and the login button */
 
 .lockscreen-item > .lockscreen-credentials input {
-  border: 0 !important;
+  /*border: 0 !important;*/
 }
 .lockscreen-item > .lockscreen-credentials .btn {
   background-color: #fff;
@@ -1968,10 +1968,10 @@ body > .header .logo .icon {
   text-transform: uppercase;
 }
 #registration_link a, #custom_passphrase_link a {
-  color: rgba(255,255,255,1.0);
+  color: #000;
 }
 #registration_link a:hover, #custom_passphrase_link a {
-  color: rgba(255,255,255,1.0);
+  color: #000;
   text-decoration: none;
 }
 
@@ -2914,7 +2914,7 @@ label .popover-content {
   color: #f9f9f9;
 }
 #remember_password_container {
-  color:#fff;
+    color:#000;
 	text-align:center;
 }
 #remember_password_container label {
