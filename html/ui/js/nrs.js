@@ -275,12 +275,12 @@ var NRS = (function(NRS, $, undefined) {
 	        var coin = result[0].coin.toLowerCase();
 	        color = result[0].color;
 
-	        $('.lockscreen').css({ "background": "url(../img/client_background_" + coin + ".png) repeat center center fixed" });
+	        $('#lockscreen').css({ "background": "url(../img/client_background_" + coin + ".png) repeat center center fixed" });
 	        $('#img_coin_logo').attr("src", "img/" + coin + "_logo.png");
 	        $('#img_coin_small_logo').attr("src", "img/" + coin + "_logo_small.png");
 	    }
 	    else {
-	        $('.lockscreen').css({ "background": "url(../img/client_background.png) repeat center center fixed" });
+	        $('#lockscreen').css({ "background": "url(../img/client_background.png) repeat center center fixed" });
 	        $('#img_coin_logo').attr("src", "img/nxt_logo.png");
 	        $('#img_coin_small_logo').attr("src", "img/nxt_logo_small.png");
 
