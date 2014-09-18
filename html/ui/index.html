@@ -3258,7 +3258,7 @@
 		  	</div>
 		</div>	
 
-		<div class="modal fade" id="nsv_vote_create_modal" tabindex="-1" role="dialog" aria-hidden="true" >
+		<div class="modal fade" id="nsv_vote_create_modal" tabindex="-1" role="dialog" aria-hidden="true" onshow="NSV.vote_create_init()" >
 			<div class="modal-dialog modal-dialog-wide">
 		    	<div class="modal-content">
 		      		<div class="modal-header">
@@ -3329,7 +3329,7 @@
 							<div class="row">
 								<div class="col-xs-6 col-sm-6 col-md-6">
 									<div class="form-group">
-										<label for="nsv_vote_create_asset">WEIGHTING (NXT/NONE/ASSET SHAREHOLDING)</label> <i class="fa fa-question-circle show_popover" style="color:#4CAA6E" data-content="Three options. 0=Weight vote by amount of Nxt held, 1=Do not weight vote, one vote per account, Asset_ID=Weight vote by holdings of that asset" data-container="body"></i>
+										<label for="nsv_vote_create_asset">WEIGHTING [NXT(0)/NONE(1)/ASSET(ID)]</label> <i class="fa fa-question-circle show_popover" style="color:#4CAA6E" data-content="Three options. 0=Weight vote by amount of Nxt held, 1=Do not weight vote, one vote per account, Asset_ID=Weight vote by holdings of that asset" data-container="body"></i>
 						                <input type="text" id="nsv_vote_create_asset"  class="form-control" placeholder="" tabindex="10" value="">
 									</div>
 								</div>
@@ -3350,7 +3350,6 @@
 						<div class="callout account_info" style="display:none;margin-bottom: 0;"></div>
 						<div class="alert-danger alert alert-no-icon" id="nsv_vote_create_error_message" style="display: none;padding: 5px; padding-left: 5px; margin-bottom: 15px;"></div>
 						<div class="alert-success alert alert-no-icon" id="nsv_vote_create_succ_message" style="display: none;padding: 5px; padding-left: 5px; margin-bottom: 15px;"></div>
-						<div class="alert-warning alert alert-no-icon" id="nsv_vote_create_warn_message" style="display: none;padding: 5px; padding-left: 5px; margin-bottom: 15px;"></div>
 					</div>				
 		      		<div class="modal-footer" style="margin-top:0;">
 		  
@@ -3361,7 +3360,7 @@
 		  	</div>
 		</div>
 
-		<div class="modal fade" id="nsv_vote_cast_modal" tabindex="-1" role="dialog" aria-hidden="true" >
+		<div class="modal fade" id="nsv_vote_cast_modal" tabindex="-1" role="dialog" aria-hidden="true" onshow="NSV.vote_cast_init()" >
 			<div class="modal-dialog modal-dialog-wide">
 		    	<div class="modal-content">
 		      		<div class="modal-header">
@@ -3381,7 +3380,7 @@
 							<div class="row">
 								<div class="col-xs-8 col-sm-8 col-md-8">							
 									<div class="form-group">
-										<label for="nsv_vote_create_question">QUESTION</label> 
+										<label for="nsv_vote_cast_question">QUESTION</label> 
 										<textarea class="form-control" id="nsv_vote_cast_question" rows="7" tabindex="2" disabled></textarea>
 									</div>
 								</div>
@@ -3407,11 +3406,10 @@
 						<div class="callout account_info" style="display:none;margin-bottom: 0;"></div>
 						<div class="alert-danger alert alert-no-icon" id="nsv_vote_cast_error_message" style="display: none;padding: 5px; padding-left: 5px; margin-bottom: 15px;"></div>
 						<div class="alert-success alert alert-no-icon" id="nsv_vote_cast_succ_message" style="display: none;padding: 5px; padding-left: 5px; margin-bottom: 15px;"></div>
-						<div class="alert-warning alert alert-no-icon" id="nsv_vote_cast_warn_message" style="display: none;padding: 5px; padding-left: 5px; margin-bottom: 15px;"></div>
 					</div>				
 		      		<div class="modal-footer" style="margin-top:0;">
 		  
-				        <button type="button" class="btn btn-default" data-dismiss="modal" id="nsv_vote_create_cancel">Cancel</button>
+				        <button type="button" class="btn btn-default" data-dismiss="modal" id="nsv_vote_cast_cancel">Cancel</button>
 				        <button type="button" class="btn btn-info" data-loading-text="Submitting..." id ="nsv_vote_gen_but" onclick="NSV.vote_initialize()">Initialize</button>
 						<button type="button" class="btn btn-success" data-loading-text="Submitting..." id ="nsv_vote_cast_but" disabled onclick="NSV.vote_cast()">Vote in Poll</button>
 		      		</div>
@@ -3419,7 +3417,7 @@
 		  	</div>
 		</div>		
 
-		<div class="modal fade" id="nsv_vote_check_modal" tabindex="-1" role="dialog" aria-hidden="true" >
+		<div class="modal fade" id="nsv_vote_check_modal" tabindex="-1" role="dialog" aria-hidden="true" onshow="NSV.vote_check_init()" >
 			<div class="modal-dialog modal-dialog-wide">
 		    	<div class="modal-content">
 		      		<div class="modal-header">
@@ -3504,7 +3502,6 @@
 						<div class="callout account_info" style="display:none;margin-bottom: 0;"></div>
 						<div class="alert-danger alert alert-no-icon" id="nsv_vote_check_error_message" style="display: none;padding: 5px; padding-left: 5px; margin-bottom: 15px;"></div>
 						<div class="alert-success alert alert-no-icon" id="nsv_vote_check_succ_message" style="display: none;padding: 5px; padding-left: 5px; margin-bottom: 15px;"></div>
-						<div class="alert-warning alert alert-no-icon" id="nsv_vote_check_warn_message" style="display: none;padding: 5px; padding-left: 5px; margin-bottom: 15px;"></div>
 					</div>				
 		      		<div class="modal-footer" style="margin-top:0;">
 		  
