@@ -4,6 +4,11 @@ var NSV = (function(NSV, $, undefined) {
 	var NSV_votes_arr = [];
 	var NSV_vote_poll_account = "";
 
+	NSV.vote_create_init = function () {
+		$('#nsv_vote_create_error_message').hide();
+		$('#nsv_vote_create_succ_message').hide();
+		document.getElementById("nsv_vote_create_asset").value = "";
+	};
 	
 	NSV.vote_create_activate = function () {
 		
@@ -17,20 +22,43 @@ var NSV = (function(NSV, $, undefined) {
 			return;
 		}	
 		
-		var recipient_secret = "shf;we943jr2432k";
-		var rep_tmp_RS = "NXT-22ET-QA68-G4PU-2XK8G";
-		
+		$('#nsv_vote_create_error_message').hide();
+		$('#nsv_vote_create_succ_message').hide();
+		//var recipient_secret = "shf;we943jr2432k";
+		var recipient_secret = NSV.random_secret_simple();
+
 		var err_message = "";
-		var p_question = "Who is the most famous English monarch?";
-		var p_option1 = "King Henry 8";
-		var p_option2 = "William the Conqueror";
-		var p_option3 = "Queen Victoria";
-		var p_option4 = ""; p_option5 = ""; p_option6 = ""; p_option7 = ""; p_option8 = "";
+		
+		var poll_message_json = {};
+		poll_message_json.Q = document.getElementById("nsv_vote_create_question").value;
+		poll_message_json.O1 = document.getElementById("nsv_vote_create_option1").value;
+		poll_message_json.O2 = document.getElementById("nsv_vote_create_option2").value;
+		poll_message_json.O3 = document.getElementById("nsv_vote_create_option3").value;
+		poll_message_json.O4 = document.getElementById("nsv_vote_create_option4").value;
+		poll_message_json.O5 = document.getElementById("nsv_vote_create_option5").value;
+		poll_message_json.O6 = document.getElementById("nsv_vote_create_option6").value;
+		poll_message_json.O7 = document.getElementById("nsv_vote_create_option7").value;
+		poll_message_json.O8 = document.getElementById("nsv_vote_create_option8").value;
+
+		if (poll_message_json.O1 === "") {
+			err_message = "Option 1 must have a choice";
+		}
+		
+		if (poll_message_json.Q === "") {
+			err_message = "Poll question not set";
+		}
+		
+		if (err_message !== "") {
+			$('#nsv_vote_create_error_message').html(err_message);
+			$('#nsv_vote_create_error_message').show();
+			return;
+		}
+		
 		var secret; // = "1MNL-Q2qqFaHfB0TjSAbHfBwiWt4X3zECX1z";
 
 		var poll_acc, poll_pk;
 
-		poll_pk = "8a951c444e7a1b77da0802ea7e99c5aee2ffdcb6e61dd8ee04756f17c496ec36";
+		//poll_pk = "8a951c444e7a1b77da0802ea7e99c5aee2ffdcb6e61dd8ee04756f17c496ec36";
 		
 		if (!NRS.rememberPassword) {
 			secret = document.getElementById("nsv_vote_create_password").value;
@@ -47,24 +75,42 @@ var NSV = (function(NSV, $, undefined) {
 			secret = NRS._password;
 		}
 		
-		NRS.sendRequest("getAccountId", { "secretPhrase":recipient_secret},
-		function(response) {
-			if (response.errorCode) {				
-				err_message = "Problem setting up poll, Reason: " + response.errorDescription;
-			} else {
-				poll_RS = response.accountRS;
-				//poll_pk = response.publicKey;
-			}					
+		var recip_accountId = NRS.getAccountId(recipient_secret);
+		var nxtAddress = new NxtAddress();
+		if (nxtAddress.set(recip_accountId)) {
+			var poll_RS = nxtAddress.toString();
+		} else {
+			err_message = "Unable to get RS account number";
+		}
+		poll_pk = NRS.generatePublicKey(recipient_secret);
+
+		
+		var dP_asset = document.getElementById("nsv_vote_create_asset").value;
+		if (dP_asset != "1" && dP_asset != "0") {
+			if (dP_asset === "") {
+				err_message = "Weighting not set";
+			} else if (!(/^\d+$/.test(dP_asset))) {
+				err_message = "Weighting Asset ID is Invalid";
+			}
+			else {
+				NRS.sendRequest("getAsset", {
+					"asset": dP_asset
+				}, function(response) {
+					if (response.errorCode) {
+						err_message = "Incorrect Weighting Asset ID";
+					}
+				},false);	
 			
-		},false);
-				
+			}
+		}
+		
 		if (err_message !== "") {
 			$('#nsv_vote_create_error_message').html(err_message);
 			$('#nsv_vote_create_error_message').show();
 			return;
 		}
-		
-		poll_message_json = {"divPlus_asset":"0","Q":p_question,"O1":p_option1,"O2":p_option2,"O3":p_option3,"O4":p_option4,"O5":p_option5,"O6":p_option6,"O7":p_option7,"O8":p_option8};
+
+		poll_message_json.divPlus_asset = dP_asset;
 
 		poll_message = JSON.stringify(poll_message_json);
 						
@@ -72,30 +118,84 @@ var NSV = (function(NSV, $, undefined) {
 		  	message:poll_message
 		}, function(response, input) {
 			if (response.errorCode) {
-			
-				$('#nsv_vote_create_error_message').html("Problem setting up poll, Reason: " + response.errorDescription);
-				$('#nsv_vote_create_error_message').show();
+				err_message = "Problem setting up poll, Reason: " + response.errorDescription;
 			} else {
-				$('#nsv_vote_create_succ_message').html("Poll Created, Nxt ID: " + poll_addr);
+				$('#nsv_vote_create_succ_message').html("Poll Created, Nxt ID: " + poll_RS);
 				$('#nsv_vote_create_succ_message').show();
-
-			}				
-				
-			
+			}											
 		},false);		
+		
+		if (err_message !== "") {
+			$('#nsv_vote_create_error_message').html(err_message);
+			$('#nsv_vote_create_error_message').show();
+			return;
+		}		
+
+		$('#nsv_vote_create_succ_message').html("Poll Created, Nxt ID: " + poll_RS);
+		$('#nsv_vote_create_succ_message').show();		
+		document.getElementById("nsv_vote_create_account").value = poll_RS;
 	};
 
+	NSV.vote_cast_init = function () {
+		$('#nsv_vote_cast_error_message').hide();
+		$('#nsv_vote_cast_succ_message').hide();
+		document.getElementById("nsv_vote_cast_but").disabled=true;
+		document.getElementById("nsv_vote_cast_option1_lb").innerHTML = "Option 1";
+		document.getElementById("nsv_vote_cast_option1").disabled=true;
+		document.getElementById("nsv_vote_cast_option1").checked=false;		
+		document.getElementById("nsv_vote_cast_option1").style.display = 'inline';
+		document.getElementById("nsv_vote_cast_option1_lb").style.display = 'inline';		
+		document.getElementById("nsv_vote_cast_option2_lb").innerHTML = "Option 2";
+		document.getElementById("nsv_vote_cast_option2").disabled=true;	
+		document.getElementById("nsv_vote_cast_option2").checked=false;	
+		document.getElementById("nsv_vote_cast_option2").style.display = 'inline';
+		document.getElementById("nsv_vote_cast_option2_lb").style.display = 'inline';		
+		document.getElementById("nsv_vote_cast_option3_lb").innerHTML = "Option 3";
+		document.getElementById("nsv_vote_cast_option3").disabled=true;
+		document.getElementById("nsv_vote_cast_option3").checked=false;		
+		document.getElementById("nsv_vote_cast_option3").style.display = 'inline';
+		document.getElementById("nsv_vote_cast_option3_lb").style.display = 'inline';		
+		document.getElementById("nsv_vote_cast_option4_lb").innerHTML = "Option 4";
+		document.getElementById("nsv_vote_cast_option4").disabled=true;
+		document.getElementById("nsv_vote_cast_option4").checked=false;		
+		document.getElementById("nsv_vote_cast_option4").style.display = 'inline';
+		document.getElementById("nsv_vote_cast_option4_lb").style.display = 'inline';		
+		document.getElementById("nsv_vote_cast_option5_lb").innerHTML = "Option 5";
+		document.getElementById("nsv_vote_cast_option5").disabled=true;
+		document.getElementById("nsv_vote_cast_option5").checked=false;		
+		document.getElementById("nsv_vote_cast_option5").style.display = 'inline';
+		document.getElementById("nsv_vote_cast_option5_lb").style.display = 'inline';		
+		document.getElementById("nsv_vote_cast_option6_lb").innerHTML = "Option 6";
+		document.getElementById("nsv_vote_cast_option6").disabled=true;
+		document.getElementById("nsv_vote_cast_option6").checked=false;		
+		document.getElementById("nsv_vote_cast_option6").style.display = 'inline';
+		document.getElementById("nsv_vote_cast_option6_lb").style.display = 'inline';		
+		document.getElementById("nsv_vote_cast_option7_lb").innerHTML = "Option 7";
+		document.getElementById("nsv_vote_cast_option7").disabled=true;
+		document.getElementById("nsv_vote_cast_option7").checked=false;		
+		document.getElementById("nsv_vote_cast_option7").style.display = 'inline';
+		document.getElementById("nsv_vote_cast_option7_lb").style.display = 'inline';		
+		document.getElementById("nsv_vote_cast_option8_lb").innerHTML = "Option 8";
+		document.getElementById("nsv_vote_cast_option8").disabled=true;
+		document.getElementById("nsv_vote_cast_option8").checked=false;		
+		document.getElementById("nsv_vote_cast_option8").style.display = 'inline';
+		document.getElementById("nsv_vote_cast_option8_lb").style.display = 'inline';		
+		
+	};
+	
 	NSV.vote_check_activate = function () {
 
 		if (NRS.downloadingBlockchain) {
-			$("#nsv_vote_create_error_message").html("Please wait until the blockchain has finished downloading.");
-			$("#nsv_vote_create_error_message").show();
+			$("#nsv_vote_check_error_message").html("Please wait until the blockchain has finished downloading.");
+			$("#nsv_vote_check_error_message").show();
 			return;
 		} else if (NRS.state.isScanning) {
-			$("#nsv_vote_create_error_message").html("The blockchain is currently being rescanned. Please wait a minute and then try submitting again.");
-			$("#nsv_vote_create_error_message").show();
+			$("#nsv_vote_check_error_message").html("The blockchain is currently being rescanned. Please wait a minute and then try submitting again.");
+			$("#nsv_vote_check_error_message").show();
 			return;
 		}	
+		$('#nsv_vote_check_error_message').hide();
+		$('#nsv_vote_check_succ_message').hide();
 		
 		NSV_vote_create_poll_arr = [];
 		NSV_votes_arr = [];
@@ -145,7 +245,10 @@ var NSV = (function(NSV, $, undefined) {
 		
 		if (NSV_vote_create_poll_arr.length === 0) {
 			err_message = "Couldn't find a poll at that account, recheck account number.";
+		} else if (NSV_vote_create_poll_arr.length > 1) {
+			NSV_vote_create_poll_arr.sort(function(a,b) {return b.time < a.time; });
 		}
+		
 		
 		if (err_message !== "") {
 			$('#nsv_vote_check_error_message').html(err_message);
@@ -169,7 +272,7 @@ var NSV = (function(NSV, $, undefined) {
 		var total_weight = 0;
 		var vote_results_array = [0,0,0,0,0,0,0,0];
 		if (NSV_votes_arr.length === 0) {
-			out_message = "No Votes Found.";
+			out_message = "No Votes Found.\n";
 		} else {
 			NSV_votes_arr.sort(function(a,b) {return b.sender < a.sender; });
 			for (var k=0; k<NSV_votes_arr.length-1; k++) {
@@ -209,7 +312,6 @@ var NSV = (function(NSV, $, undefined) {
 						}							
 					},false);
 				}
-				out_message = out_message + NSV_votes_arr[k].sender + ", vote=" + NSV_votes_arr[k].divPlus_vote + ", weight=" + NSV_votes_arr[k].weight + "\n";				
 			}
 
 			
@@ -239,8 +341,9 @@ var NSV = (function(NSV, $, undefined) {
 					vote_results_array[7] = vote_results_array[7] + NSV_votes_arr[k].weight;
 					total_weight = total_weight + NSV_votes_arr[k].weight;
 				} else {
-					NSV_votes_arr[k].vote = "INVALID VOTE";
+					NSV_votes_arr[k].divPlus_vote = "INVALID VOTE";
 				}
+				out_message = out_message + NSV_votes_arr[k].sender + ", vote=" + NSV_votes_arr[k].divPlus_vote + ", weight=" + NSV_votes_arr[k].weight + "\n";				
 			}
 			
 		}
@@ -283,9 +386,11 @@ var NSV = (function(NSV, $, undefined) {
 			$("#nsv_vote_create_error_message").show();
 			return;
 		}	
+		$('#nsv_vote_check_error_message').hide();
+		$('#nsv_vote_check_succ_message').hide();
+			
 		NSV_vote_create_poll_arr = [];
-		//var poll_account = $.trim(document.getElementById("nsv_vote_cast_account").value);
-		var poll_account = "NXT-22ET-QA68-G4PU-2XK8G";
+		var poll_account = $.trim(document.getElementById("nsv_vote_cast_account").value);
 		var err_message = "";
 		NRS.sendOutsideRequest("/nxt?requestType=" + "getAccountTransactionIds", {
 			"account":poll_account , "type":"1", "subtype":"0"
@@ -315,7 +420,12 @@ var NSV = (function(NSV, $, undefined) {
 			}						
 		},false);	
 		
+		
+		
 		if (NSV_vote_create_poll_arr.length > 0 ) {
+			if (NSV_vote_create_poll_arr.length > 1) {
+				NSV_vote_create_poll_arr.sort(function(a,b) {return b.time < a.time; });
+			}
 			NSV.setup_cast_page();
 		} else {
 			err_message = "Couldn't find a poll at that account, recheck account number.";
@@ -328,7 +438,59 @@ var NSV = (function(NSV, $, undefined) {
 	};
 
 	
+	NSV.vote_check_init = function () {
+		$('#nsv_vote_check_error_message').hide();
+		$('#nsv_vote_check_succ_message').hide();
+		document.getElementById("nsv_vote_check_question").value = "";
+		document.getElementById("nsv_vote_check_option1_lb").innerHTML = "Option 1";
+		document.getElementById("nsv_vote_check_option1").value = "";
+		document.getElementById("nsv_vote_check_option1_lb").style.display = 'block';
+		document.getElementById("nsv_vote_check_option1").style.display = 'block';
+		document.getElementById("nsv_vote_check_option2_lb").innerHTML = "Option 2";
+		document.getElementById("nsv_vote_check_option2").value = "";
+		document.getElementById("nsv_vote_check_option2_lb").style.display = 'block';
+		document.getElementById("nsv_vote_check_option2").style.display = 'block';
+		document.getElementById("nsv_vote_check_option3_lb").innerHTML = "Option 3";
+		document.getElementById("nsv_vote_check_option3").value = "";
+		document.getElementById("nsv_vote_check_option3_lb").style.display = 'block';
+		document.getElementById("nsv_vote_check_option3").style.display = 'block';
+		document.getElementById("nsv_vote_check_option4_lb").innerHTML = "Option 4";
+		document.getElementById("nsv_vote_check_option4").value = "";
+		document.getElementById("nsv_vote_check_option4_lb").style.display = 'block';
+		document.getElementById("nsv_vote_check_option4").style.display = 'block';
+		document.getElementById("nsv_vote_check_option5_lb").innerHTML = "Option 5";
+		document.getElementById("nsv_vote_check_option5").value = "";
+		document.getElementById("nsv_vote_check_option5_lb").style.display = 'block';
+		document.getElementById("nsv_vote_check_option5").style.display = 'block';
+		document.getElementById("nsv_vote_check_option6_lb").innerHTML = "Option 6";
+		document.getElementById("nsv_vote_check_option6").value = "";
+		document.getElementById("nsv_vote_check_option6_lb").style.display = 'block';
+		document.getElementById("nsv_vote_check_option6").style.display = 'block';
+		document.getElementById("nsv_vote_check_option7_lb").innerHTML = "Option 7";
+		document.getElementById("nsv_vote_check_option7").value = "";
+		document.getElementById("nsv_vote_check_option7_lb").style.display = 'block';
+		document.getElementById("nsv_vote_check_option7").style.display = 'block';
+		document.getElementById("nsv_vote_check_option8_lb").innerHTML = "Option 8";
+		document.getElementById("nsv_vote_check_option8").value = "";
+		document.getElementById("nsv_vote_check_option8_lb").style.display = 'block';
+		document.getElementById("nsv_vote_check_option8").style.display = 'block';
+	};
+
+		
 	NSV.vote_cast = function () {
+	
+		if (NRS.downloadingBlockchain) {
+			$("#nsv_vote_cast_error_message").html("Please wait until the blockchain has finished downloading.");
+			$("#nsv_vote_cast_error_message").show();
+			return;
+		} else if (NRS.state.isScanning) {
+			$("#nsv_vote_cast_error_message").html("The blockchain is currently being rescanned. Please wait a minute and then try submitting again.");
+			$("#nsv_vote_cast_error_message").show();
+			return;
+		}	
+		$('#nsv_vote_cast_error_message').hide();
+		$('#nsv_vote_cast_succ_message').hide();
+
 	
 		var secret;// = "1MNL-Q2qqFaHfB0TjSAbHfBwiWt4X3zECX1z";		
 		var option_choosen = "";
@@ -348,8 +510,8 @@ var NSV = (function(NSV, $, undefined) {
 		} else {
 			secret = NRS._password;
 		}
-
-		var poll_account = "NXT-22ET-QA68-G4PU-2XK8G";		
+		poll_account = $.trim(document.getElementById("nsv_vote_cast_account").value);
+		//var poll_account = "NXT-22ET-QA68-G4PU-2XK8G";		
 		
 		poll_details = NSV_vote_create_poll_arr[0];
 		if (document.getElementById("nsv_vote_cast_option1").checked) {
@@ -387,7 +549,8 @@ var NSV = (function(NSV, $, undefined) {
 			if (response.errorCode) {
 				err_message = "Problem voting, Reason: " + response.errorDescription;
 			} else {
-				$('#nsv_vote_cast_succ_message').html("Vote Sent");
+				
+				$('#nsv_vote_cast_succ_message').html("Vote Sent: " + option_choosen);
 				$('#nsv_vote_cast_succ_message').show();
 			}										
 		},false);
@@ -398,6 +561,17 @@ var NSV = (function(NSV, $, undefined) {
 		}		
 	};	
 
+	NSV.random_secret_simple = function () {
+
+		var keylist="abcdefghijklmnopqrstuvwxyz123456789";
+		var temp='';
+		var plength = 25;
+
+		for (var i=0;i<plength;i++) {
+			temp+=keylist.charAt(Math.floor(Math.random()*keylist.length))
+		}
+		return temp
+	};	
 
 	NSV.parse_poll_message = function (message,sender,time) {
 		var message_json = JSON.parse(message);
