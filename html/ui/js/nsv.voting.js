@@ -56,7 +56,7 @@ var NSV = (function(NSV, $, undefined) {
 			return;
 		}
 		
-		var secret; // = "1MNL-Q2qqFaHfB0TjSAbHfBwiWt4X3zECX1z";
+		var secret; 
 
 		var poll_acc, poll_pk;
 
