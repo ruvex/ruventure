@@ -12,6 +12,10 @@ var NSV = (function(NSV, $, undefined) {
 	var NSV_div_send_out_asset;
 	var NSV_div_send_out_amount;
 	var NSV_div_unquant_out_mult;
+
+	var NSV_shareswap_unredeemed = [];
+	var NSV_shareswap_repl_asset;
+	var NSV_shareswap_repl_unquant_mult;
 	
 	/*$("#nsv_div_ad_asset, #nsv_div_ad_amount, #nsv_div_ad_accounts_list").on("change", function(e) {
 		document.getElementById("nsv_div_ad_gen_but").disabled=true;
@@ -284,7 +288,7 @@ var NSV = (function(NSV, $, undefined) {
 		}
 
 	
-	}
+	};
 
 	NSV.getAccountError = function(accountId, callback) {
 		NRS.sendRequest("getAccount", {
@@ -326,13 +330,13 @@ var NSV = (function(NSV, $, undefined) {
 				}
 			}
 		},false);
-	}
+	};
 
 	NSV.div_send_gettime = function(inp_date) {
 		
-		var d1 = new Date(inp_date)
+		var d1 = new Date(inp_date);
 		if (d1) {
-			var nxt_gen = new Date("November 24, 2013, 12:00:00 UTC")
+			var nxt_gen = new Date("November 24, 2013, 12:00:00 UTC");
 			var nxt_gen_sec = nxt_gen.getTime()/1000;
 			var entry_time_sec = d1.getTime()/1000;
 			var res = entry_time_sec - nxt_gen_sec; 
@@ -340,7 +344,7 @@ var NSV = (function(NSV, $, undefined) {
 		} else {
 			return d1;
 		}
-	}	
+	};	
 
 	NSV.div_send_init  = function () {
 		document.getElementById("nsv_div_send_nodist_acc").value="ISSUER";
@@ -353,7 +357,7 @@ var NSV = (function(NSV, $, undefined) {
 		document.getElementById("nsv_div_send_outasset").disabled=true;	
 		document.getElementById("nsv_div_send_nodist_acc").disabled=true;
 		document.getElementById("nsv_div_send_timestamp").disabled=true;		
-	}
+	};
 	
 	NSV.div_send_act_adv = function () {
 		if (document.getElementById("nsv_div_send_adv_checkbox").checked) {
@@ -369,7 +373,7 @@ var NSV = (function(NSV, $, undefined) {
 			document.getElementById("nsv_div_send_timestamp").value="";
 			document.getElementById("nsv_div_send_nodist_acc").value="ISSUER";
 		}
-	}
+	};
 	
 	NSV.div_send_calc_dividends = function () {
 		//document.getElementById("nsv_div_send_asset").value = "9545582885005657403";
@@ -522,9 +526,9 @@ var NSV = (function(NSV, $, undefined) {
 								error_message = "Invalid timestamp.";
 							} else {
 								if (activate_timestamp > present_time) {
-									err_message = "Timestamp is in future, must use one in the past."
+									err_message = "Timestamp is in future, must use one in the past.";
 								} else if (activate_timestamp < issued_time) {
-									err_message = "Timestamp is set to before asset is issued, please use a later date."
+									err_message = "Timestamp is set to before asset is issued, please use a later date.";
 								}
 							}
 						}
@@ -548,7 +552,7 @@ var NSV = (function(NSV, $, undefined) {
 							});					
 						}
 					} else {
-						no_dist_arr.push(issued_account)
+						no_dist_arr.push(issued_account);
 					}
 				}	
 				
@@ -594,7 +598,7 @@ var NSV = (function(NSV, $, undefined) {
 										
 									} else {
 										sender = response.senderRS;
-										sender_amt = parseInt(response.attachment.quantityQNT,10)
+										sender_amt = parseInt(response.attachment.quantityQNT,10);
 									}
 
 									NRS.sendOutsideRequest("/nxt?requestType=" + "getTransaction", {
@@ -672,17 +676,20 @@ var NSV = (function(NSV, $, undefined) {
 				var prt_issued_amount = String(NSV_div_cur_ass_issued_amount/unquant_mult);
 				
 				if (NSV_div_cur_ass_issued_amount != tot_assets) {
-					err_message = "Found assets and expected assets don't match up. Try again. If that fails, forward the output log to the developer."
+					err_message = "Found assets and expected assets don't match up. Try again. If that fails, forward the output log to the developer.";
 				}
 				if (NSV_div_send_acc_array[aa_len-1] < 0) {
-					err_message = "Negative balances in calculation. Try again. If that fails, forward the output log to the developer."
+					err_message = "Negative balances in calculation. Try again. If that fails, forward the output log to the developer.";
 				}
 				output = output.concat(asset_name, " (",String(asset),") Total found assets: ", String(tot_assets/unquant_mult), ", Assets to be distributed: ", String(tot2_assets/unquant_mult), "\n");
 				if (NSV_div_send_out_nxt) {
-					output = output.concat("Distribution of ", amount, "NXT to ", String(aa_len)," asset holders at timestamp ", String(activate_timestamp), "\n");
+					output = output.concat("Summary of proposed distribution of  ", amount, "NXT to ", String(aa_len),"\n");
 				} else {
-					output = output.concat("Summary of proposed distribution of ", amount, " [",outasset_name, "] assets to ", String(aa_len)," asset holders at timestamp ", String(activate_timestamp), "\n");
+					output = output.concat("Summary of proposed distribution of ", amount, " [",outasset_name, "] assets to ", String(aa_len),"\n");
 				}
+				var datetime = NSV.timestamp_to_time(activate_timestamp);
+				output = output.concat("Based on asset holders at timestamp ", String(activate_timestamp)," (", datetime, ")\n");
+				output = output.concat("----------------------\n");
 				output = output.concat("Number of assets, Account, Payout amount\n");
 
 				for (i=0; i<aa_len; ++i) {
@@ -707,7 +714,7 @@ var NSV = (function(NSV, $, undefined) {
 		btn.button('reset');
 
 
-	}
+	};
 
 	NSV.div_send_gen_dividends = function () {
 		//document.getElementById("nsv_div_send_asset").value = "589109187227654261";
@@ -899,7 +906,7 @@ var NSV = (function(NSV, $, undefined) {
 		$("#nsv_div_send_warn_message").hide();			
 		document.getElementById("nsv_div_send_gen_but").disabled=true;
 	
-	}
+	};
 	
 
 	NSV.div_send_add_acc = function(account,ch_amount ) {
@@ -913,7 +920,7 @@ var NSV = (function(NSV, $, undefined) {
 		asset_object.account = account;		
 		asset_object.amount = ch_amount;
 		NSV_div_send_acc_array.push(asset_object);
-	}	
+	};	
 
 	NSV.div_send_push_newacc = function(account ) {	
 		var asset_object = new Object();
@@ -921,7 +928,7 @@ var NSV = (function(NSV, $, undefined) {
 		asset_object.amount = 0;
 		NSV_div_send_acc_array.push(asset_object);
 		NSV_div_send_additional_accounts.push(asset_object);
-	}
+	};
 
 	NSV.div_send_check_arr = function(account ) {
 		for (var ind=0; ind<NSV_div_send_acc_array.length; ind++) {
@@ -930,7 +937,7 @@ var NSV = (function(NSV, $, undefined) {
 				}
 		}
 		return -1;
-	}	
+	};	
 			
 	
 	NSV.div_send_get_transactions = function(cur_asset, asset_array,initial_time,final_time) {
@@ -1009,10 +1016,268 @@ var NSV = (function(NSV, $, undefined) {
 		}
 		return err_message2;
 		
-	}
+	};
 
-	//copied from nrs.server and increased size of timeout due to problems with GetTransaction. Maybe after async solution, won't be needed. Maybe outside testnet won't be needed.
-	//Have left it the same since it's very bad to miss transactions for this script and the extra time shouldn't matter. Async left in for same reason.
+	NSV.shareswap_init  = function () {
+		$("#nsv_shareswap_error_message").hide();
+		$("#nsv_shareswap_succ_message").hide();
+		
+		document.getElementById("nsv_shareswap_but").disabled=true;	
+	};	
+	
+	//Share swap functions
+	NSV.shareswap_calc = function() {
+
+		
+		var NSV_redeemed_assets = [];
+		var warnings = false;
+
+	
+		if (NRS.downloadingBlockchain) {
+			$("#nsv_shareswap_error_message").html("Please wait until the blockchain has finished downloading.");
+			$("#nsv_shareswap_error_message").show();
+			return;
+		} else if (NRS.state.isScanning) {
+			$("#nsv_shareswap_error_message").html("The blockchain is currently being rescanned. Please wait a minute and then try submitting again.");
+			$("#nsv_shareswap_error_message").show();
+			return;
+		}	
+		
+		$('#nsv_shareswap_error_message').hide();
+		$('#nsv_shareswap_succ_message').hide();	
+		var err_message = "";
+		var asset1_dec;
+		var asset2_dec;
+
+		NSV_shareswap_unredeemed = [];
+		NSV_shareswap_repl_asset = "";
+	
+		var asset1 = document.getElementById("nsv_shareswap_asset1").value;
+		var redeem_ac = document.getElementById("nsv_shareswap_redeem_ac").value;
+		var asset2 = document.getElementById("nsv_shareswap_asset2").value;
+		var ratio = document.getElementById("nsv_shareswap_ratio").value;
+		
+		//redeem_ac = "NXT-7YEP-26LK-HG32-3R277";
+		//asset1 = "8011756047853511145";
+		//asset2 = "1639299849328439538";
+		//ratio = ".0001";
+
+		if (ratio === "") {
+			err_message = "Ratio not specified";		
+		} else {
+			if (isNaN(ratio)) {
+				err_message = "Ratio doesn't seem to be a number";
+			} else {
+				var ratio_f = parseFloat(ratio);
+			}
+		}
+		if (asset2 === "") {
+			err_message = "Replacement asset not specified";
+		} else if (!(/^\d+$/.test(asset2))) {
+			err_message = "Asset ID is Invalid for Replacement Asset";
+		}
+		else {
+			NRS.sendRequest("getAsset", {
+				"asset": asset2
+			}, function(response) {
+				if (response.errorCode) {
+					err_message = "Incorrect Asset ID for Replacement Asset";
+				} else {
+					asset2_dec = response.decimals;
+				}					
+			},false);			
+		}
+		
+		if (asset1 === "") {
+			err_message = "Original asset not specified";
+		} else if (!(/^\d+$/.test(asset1))) {
+			err_message = "Asset ID is Invalid for Original Asset";
+		}
+		else {
+			NRS.sendRequest("getAsset", {
+				"asset": asset1
+			}, function(response) {
+				if (response.errorCode) {
+					err_message = "Incorrect Asset ID for Original Asset";
+				} else {
+					asset1_dec = response.decimals;
+				}					
+			},false);			
+		}
+		if (err_message !== "") {
+			$('#nsv_shareswap_error_message').html(err_message);
+			$('#nsv_shareswap_error_message').show();
+			return;
+		}	
+		var unquant1_mult = Math.pow(10,asset1_dec);
+		var unquant2_mult = Math.pow(10,asset2_dec);
+
+		if (redeem_ac === "") {
+			err_message = "Original asset not specified";
+		} else {
+			NRS.sendOutsideRequest("/nxt?requestType=" + "getAccountTransactionIds", {
+				"account":redeem_ac , "type":"2", "subtype":"1"
+			}, function(response,input) {
+				if (response.errorCode) {
+					err_message = "Reddem acccont doesn't seem valid.";
+					return;					
+				} else {
+					var tran_arr = response.transactionIds;
+					var tran_len = tran_arr.length;
+					for (var j=0; j<tran_len; j++) {
+						var tmp_tran = tran_arr[j];
+						NSV.sendOutsideRequest("/nxt?requestType=" + "getTransaction", {
+							"transaction": tmp_tran
+						}, function(response, input) {
+							if (response.errorCode) {
+								err_message = "Unknown bug. Problem accessing getTransaction.";
+							} else if (response.recipientRS == redeem_ac) {
+								if (response.attachment.asset == asset1) {
+									var received_obj = {};
+									received_obj.sender = response.senderRS;
+									received_obj.amount = response.attachment.quantityQNT;
+									received_obj.tran = response.transaction;
+									NSV_redeemed_assets.push(received_obj);
+								}
+							}															
+						},false);						 													
+					}								
+				}						
+			},false);			
+		}
+		var out_message = "Redeem account: " + redeem_ac + ", Original Asset: " + asset1 +  "\n";
+		out_message = out_message + "Replacement asset: " + asset2 + ", Ratio: " + ratio +  "\n";
+		if (NSV_redeemed_assets.length === 0) {
+			out_message = out_message + "No transactions found.\n";
+		} else {
+			out_message = out_message + "Assets Sent, Account, Sending TX, Assets Recieved, Recieving TX\n";				
+			for (var k=0; k<NSV_redeemed_assets.length; k++) {
+				NRS.sendOutsideRequest("/nxt?requestType=" + "getAccountTransactionIds", {
+					"account":NSV_redeemed_assets[k].sender , "type":"2", "subtype":"1"
+				}, function(response,input) {
+					if (response.errorCode) {
+						err_message = "Unknown error. One of the Sender Accounts doesn't seem valid.";
+						return;					
+					} else {
+						var tran_arr = response.transactionIds;
+						var tran_len = tran_arr.length;
+						for (var j=0; j<tran_len; j++) {
+							var tmp_tran = tran_arr[j];
+							NSV.sendOutsideRequest("/nxt?requestType=" + "getTransaction", {
+								"transaction": tmp_tran
+							}, function(response, input) {
+								if (response.errorCode) {
+									err_message = "Unknown bug. Problem accessing getTransaction.";
+								} else if (response.attachment.message == NSV_redeemed_assets[k].tran) { 
+									if (response.attachment.asset == asset2) {
+										NSV_redeemed_assets[k].amountSent = response.attachment.quantityQNT;
+										NSV_redeemed_assets[k].tranSent = response.transaction;
+									}
+								}															
+							},false);						 													
+						}								
+					}						
+				},false);
+				
+				
+				if (NSV_redeemed_assets[k].tranSent) {
+					var unquant_asset1 = parseInt(NSV_redeemed_assets[k].amount,10)/unquant1_mult;
+					var unquant_asset2 = parseInt(NSV_redeemed_assets[k].amountSent,10)/unquant2_mult;
+					out_message = out_message + unquant_asset1.toString() + ", " + NSV_redeemed_assets[k].sender + ", " + NSV_redeemed_assets[k].tran + ", " + unquant_asset2.toString() + ", " + NSV_redeemed_assets[k].tranSent + "\n";
+
+					var expected_asset_amt = unquant_asset1*ratio_f;
+					
+					if (Math.abs(expected_asset_amt/unquant_asset2-1) > 0.0001 ) {
+						out_message = out_message + "****WARNING, AMOUNT SENT DOESN'T MATCH******EXPECTED: " + expected_asset_amt.toString() + " ACTUAL: " + unquant_asset2.toString() + "\n";
+						warnings = true;
+					}
+				} else {
+					NSV_shareswap_unredeemed.push(NSV_redeemed_assets[k]);
+				}
+			}
+			out_message = out_message + "-----------------------\n";
+			
+			var total_replacement_assets = 0;
+			var num_tobe_swapped = NSV_shareswap_unredeemed.length;
+			for (var i=0; i<num_tobe_swapped; i++) {
+				unquant_asset1 = parseInt(NSV_shareswap_unredeemed[i].amount,10)/unquant1_mult;
+				
+				var adjusted_ratio = Math.pow(10,asset2_dec-asset1_dec)*ratio_f;
+				var send_amt = parseInt(NSV_shareswap_unredeemed[i].amount,10)*adjusted_ratio;				
+				NSV_shareswap_unredeemed[i].amount = send_amt;
+				var asset_send_unquant = send_amt/unquant2_mult;
+				out_message = out_message + unquant_asset1.toString() + ", " + NSV_shareswap_unredeemed[i].sender + ", " + NSV_shareswap_unredeemed[i].tran + ", (" + asset_send_unquant.toString() +  "), UNSWAPPED\n";
+				total_replacement_assets += asset_send_unquant;
+			}
+			out_message = out_message + "-----------------------\n";
+			if (num_tobe_swapped > 0) {
+				out_message = out_message + "NXT needed for transactions: " + num_tobe_swapped.toString() + ", Replacement Assets needed: " + total_replacement_assets.toString() + "\n";
+				document.getElementById("nsv_shareswap_but").disabled=false;	
+			} else {
+				out_message = out_message + "No transactions required\n";
+			}
+			NSV_shareswap_repl_asset = asset2;
+			NSV_shareswap_repl_unquant_mult = unquant2_mult;
+		}
+		if (warnings) {
+			out_message = out_message + "***********Check warnings above, amounts don't match up\n";
+		}
+		document.getElementById("nsv_shareswap_details").value = out_message;		
+		
+		if (err_message !== "") {
+			$('#nsv_shareswap_error_message').html(err_message);
+			$('#nsv_shareswap_error_message').show();
+			return;
+		}	
+	};	
+	
+	NSV.shareswap_activate = function() {
+		var err_message = "";
+		var secret;
+		
+		if (!NRS.rememberPassword) {
+			secret = document.getElementById("nsv_shareswap_password").value;
+			secret = $.trim(secret);
+			if (secret === "") {
+				err_message = "Password not specified";
+			} else {						
+				var accountId = NRS.getAccountId(secret);
+				if (accountId != NRS.account) {
+					err_message = "Password doesn't match";
+				}
+			}
+		} else {
+			secret = NRS._password;
+		}
+		if (err_message !== "") {
+			$('#nsv_shareswap_error_message').html(err_message);
+			$('#nsv_shareswap_error_message').show();
+			return;
+		}		
+		var out_message = "Sending Replacement assets(" + NSV_shareswap_repl_asset + ")...\n";
+		out_message = out_message + "Amount, Account, Tran ID\n"
+		document.getElementById("nsv_shareswap_details").value = out_message;
+		
+		for (var i=0; i<NSV_shareswap_unredeemed.length; i++) {
+			var tmp_acc = NSV_shareswap_unredeemed[i].sender;
+			var tmp_amt = NSV_shareswap_unredeemed[i].amount;
+			var tmp_mess = NSV_shareswap_unredeemed[i].tran;		
+			NRS.sendRequest("transferAsset", {"secretPhrase":secret,feeNQT:"100000000",deadline:"1440","recipient":tmp_acc,"quantityQNT":tmp_amt,"asset":NSV_shareswap_repl_asset, "message":tmp_mess}, function(response, input) {
+				if (response.errorCode) {
+					out_message = out_message + "Problem with sending to Account " + input.account + "\n";
+				} else {
+					var amt_unmult = parseInt(input.quantityQNT, 10)/NSV_shareswap_repl_unquant_mult;
+					out_message = out_message + amt_unmult. toString() + ", " + input.recipientRS + ", " + response.transaction + "\n";
+					document.getElementById("nsv_shareswap_details").value = out_message;
+				}
+			},false);		
+		}
+		document.getElementById("nsv_shareswap_but").disabled=true;	
+
+	};	
+	
+	//copied from nrs.server and increased size of timeout due to problems with GetTransaction. Maybe not needed but...
+	//Have left it the same since it's very bad to miss transactions for this script and the extra time shouldn't matter.
 	NSV.sendOutsideRequest = function(url, data, callback, async) {
 		if ($.isFunction(data)) {
 			async = callback;
