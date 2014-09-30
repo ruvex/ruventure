@@ -86,6 +86,8 @@ var NRS = (function(NRS, $, undefined) {
 			NRS.isOutdated = false;
 			$("#nrs_update_explanation_up_to_date").show();
 		}
+
+		SPN.init();
 	}
 
 	NRS.versionCompare = function(v1, v2) {

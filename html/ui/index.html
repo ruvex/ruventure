@@ -1314,8 +1314,12 @@
 				
 		<!--additional Dividends+ code-->
            		<div id="nsv_dividends_page" class="page">
-	                <section class="content-header"><h1>Dividends+</h1></section>
-	                <section class="content">      	               
+	                <section class="content-header"><h1>Dividends+Voting</h1></section>
+	                <section class="content">
+                        <ol class="breadcrumb">
+                            <li><a href="#" class="goto-page" data-page="supernet">SuperNET</a></li>
+                            <li class="active">Dividends+Voting</li>
+                        </ol>      	               
 	                    <div class="row">
 							<div class="box-header"><h3 class="box-title" >Asset Distribution Modules</h3></div>
 	                        <div class="col-lg-3 col-xs-6">
@@ -1434,13 +1438,14 @@
                 <div id="supernet_page" class="page">
                     <section class="content-header"><h1>SuperNET</h1></section>
                     <section class="content" id="settings_box">
+                        <div class="alert-danger alert alert-no-icon" id="spn_incorrect_version_message" style="display:none;padding:5px;padding-left:5px;margin-bottom:15px;">A new SuperNET release is available. Please update from your dashboard to continue using SuperNET features. </div>
                         <div class="row">
                             <div class="col-sm-4 col-md-3">
                                 <div class="thumbnail">
                                     <div class="caption">
                                         <h3>Multigateway</h3>
                                         <p style="min-height:100px">Peer-to-peer exchange that offers decentralized trading with no trading fees</p>
-                                        <p><a href="#" class="btn btn-primary goto-page" role="button" data-page="multigateway">Multigateway</a></p>
+                                        <p><a id="spn_multigateway" href="#" class="btn btn-primary goto-page disabled" role="button" data-page="multigateway">Multigateway</a></p>
                                     </div>
                                 </div>
                             </div>
@@ -1449,7 +1454,7 @@
                                     <div class="caption">
                                         <h3>Dividends+Voting</h3>
                                         <p style="min-height:100px">Dividends, Voting, Alias Voting, Share Swap</p>
-                                        <p><a href="#" class="btn btn-primary goto-page" role="button" data-page="nsv_dividends">Dividends+Voting</a></p>
+                                        <p><a id="spn_dividends" href="#" class="btn btn-primary goto-page disabled" role="button" data-page="nsv_dividends">Dividends+Voting</a></p>
                                     </div>
                                 </div>
                             </div>
