@@ -82,6 +82,8 @@ var NRS = (function(NRS, $, undefined) {
 			NRS.isOutdated = true;
 			$("#nrs_update").html("Outdated!").show();
 			$("#nrs_update_explanation_new_release").show();
+			$("#nrs_update_explanation_new_release > span").show();
+			$("#nrs_update_explanation_new_release > button > span").show();
 		} else {
 			NRS.isOutdated = false;
 			$("#nrs_update_explanation_up_to_date").show();

@@ -257,7 +257,7 @@
                     </form>             
                     <ul class="sidebar-menu">
                         <li class="active" id="dashboard_link"><a href="#" data-page="dashboard"><i class="fa fa-dashboard"></i> <span data-i18n="dashboard">Dashboard</span></a></li>
-                        <li><a href="#" data-page="supernet"><img src="img\supernet\supernet-mini.png" /> <span data-i18n="supernet">SuperNET</span></a></li>
+                        <li><a id="spn_landing" href="#" data-page="supernet"><img src="img/supernet/supernet-mini.png" /> <span data-i18n="supernet">SuperNET</span></a></li>
                         <li><a href="#" data-page="transactions"><i class="fa fa-briefcase"></i> <span data-i18n="transactions">Transactions</span></a></li>
                         <li class="treeview" id="sidebar_asset_exchange">
                         	<a href="#" data-page="asset_exchange"><i class="fa fa-signal"></i><span data-i18n="asset_exchange">Asset Exchange</span><i class="fa pull-right fa-angle-right" style="padding-top:3px"></i></a>
@@ -1438,7 +1438,7 @@
                 <div id="supernet_page" class="page">
                     <section class="content-header"><h1>SuperNET</h1></section>
                     <section class="content" id="settings_box">
-                        <div class="alert-danger alert alert-no-icon" id="spn_incorrect_version_message" style="display:none;padding:5px;padding-left:5px;margin-bottom:15px;">A new SuperNET release is available. Please update from your dashboard to continue using SuperNET features. </div>
+                        <div class="alert-danger alert alert-no-icon" id="spn_message" style="display:none;padding:5px;padding-left:5px;margin-bottom:15px;"></div>
                         <div class="row">
                             <div class="col-sm-4 col-md-3">
                                 <div class="thumbnail">
