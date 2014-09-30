@@ -337,7 +337,7 @@ var NRS = (function(NRS, $, undefined) {
 				NRS.state = response;
 
 				if (firstTime) {
-					$("#nrs_version").html(NRS.state.version).removeClass("loading_dots");
+				    $("#nrs_version").html(SPN.version).removeClass("loading_dots");
 					NRS.getBlock(NRS.state.lastBlock, NRS.handleInitialBlocks);
 				} else if (NRS.state.isScanning) {
 					//do nothing but reset NRS.state so that when isScanning is done, everything is reset.

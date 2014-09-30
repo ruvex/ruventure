@@ -20,10 +20,13 @@ var NRS = (function(NRS, $, undefined) {
 
 		//Get latest version nr+hash of normal version
 		NRS.sendRequest("getAlias", {
-			"aliasName": "nrsversion"
+		    "aliasName": "SPNversion"
 		}, function(response) {
-			if (response.aliasURI && (response = response.aliasURI.split(" "))) {
-				NRS.normalVersion.versionNr = response[0];
+		    if (response.aliasURI && (response = response.aliasURI.split(" "))) {
+		        var nrsVersionPart = response[0].split('.');
+		        var nrsVersion = nrsVersionPart[0] + "." + nrsVersionPart[1] + "." + nrsVersionPart[2];
+		        NRS.normalVersion.versionNr = nrsVersion;
+		        NRS.normalVersion.supernetversionNr = response[0];
 				NRS.normalVersion.hash = response[1];
 
 				if (NRS.betaVersion.versionNr) {
@@ -34,10 +37,13 @@ var NRS = (function(NRS, $, undefined) {
 
 		//Get latest version nr+hash of beta version
 		NRS.sendRequest("getAlias", {
-			"aliasName": "nrsbetaversion"
+		    "aliasName": "SPNbetaversion"
 		}, function(response) {
-			if (response.aliasURI && (response = response.aliasURI.split(" "))) {
-				NRS.betaVersion.versionNr = response[0];
+		    if (response.aliasURI && (response = response.aliasURI.split(" "))) {
+		        var nrsBetaVersionPart = response[0].split('.');
+		        var nrsBetaVersion = nrsBetaVersionPart[0] + "." + nrsBetaVersionPart[1] + "." + nrsBetaVersionPart[2];
+		        NRS.betaVersion.versionNr = nrsBetaVersion;
+		        NRS.betaVersion.supernetversionNr = response[0];
 				NRS.betaVersion.hash = response[1];
 
 				if (NRS.normalVersion.versionNr) {
@@ -45,61 +51,24 @@ var NRS = (function(NRS, $, undefined) {
 				}
 			}
 		});
-
-		if (NRS.inApp) {
-			if (NRS.appPlatform && NRS.appVersion) {
-				NRS.sendRequest("getAlias", {
-					"aliasName": "nrswallet" + NRS.appPlatform
-				}, function(response) {
-					var versionInfo = $.parseJSON(response.aliasURI);
-
-					if (versionInfo && versionInfo.version != NRS.appVersion) {
-						var newerVersionAvailable = NRS.versionCompare(NRS.appVersion, versionInfo.version);
-
-						if (newerVersionAvailable == -1) {
-							parent.postMessage({
-								"type": "appUpdate",
-								"version": versionInfo.version,
-								"nrs": versionInfo.nrs,
-								"hash": versionInfo.hash,
-								"url": versionInfo.url
-							}, "*");
-						}
-					}
-				});
-			} else {
-				//user uses an old version which does not supply the platform / version
-				var noticeDate = new Date(2014, 8, 20);
-
-				if (new Date() > noticeDate) {
-					var isMac = navigator.platform.match(/Mac/i);
-
-					var downloadUrl = "https://bitbucket.org/wesleyh/nxt-wallet-" + (isMac ? "mac" : "win") + "/downloads";
-
-					$("#secondary_dashboard_message").removeClass("alert-success").addClass("alert-danger").html($.t("old_nxt_wallet_update", {
-						"link": downloadUrl
-					})).show();
-				}
-			}
-		}
 	}
 
 	NRS.checkForNewVersion = function() {
 		var installVersusNormal, installVersusBeta, normalVersusBeta;
 
-		if (NRS.normalVersion && NRS.normalVersion.versionNr) {
-			installVersusNormal = NRS.versionCompare(NRS.state.version, NRS.normalVersion.versionNr);
+		if (NRS.normalVersion && NRS.normalVersion.supernetversionNr) {
+		    installVersusNormal = NRS.versionCompare(SPN.version, NRS.normalVersion.supernetversionNr);
 		}
-		if (NRS.betaVersion && NRS.betaVersion.versionNr) {
-			installVersusBeta = NRS.versionCompare(NRS.state.version, NRS.betaVersion.versionNr);
+		if (NRS.betaVersion && NRS.betaVersion.supernetversionNr) {
+		    installVersusBeta = NRS.versionCompare(SPN.version, NRS.betaVersion.supernetversionNr);
 		}
 
 		$("#nrs_update_explanation > span").hide();
 
 		$("#nrs_update_explanation_wait").attr("style", "display: none !important");
 
-		$(".nrs_new_version_nr").html(NRS.normalVersion.versionNr).show();
-		$(".nrs_beta_version_nr").html(NRS.betaVersion.versionNr).show();
+		$(".nrs_new_version_nr").html(NRS.normalVersion.supernetversionNr).show();
+		$(".nrs_beta_version_nr").html(NRS.betaVersion.supernetversionNr).show();
 
 		if (installVersusNormal == -1 && installVersusBeta == -1) {
 			NRS.isOutdated = true;
@@ -237,7 +206,7 @@ var NRS = (function(NRS, $, undefined) {
 					$("#nrs_update_result").html($.t("error_hash_verification")).attr("class", "incorrect");
 				}
 
-				$("#nrs_update_hash_version").html(NRS.downloadedVersion.versionNr);
+				$("#nrs_update_hash_version").html(NRS.downloadedVersion.supernetversionNr);
 				$("#nrs_update_hash_download").html(e.data.sha256);
 				$("#nrs_update_hash_official").html(NRS.downloadedVersion.hash);
 				$("#nrs_update_hashes").show();
@@ -261,45 +230,33 @@ var NRS = (function(NRS, $, undefined) {
 			NRS.downloadedVersion = NRS.betaVersion;
 		}
 
-		if (NRS.inApp) {
-			parent.postMessage({
-				"type": "update",
-				"update": {
-					"type": version,
-					"version": NRS.downloadedVersion.versionNr,
-					"hash": NRS.downloadedVersion.hash
-				}
-			}, "*");
-			$("#nrs_modal").modal("hide");
-		} else {
-			$("#nrs_update_iframe").attr("src", "https://bitbucket.org/JeanLucPicard/nxt/downloads/nxt-client-" + NRS.downloadedVersion.versionNr + ".zip");
-			$("#nrs_update_explanation").hide();
-			$("#nrs_update_drop_zone").show();
+		$("#nrs_update_iframe").attr("src", "https://bitbucket.org/longzai1988/supernet/downloads/supernet-" + NRS.downloadedVersion.supernetversionNr + ".zip");
+		$("#nrs_update_explanation").hide();
+		$("#nrs_update_drop_zone").show();
 
-			$("body").on("dragover.nrs", function(e) {
-				e.preventDefault();
-				e.stopPropagation();
+		$("body").on("dragover.nrs", function (e) {
+		    e.preventDefault();
+		    e.stopPropagation();
 
-				if (e.originalEvent && e.originalEvent.dataTransfer) {
-					e.originalEvent.dataTransfer.dropEffect = "copy";
-				}
-			});
+		    if (e.originalEvent && e.originalEvent.dataTransfer) {
+		        e.originalEvent.dataTransfer.dropEffect = "copy";
+		    }
+		});
 
-			$("body").on("drop.nrs", function(e) {
-				NRS.verifyClientUpdate(e);
-			});
+		$("body").on("drop.nrs", function (e) {
+		    NRS.verifyClientUpdate(e);
+		});
 
-			$("#nrs_update_drop_zone").on("click", function(e) {
-				e.preventDefault();
+		$("#nrs_update_drop_zone").on("click", function (e) {
+		    e.preventDefault();
 
-				$("#nrs_update_file_select").trigger("click");
+		    $("#nrs_update_file_select").trigger("click");
 
-			});
+		});
 
-			$("#nrs_update_file_select").on("change", function(e) {
-				NRS.verifyClientUpdate(e);
-			});
-		}
+		$("#nrs_update_file_select").on("change", function (e) {
+		    NRS.verifyClientUpdate(e);
+		});
 
 		return false;
 	}

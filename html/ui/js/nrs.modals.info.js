@@ -26,6 +26,7 @@ var NRS = (function(NRS, $, undefined) {
 				}
 			}
 
+			$("#nrs_node_state_version").html(SPN.version);
 			$("#nrs_update_explanation").show();
 			$("#nrs_modal_state").show();
 
