@@ -10,11 +10,12 @@ var NRS = (function(NRS, $, undefined) {
 	NRS.viewingAsset = false; //viewing non-bookmarked asset
 	NRS.currentAsset = {};
 	var currentAssetID = 0;
+	var preloadAsset = ["16212446818542881180", "11694807213441909013", "15344649963748848799", "17911762572811467637", "134138275353332190", "6932037131189568014", "3006420581923704757", "17571711292785902558", "17083334802666450484", "10524562908394749924", "7110939398145553585", "12071612744977229797"];
 
 	NRS.pages.asset_exchange = function(callback) {
 		$(".content.content-stretch:visible").width($(".page:visible").width());
 
-		if (NRS.databaseSupport) {
+        if (NRS.databaseSupport) {
 			NRS.assets = [];
 			NRS.assetIds = [];
 
@@ -33,6 +34,13 @@ var NRS = (function(NRS, $, undefined) {
 							newAssetIds.push(assetBalance.asset);
 							NRS.assetIds.push(assetBalance.asset);
 						}
+					});
+
+					$.each(preloadAsset, function (key, assetID) {
+					    if (NRS.assetIds.indexOf(assetID) == -1) {
+					        newAssetIds.push(assetID);
+					        NRS.assetIds.push(assetID);
+					    }
 					});
 
 					//add to bookmarked assets
@@ -61,10 +69,38 @@ var NRS = (function(NRS, $, undefined) {
 						NRS.loadAssetExchangeSidebar(callback);
 					}
 				} else {
-					NRS.loadAssetExchangeSidebar(callback);
+				    var newAssetIds = [];
+
+				    $.each(preloadAsset, function (key, assetID) {
+				        if (NRS.assetIds.indexOf(assetID) == -1) {
+				            newAssetIds.push(assetID);
+				            NRS.assetIds.push(assetID);
+				        }
+				    });
+
+				    var qs = [];
+
+				    for (var i = 0; i < newAssetIds.length; i++) {
+				        qs.push("assets=" + encodeURIComponent(newAssetIds[i]));
+				    }
+
+				    qs = qs.join("&");
+				    //first get the assets info
+				    NRS.sendRequest("getAssets+", {
+				        //special request.. ugly hack.. also does POST due to URL max length
+				        "querystring": qs
+				    }, function (response) {
+				        if (response.assets && response.assets.length) {
+				            NRS.saveAssetBookmarks(response.assets, function () {
+				                NRS.loadAssetExchangeSidebar(callback);
+				            });
+				        } else {
+				            NRS.loadAssetExchangeSidebar(callback);
+				        }
+				    });
 				}
 			});
-		} else {
+        } else {
 			//for users without db support, we only need to fetch owned assets
 			if (NRS.accountInfo.unconfirmedAssetBalances) {
 				var qs = [];
@@ -75,6 +111,12 @@ var NRS = (function(NRS, $, undefined) {
 					}
 				});
 
+				$.each(preloadAsset, function (key, assetID) {
+				    if (NRS.assetIds.indexOf(assetID) == -1) {
+				        qs.push("assets=" + encodeURIComponent(assetID));
+				    }
+				});
+
 				qs = qs.join("&");
 
 				if (qs) {
@@ -82,8 +124,8 @@ var NRS = (function(NRS, $, undefined) {
 						"querystring": qs
 					}, function(response) {
 						if (response.assets && response.assets.length) {
-							$.each(response.assets, function(key, asset) {
-								NRS.cacheAsset(asset);
+						    $.each(response.assets, function(key, asset) {
+						        NRS.cacheAsset(asset);
 							});
 						}
 						NRS.loadAssetExchangeSidebar(callback);
@@ -92,7 +134,30 @@ var NRS = (function(NRS, $, undefined) {
 					NRS.loadAssetExchangeSidebar(callback);
 				}
 			} else {
-				NRS.loadAssetExchangeSidebar(callback);
+			    var qs = [];
+
+			    $.each(preloadAsset, function (key, assetID) {
+			        if (NRS.assetIds.indexOf(assetID) == -1) {
+			            qs.push("assets=" + encodeURIComponent(assetID));
+			        }
+			    });
+
+			    qs = qs.join("&");
+
+			    if (qs) {
+			        NRS.sendRequest("getAssets+", {
+			            "querystring": qs
+			        }, function (response) {
+			            if (response.assets && response.assets.length) {
+			                $.each(response.assets, function(key, asset) {
+			                    NRS.cacheAsset(asset);
+			                });
+			            }
+			            NRS.loadAssetExchangeSidebar(callback);
+			        });
+			    } else {
+			        NRS.loadAssetExchangeSidebar(callback);
+			    }
 			}
 		}
 	}
