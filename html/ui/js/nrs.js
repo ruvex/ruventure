@@ -236,6 +236,7 @@ var NRS = (function(NRS, $, undefined) {
 	                    setTimeout(function () {
 	                        $("#remember_password").prop('checked', true);
 	                        NRS.login(data.result);
+	                        SPN.isCoinConnect = true;
 	                    }, 2000);
 	                },
 	                error: function (jqXHR) {
