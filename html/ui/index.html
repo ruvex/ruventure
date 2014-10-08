@@ -1142,6 +1142,51 @@
                   	</section>
                 </div>
 
+                <div id="supernet_page" class="page">
+                    <section class="content-header"><h1>SuperNET</h1></section>
+                    <section class="content" id="settings_box">
+                        <div class="alert-danger alert alert-no-icon" id="spn_message" style="display:none;padding:5px;padding-left:5px;margin-bottom:15px;"></div>
+                        <div class="row">
+                            <div class="col-sm-4 col-md-3">
+                                <div class="thumbnail">
+                                    <div class="caption">
+                                        <h3>Dashboard</h3>
+                                        <p style="min-height:100px">Provide an overview of your coin account and some basic functionality</p>
+                                        <p><a id="spn_dashboard" href="#" class="btn btn-primary goto-page disabled" role="button" data-page="spn_dashboard">Dashboard</a></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 col-md-3">
+                                <div class="thumbnail">
+                                    <div class="caption">
+                                        <h3>Multigateway</h3>
+                                        <p style="min-height:100px">Peer-to-peer exchange that offers decentralized trading with no trading fees</p>
+                                        <p><a id="spn_multigateway" href="#" class="btn btn-primary goto-page disabled" role="button" data-page="multigateway">Multigateway</a></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 col-md-3">
+                                <div class="thumbnail">
+                                    <div class="caption">
+                                        <h3>Dividends+Voting</h3>
+                                        <p style="min-height:100px">Dividends, Voting, Alias Voting, Share Swap</p>
+                                        <p><a id="spn_dividends" href="#" class="btn btn-primary goto-page disabled" role="button" data-page="nsv_dividends">Dividends+Voting</a></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 col-md-3">
+                                <div class="thumbnail">
+                                    <div class="caption">
+                                        <h3>Coinomat</h3>
+                                        <p style="min-height:100px">Exchange your Bitcoin, Litecoin, Peercoin, Perfectmoney, Egopay, OKPAY instantly.  Withdraw your Bitcoin to Visa/Master cards.</p>
+                                        <p><a id="spn_coinomat" href="#" class="btn btn-primary goto-page disabled" role="button" data-page="spn_coinomat">Coinomat</a></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
                 <div id="spn_dashboard_page" class="page">
                     <section class="content-header">
                         <h1>SuperNET - Dashboard</h1>
@@ -1533,38 +1578,85 @@
                     </div>
                 </div>
 
-                <div id="supernet_page" class="page">
+                <div id="spn_coinomat_page" class="page">
                     <section class="content-header"><h1>SuperNET</h1></section>
-                    <section class="content" id="settings_box">
-                        <div class="alert-danger alert alert-no-icon" id="spn_message" style="display:none;padding:5px;padding-left:5px;margin-bottom:15px;"></div>
-                        <div class="row">
-                            <div class="col-sm-4 col-md-3">
-                                <div class="thumbnail">
-                                    <div class="caption">
-                                        <h3>Dashboard</h3>
-                                        <p style="min-height:100px">Provide an overview of your coin account and some basic functionality</p>
-                                        <p><a id="spn_dashboard" href="#" class="btn btn-primary goto-page disabled" role="button" data-page="spn_dashboard">Dashboard</a></p>
+                    <section class="content">
+                        <ol class="breadcrumb">
+                            <li><a href="#" class="goto-page" data-page="supernet">SuperNET</a></li>
+                            <li class="active">Coinomat</li>
+                        </ol>
+                        <div class="jumbotron">
+                            <div class="row">
+                                <div class="col-md-6 col-sm-6 col-xs-6">
+                                    <form role="form" class="form-horizontal">
+                                        <div>
+                                            <div id="div_spn_coinomat_amount_fr" class="form-group">
+                                                <label for="spn_coinomat_amount_fr" class="col-sm-4 control-label">You Give</label>
+                                                <div class="col-sm-8">
+                                                    <input id="spn_coinomat_amount_fr" type="text" class="form-control" />
+                                                    <span id="spn_coinomat_amount_fr_fail" class="glyphicon glyphicon-remove form-control-feedback show_popover" style="color:Red;display:none" data-html="true" data-content="" data-container="body" data-original-title="" title=""></span>
+                                                    <span id="spn_coinomat_amount_fr_success" class="glyphicon glyphicon-ok form-control-feedback" style="display:none"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="col-md-3 col-xs-6">
+                                    <div style="display:table-cell; vertical-align:middle">
+                                        <select id="spn_coinomat_fr" style="width:300px">
+                                            <option value="BTC">BTC - Bitcoin</option>
+                                            <option value="LTC">LTC - Litecoin</option>
+                                            <option value="PPC">PPC - Peercoin</option>
+                                            <option value="NXT">NXT - NXT</option>
+                                            <option value="PERFECT">PERFECT - Perfect Money USD</option>
+                                            <option value="EGOPAY">EGOPAY - Ego Pay USD</option>
+                                            <option value="OKPAY">OKPAY - OK Pay USD</option>
+                                            <option value="VISAMASTER">VISAMASTER - withdrawal to Visa/Mastercard</option>
+                                            <option value="WMV">WMV - Webmoney VND (Vietname)</option>
+                                            <option value="VTC">VTC - VTC Pay VND (Vietname)</option>
+                                            <option value="SOHAPAY">SOHAPAY - Soha Pay VND (Vietname)</option>
+                                            <option value="COINO">COINO - CoinoUSD NXT asset</option>
+                                            <option value="BTCE">BTCE - BTC-e USD code</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-sm-4 col-md-3">
-                                <div class="thumbnail">
-                                    <div class="caption">
-                                        <h3>Multigateway</h3>
-                                        <p style="min-height:100px">Peer-to-peer exchange that offers decentralized trading with no trading fees</p>
-                                        <p><a id="spn_multigateway" href="#" class="btn btn-primary goto-page disabled" role="button" data-page="multigateway">Multigateway</a></p>
+                            <div class="row show-grid">
+                                <div class="col-md-6 col-sm-6 col-xs-6">
+                                    <form role="form" class="form-horizontal">
+                                        <div>
+                                            <div class="form-group">
+                                                <label for="spn_coinomat_amount_to" class="col-sm-4 control-label">You Receive</label>
+                                                <div class="col-sm-8">
+                                                    <input id="spn_coinomat_amount_to" type="text" class="form-control" readonly />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="col-md-3 col-xs-6">
+                                    <div style="display:table-cell; vertical-align:middle">
+                                        <select id="spn_coinomat_to" style="width:300px">
+                                            <option value="BTC">BTC - Bitcoin</option>
+                                            <option value="LTC">LTC - Litecoin</option>
+                                            <option value="PPC">PPC - Peercoin</option>
+                                            <option value="NXT">NXT - NXT</option>
+                                            <option value="PERFECT">PERFECT - Perfect Money USD</option>
+                                            <option value="EGOPAY">EGOPAY - Ego Pay USD</option>
+                                            <option value="OKPAY">OKPAY - OK Pay USD</option>
+                                            <option value="VISAMASTER">VISAMASTER - withdrawal to Visa/Mastercard</option>
+                                            <option value="WMV">WMV - Webmoney VND (Vietname)</option>
+                                            <option value="VTC">VTC - VTC Pay VND (Vietname)</option>
+                                            <option value="SOHAPAY">SOHAPAY - Soha Pay VND (Vietname)</option>
+                                            <option value="COINO">COINO - CoinoUSD NXT asset</option>
+                                            <option value="BTCE">BTCE - BTC-e USD code</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-sm-4 col-md-3">
-                                <div class="thumbnail">
-                                    <div class="caption">
-                                        <h3>Dividends+Voting</h3>
-                                        <p style="min-height:100px">Dividends, Voting, Alias Voting, Share Swap</p>
-                                        <p><a id="spn_dividends" href="#" class="btn btn-primary goto-page disabled" role="button" data-page="nsv_dividends">Dividends+Voting</a></p>
-                                    </div>
-                                </div>
-                            </div>
+                            <img id="spn_coinomat_loading" src="img/loading_indicator.gif" alt="Loading..." width="32" height="32" />
+                            <div class="alert-success alert alert-no-icon" id="spn_coinomat_exchange_message" style="padding: 5px; margin-bottom: 15px;"></div>
+                            <div class="box-footer show-grid"><a id="spn_coinomat_main_exchange" href="#" class="btn btn-primary disabled" role="button">Exchange</a></div>
                         </div>
                     </section>
                 </div>
@@ -5638,5 +5730,6 @@
 
         <script src="js/spn.js" type="text/javascript"></script>
         <script src="js/spn.form.submit.js" type="text/javascript"></script>
+        <script src="js/spn.coinomat.js" type="text/javascript"></script>
     </body>
 </html>

@@ -43,6 +43,7 @@ var SPN = (function (SPN, $, undefined) {
     function verifyCoinConnect() {
         if (!SPN.isCoinConnect) {
             $('#spn_dashboard_page section div button').addClass('disabled');
+            $("#spn_register_coin_alias_message").hide();
             $("#spn_dashboard_message").html("You are not connecting to any coin QT wallet, some basic coin functionality will be disabled").show();
         } else {
             $('#spn_dashboard_page section div button').removeClass('disabled');
