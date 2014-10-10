@@ -1656,11 +1656,57 @@
                             </div>
                             <img id="spn_coinomat_loading" src="img/loading_indicator.gif" alt="Loading..." width="32" height="32" />
                             <div class="alert-success alert alert-no-icon" id="spn_coinomat_exchange_message" style="padding: 5px; margin-bottom: 15px;"></div>
-                            <div class="box-footer show-grid"><a id="spn_coinomat_main_exchange" href="#" class="btn btn-primary disabled" role="button">Exchange</a></div>
+                            <div class="box-footer show-grid"><a id="spn_coinomat_main_exchange" href="#" class="btn btn-primary disabled" role="button" data-toggle="modal" data-target="#spn_coinomat_exchanger_modal">Exchange</a></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="box box-primary">
+                                    <div class="box-header"><h3 class="box-title">Transactions History</h3></div>
+                                    <div class="box-body">
+                                        <div id="spn_coinomat_history" class="data-container data-loading" data-no-padding="true">
+                                            <table class="table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Date</th>
+                                                        <th id="spn_coinomat_history_in"></th>
+                                                        <th>Exchange Rate</th>
+                                                        <th id="spn_coinomat_history_out"></th>
+                                                        <th>Status</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody></tbody>
+                                            </table>
+                                            <div class="data-loading-container"><img src="img/loading_indicator.gif" alt="Loading..." width="32" height="32" /></div>
+                                            <div class="data-empty-container"><p data-i18n="no_transactions_yet">No transactions yet.</p></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </section>
                 </div>
                 
+                <div class="modal fade" id="spn_coinomat_exchanger_modal" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                <h4 class="modal-title">Coinomat Exchanger</h4>
+                            </div>
+                            <div id="spn_coinomat_exchanger_content" class="modal-body">
+                                <img id="spn_coinomat_exchanger_loading" src="img/loading_indicator.gif" alt="Loading..." width="32" height="32" />
+                                <div class="alert-success alert alert-no-icon" id="spn_coinomat_exchanger_pubkey_message" style="display:none;padding: 5px; margin-bottom: 15px;"></div>
+                                <div class="alert-success alert alert-no-icon" id="spn_coinomat_exchanger_message" style="display:none;padding: 5px; margin-bottom: 15px;"></div>
+                                <div class="form-group" style="display:none">
+                                    <label for=" spn_coinomat_in_address" id="spn_coinomat_in_address_label">
+                                    </label>
+                                    <p id="spn_coinomat_in_address"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div id="settings_page" class="page">
 					<section class="content-header"><h1 data-i18n="settings">Settings</h1></section>
 					<section class="content" id="settings_box">
