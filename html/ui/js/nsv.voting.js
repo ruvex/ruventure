@@ -56,11 +56,9 @@ var NSV = (function(NSV, $, undefined) {
 			return;
 		}
 		
-		var secret; // = "1MNL-Q2qqFaHfB0TjSAbHfBwiWt4X3zECX1z";
+		var secret;
 
 		var poll_acc, poll_pk;
-
-		//poll_pk = "8a951c444e7a1b77da0802ea7e99c5aee2ffdcb6e61dd8ee04756f17c496ec36";
 		
 		if (!NRS.rememberPassword) {
 			secret = document.getElementById("nsv_vote_create_password").value;
