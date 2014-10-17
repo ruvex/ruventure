@@ -2,6 +2,7 @@ var SPN = (function (SPN, $, undefined) {
     var URL = "https://beta.coinomat.com/api/v1/";
     var xrate;
     var hasPublicKey = false;
+    var exchangerWalletFrom;
 
     $(document).ready(function () {
         $("#spn_coinomat_fr").select2({
@@ -23,11 +24,12 @@ var SPN = (function (SPN, $, undefined) {
         create_tunnel();
 
         setInterval(function () {
-            refreshCoinomat()
+            refreshCoinomat();
         }, 60000);
     });
 
     $("#spn_coinomat_fr, #spn_coinomat_to").on("change", function (e) {
+        $("#spn_coinomat_wallet_addr_to").val("");
         getExchangeRate();
         create_tunnel();
     });
@@ -42,7 +44,7 @@ var SPN = (function (SPN, $, undefined) {
         toggleLoadingMessage(true)
         var f = $("#spn_coinomat_fr").select2("val");
         var t = $("#spn_coinomat_to").select2("val");
-        
+
         $.ajax({
             url: URL + 'get_xrate.php?f=' + f + '&t=' + t,
             dataType: 'jsonp',
@@ -74,6 +76,7 @@ var SPN = (function (SPN, $, undefined) {
                     }
                     $("#spn_coinomat_exchange_message").removeClass('alert-danger').addClass('alert-success').html("Exchange rates : " + data.in_def + " " + f + " = " + xrate_unit + " " + t + (data.extra_note == null ? "" : data.extra_note) + " <br/>Exchange limits : Minimum " + data.in_min + " " + f + ", Maximum " + utoFixed(data.in_max,data.in_prec.dec) + " " + f).show();
                     check_exchange_limits();
+                    toggleWalletToInput(true);
                 }
                 else {
                     if (data.error) {
@@ -85,7 +88,7 @@ var SPN = (function (SPN, $, undefined) {
                         $("#spn_coinomat_amount_fr_fail").hide();
                         $("#spn_coinomat_amount_fr_success").hide();
                         $("#spn_coinomat_exchange_message").removeClass('alert-success').addClass('alert-danger').html("Error : " + data.error);
-                        
+                        toggleWalletToInput(false);
                     }
                 }
 
@@ -153,6 +156,9 @@ var SPN = (function (SPN, $, undefined) {
     $("#spn_coinomat_amount_fr").keyup(function (e) {
         update_to_val();
     });
+    $("#spn_coinomat_wallet_addr_to").keyup(function (e) {
+        create_tunnel();
+    });
     $('#spn_coinomat_exchanger_modal').on('show.bs.modal', function () {
         create_tunnel();
         activateNXT();
@@ -161,7 +167,11 @@ var SPN = (function (SPN, $, undefined) {
         setTimeout(function () {
             create_tunnel();
         }, 10000);
-    })
+    });
+    $('#send_money_modal').on('hidden.bs.modal', function () {
+        $('#send_money_recipient').prop('readonly', false);
+        $('#send_money_message').prop('readonly', false);
+    });
 
     function activateNXT() {
         var activateURL = "NXT_activate.php?NXT_account=" + NRS.accountRS + "&nxt_public_key=" + NRS.publicKey;
@@ -192,20 +202,22 @@ var SPN = (function (SPN, $, undefined) {
         });
     }
     function create_tunnel() {
-        toggleCoinomatExchangerLoading(true);
-        toggleTransactionHistoryLoading(true);
+        toggleCoinomatExchangerLoading(true,false);
+        toggleTransactionHistoryLoading(true,false);
         var f = $("#spn_coinomat_fr").select2("val");
         var t = $("#spn_coinomat_to").select2("val");
         var tunnelURL = "create_tunnel.php?currency_from=" + f + "&currency_to=" + t;
-
+        var walletAddr = $("#spn_coinomat_wallet_addr_to").val().trim();
+        
         //TODO
-        switch (f) {
-            case "BTC": {
-                switch (t) {
-                    case "NXT": {
-                        tunnelURL += "&wallet_to=" + NRS.accountRS;
-                    }
-                }
+        switch (t) {
+            case "NXT": {
+                tunnelURL += "&wallet_to=" + NRS.accountRS;
+                break;
+            }
+            case "BTC": case "LTC": case "PPC": {
+                tunnelURL += "&wallet_to=" + walletAddr;
+                break;
             }
         }
 
@@ -219,12 +231,19 @@ var SPN = (function (SPN, $, undefined) {
                 if (data.ok && data.tunnel_id && data.k1 && data.k2) {
                     get_tunnel(data.tunnel_id, data.k1, data.k2)
                 }
+                else {
+                    if (data.error) {
+                        $("#spn_coinomat_exchanger_error_message").html(data.error);
+                        toggleCoinomatExchangerLoading(false,true);
+                        toggleTransactionHistoryLoading(false, false);
+                    }
+                }
             }
         });
     }
     function get_tunnel(id, k1, k2) {
         var getTunnelURL = "get_tunnel.php?xt_id=" + id + "&k1=" + k1 + "&k2=" + k2 + "&history=1";
-        
+
         $.ajax({
             url: URL + getTunnelURL,
             dataType: 'jsonp',
@@ -233,13 +252,29 @@ var SPN = (function (SPN, $, undefined) {
             crossDomain: true,
             success: function (data) {
                 if (data.tunnel) {
-                    var rate = data.tunnel.xrate_fixed * data.tunnel.out_prec.correction / data.tunnel.in_prec.correction;
+                    var rate = data.tunnel.in_def * data.tunnel.xrate_fixed * data.tunnel.out_prec.correction / data.tunnel.in_prec.correction;
                     var amountReceived = parseFloat(rate) - parseFloat(data.tunnel.out_prec.fee);
+
                     amountReceived = utoFixed(parseFloat(amountReceived), (data.tunnel.out_prec.dec));
+                    exchangerWalletFrom = data.tunnel.wallet_from;
+
                     $("#spn_coinomat_in_address_label").text("Please send " + data.tunnel.currency_from + " to this address: ");
-                    $("#spn_coinomat_in_address").text(data.tunnel.wallet_from);
+                    if (data.tunnel.wallet_from.note) {
+                        $("#spn_coinomat_in_address_note_div").show();
+                        $("#spn_coinomat_in_address").text(data.tunnel.wallet_from.wallet);
+                        $("#spn_coinomat_in_address_note").text(data.tunnel.wallet_from.note);
+                    }
+                    else
+                    {
+                        $("#spn_coinomat_in_address_note_div").hide();
+                        $("#spn_coinomat_in_address").text(data.tunnel.wallet_from);
+                    }
+                    
+                    $("#spn_coinomat_out_address_label").text("All funds paid to above address will be converted and sent to: ");
+                    $("#spn_coinomat_out_address").text(data.tunnel.wallet_to);
                     $("#spn_coinomat_exchanger_message").html("Exchange rates : " + data.tunnel.in_def + " " + data.tunnel.currency_from + " = " + amountReceived + " " + data.tunnel.currency_to + " <br/>Exchange limits : Minimum " + data.tunnel.in_min + " " + data.tunnel.currency_from + ", Maximum " + data.tunnel.in_max + " " + data.tunnel.currency_from + "<br/><br/>This rate is valid for 30 minutes from now ").show();
-                    toggleCoinomatExchangerLoading(false);
+                    $("#spn_coinomat_exchanger_error_message").hide();
+                    toggleCoinomatExchangerLoading(false,false);
                     showTransactionHistory(data, data.tunnel.currency_to);
                 }
             }
@@ -256,7 +291,9 @@ var SPN = (function (SPN, $, undefined) {
                 var ex_rate, out, status;
                 (parseFloat(v.xrate_fixed) == 0 ? ex_rate = utoFixed(data.tunnel.xrate_fixed,data.tunnel.out_prec.dec) : ex_rate = v.xrate_fixed);
                 (v.amount_out == "" ? out = "" : out = v.amount_out);
-                (v.state_in_text == "unconfirmed" ? status = "waiting for confirmation" : status = "");
+                if (v.state_in_text) status = v.state_in_text;
+                if (v.state_in_text == "unconfirmed") status = "waiting for confirmation";
+
                 if (status == "") status = v.state_out_text;
                 rows += "<tr><td>" + v.added + "</td><td>" + v.amount_in + "</td><td>" + ex_rate + "</td><td>" + out + "</td><td>" + status + "</td></tr>";
 
@@ -268,7 +305,7 @@ var SPN = (function (SPN, $, undefined) {
             $("#spn_coinomat_history").addClass('data-empty');
         }
 
-        toggleTransactionHistoryLoading(false);
+        toggleTransactionHistoryLoading(false,true);
     }
     function check_exchange_limits() {
         var a_val = parseFloat($("#spn_coinomat_amount_fr").val())
@@ -324,22 +361,69 @@ var SPN = (function (SPN, $, undefined) {
             $("#spn_coinomat_loading").hide();
         }
     }
-    function toggleCoinomatExchangerLoading(isLoading) {
+    function toggleCoinomatExchangerLoading(isLoading,hasError) {
         if (isLoading) {
             $("#spn_coinomat_exchanger_loading").show();
             $("#spn_coinomat_exchanger_content > div").hide();
         } else {
+            var f = $("#spn_coinomat_fr").select2("val");
+
             $("#spn_coinomat_exchanger_loading").hide();
             $("#spn_coinomat_exchanger_content > div").show();
             (hasPublicKey ? $("#spn_coinomat_exchanger_pubkey_message").hide() : $("#spn_coinomat_exchanger_pubkey_message").show());
+            if (hasError) {
+                $("#spn_coinomat_exchanger_content > div").hide();
+                $("#spn_coinomat_exchanger_error_message").show();
+            }
+            else
+            {
+                (f == "NXT" ? $("#spn_coinomat_send_nxt_div").show() : $("#spn_coinomat_send_nxt_div").hide());
+                $("#spn_coinomat_exchanger_error_message").hide();
+            }
         }
     }
-    function toggleTransactionHistoryLoading(isLoading) {
+    function toggleTransactionHistoryLoading(isLoading, isExchangeRate) {
         if (isLoading) {
             $("#spn_coinomat_history").addClass('data-loading');
         }
         else {
+            if (isExchangeRate) {
+                var f = $("#spn_coinomat_fr").select2("val");
+                var t = $("#spn_coinomat_to").select2("val");
+
+                $("#spn_coinomat_tx_history_header").html("Transactions History");
+                if (f != t) {
+                    if (t == "NXT") {
+                        $("#spn_coinomat_tx_history_header").html($("#spn_coinomat_tx_history_header").html() + ": " + f + "/" + t + ": " + NRS.accountRS);
+                    }
+                    else
+                    {
+                        $("#spn_coinomat_tx_history_header").html($("#spn_coinomat_tx_history_header").html() + ": " + f + "/" + t + ": " + $("#spn_coinomat_wallet_addr_to").val().trim());
+                    } 
+                }
+            }
+            else {
+                $("#spn_coinomat_tx_history_header").html("Transactions History");
+                $("#spn_coinomat_history table tbody").empty();
+                $("#spn_coinomat_history").addClass('data-empty');
+            }
+            
             $("#spn_coinomat_history").removeClass('data-loading');
+        }
+    }
+    function toggleWalletToInput(isExchangeRate) {
+        if (isExchangeRate) {
+            var t = $("#spn_coinomat_to").select2("val");
+
+            if (t != "NXT") {
+                $("#spn_coinomat_wallet_addr_to_div").show();
+                $("#spn_coinomat_wallet_addr_to_label").html(t + " Wallet Address");
+            } else {
+                $("#spn_coinomat_wallet_addr_to_div").hide();
+            }
+        }else
+        {
+            $("#spn_coinomat_wallet_addr_to_div").hide();
         }
     }
     function setDefaultCoinomatExchangePair() {
@@ -365,5 +449,38 @@ var SPN = (function (SPN, $, undefined) {
         fixed = Math.pow(10, fixed);
         return Math.round(num * fixed) / fixed;
     }
+
+    SPN.coinomatExchange = function () {
+        var t = $("#spn_coinomat_to").select2("val");
+
+        if(t != "NXT"){
+            if ($("#spn_coinomat_wallet_addr_to").val().trim() == "") {
+                $.growl("Please specify your destination wallet address", {
+                    "type": "danger"
+                });
+            } else {
+                $('#spn_coinomat_exchanger_modal').modal('show');
+            }
+        }
+        else
+        {
+            $('#spn_coinomat_exchanger_modal').modal('show');
+        }
+
+    }
+    SPN.coinomatSendNxt = function () {
+        $('#send_money_modal').modal('show');
+        $('#send_money_recipient').val(exchangerWalletFrom.wallet);
+        $('#send_money_recipient').prop('readonly', true);
+        $('#send_money_message').val(exchangerWalletFrom.note);
+        $('#send_money_message').prop('readonly', true);
+        $('#send_money_add_message').prop('checked', true);
+        $('#send_money_modal').find(".optional_message").show();
+
+        setTimeout(function () {
+            $('#send_money_amount').focus();
+        }, 800);
+    }
+
     return SPN;
 }(SPN || {}, jQuery));

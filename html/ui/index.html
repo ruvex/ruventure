@@ -1654,14 +1654,26 @@
                                     </div>
                                 </div>
                             </div>
+                            <div id="spn_coinomat_wallet_addr_to_div" class="row show-grid" style="display:none">
+                                <div class="col-md-6 col-sm-6 col-xs-6">
+                                    <form role="form" class="form-horizontal">
+                                        <div class="form-group">
+                                            <label id="spn_coinomat_wallet_addr_to_label" for="spn_coinomat_wallet_addr_to" class="col-sm-4 control-label"></label>
+                                            <div class="col-sm-8">
+                                                <input id="spn_coinomat_wallet_addr_to" type="text" class="form-control" />
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
                             <img id="spn_coinomat_loading" src="img/loading_indicator.gif" alt="Loading..." width="32" height="32" />
                             <div class="alert-success alert alert-no-icon" id="spn_coinomat_exchange_message" style="padding: 5px; margin-bottom: 15px;"></div>
-                            <div class="box-footer show-grid"><a id="spn_coinomat_main_exchange" href="#" class="btn btn-primary disabled" role="button" data-toggle="modal" data-target="#spn_coinomat_exchanger_modal">Exchange</a></div>
+                            <div class="box-footer show-grid"><a id="spn_coinomat_main_exchange" href="#" class="btn btn-primary disabled" role="button" onclick="SPN.coinomatExchange()">Exchange</a></div>
                         </div>
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="box box-primary">
-                                    <div class="box-header"><h3 class="box-title">Transactions History</h3></div>
+                                    <div class="box-header"><h3 id="spn_coinomat_tx_history_header" class="box-title"></h3></div>
                                     <div class="box-body">
                                         <div id="spn_coinomat_history" class="data-container data-loading" data-no-padding="true">
                                             <table class="table table-striped">
@@ -1695,12 +1707,27 @@
                             </div>
                             <div id="spn_coinomat_exchanger_content" class="modal-body">
                                 <img id="spn_coinomat_exchanger_loading" src="img/loading_indicator.gif" alt="Loading..." width="32" height="32" />
+                                <div class="alert-danger alert alert-no-icon" id="spn_coinomat_exchanger_error_message" style="display:none;padding: 5px; margin-bottom: 15px;"></div>
                                 <div class="alert-success alert alert-no-icon" id="spn_coinomat_exchanger_pubkey_message" style="display:none;padding: 5px; margin-bottom: 15px;"></div>
                                 <div class="alert-success alert alert-no-icon" id="spn_coinomat_exchanger_message" style="display:none;padding: 5px; margin-bottom: 15px;"></div>
                                 <div class="form-group" style="display:none">
-                                    <label for=" spn_coinomat_in_address" id="spn_coinomat_in_address_label">
+                                    <label for="spn_coinomat_in_address" id="spn_coinomat_in_address_label">
                                     </label>
                                     <p id="spn_coinomat_in_address"></p>
+                                    <div id="spn_coinomat_in_address_note_div" style="display:none">
+                                        <label for="spn_coinomat_in_address_note">
+                                            Include the following as message in your Nxt transaction
+                                        </label>
+                                        <p id="spn_coinomat_in_address_note"></p>
+                                    </div>
+                                </div>
+                                <div class="form-group" style="display:none">
+                                    <label for=" spn_coinomat_out_address" id="spn_coinomat_out_address_label">
+                                    </label>
+                                    <p id="spn_coinomat_out_address"></p>
+                                </div>
+                                <div id="spn_coinomat_send_nxt_div" class="form-group" style="display:none">
+                                    <a href="#" class="btn btn-primary" role="button" onclick="SPN.coinomatSendNxt()">Send NXT</a>
                                 </div>
                             </div>
                         </div>
