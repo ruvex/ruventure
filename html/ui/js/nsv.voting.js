@@ -491,7 +491,7 @@ var NSV = (function(NSV, $, undefined) {
 		$('#nsv_vote_cast_succ_message').hide();
 
 	
-		var secret;// = "1MNL-Q2qqFaHfB0TjSAbHfBwiWt4X3zECX1z";		
+		var secret;	
 		var option_choosen = "";
 		var err_message = "";
 		
