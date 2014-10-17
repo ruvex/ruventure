@@ -1057,10 +1057,10 @@ var NSV = (function(NSV, $, undefined) {
 		var asset2 = document.getElementById("nsv_shareswap_asset2").value;
 		var ratio = document.getElementById("nsv_shareswap_ratio").value;
 		
-		//redeem_ac = "NXT-7YEP-26LK-HG32-3R277";
-		//asset1 = "8011756047853511145";
-		//asset2 = "1639299849328439538";
-		//ratio = ".0001";
+		//redeem_ac = "NXT-HTM9-BEPZ-28NP-A4AEK";
+		//asset1 = "3574526501061878636";
+		//asset2 = "18052454258090117553";
+		//ratio = ".7";
 
 		if (ratio === "") {
 			err_message = "Ratio not specified";		
@@ -1068,7 +1068,8 @@ var NSV = (function(NSV, $, undefined) {
 			if (isNaN(ratio)) {
 				err_message = "Ratio doesn't seem to be a number";
 			} else {
-				var ratio_f = parseFloat(ratio);
+				var ratio_atens = Math.pow(10,ratio.length - ratio.indexOf('.') - 1);
+				var ratio_int = parseFloat(ratio)*ratio_atens;
 			}
 		}
 		if (asset2 === "") {
@@ -1152,6 +1153,7 @@ var NSV = (function(NSV, $, undefined) {
 		} else {
 			out_message = out_message + "Assets Sent, Account, Sending TX, Assets Recieved, Recieving TX\n";				
 			for (var k=0; k<NSV_redeemed_assets.length; k++) {
+				var break_loop = false;
 				NRS.sendOutsideRequest("/nxt?requestType=" + "getAccountTransactionIds", {
 					"account":NSV_redeemed_assets[k].sender , "type":"2", "subtype":"1"
 				}, function(response,input) {
@@ -1172,9 +1174,14 @@ var NSV = (function(NSV, $, undefined) {
 									if (response.attachment.asset == asset2) {
 										NSV_redeemed_assets[k].amountSent = response.attachment.quantityQNT;
 										NSV_redeemed_assets[k].tranSent = response.transaction;
+										break_loop = true;
 									}
 								}															
 							},false);						 													
+							if (break_loop) {
+								break;
+							}
+							
 						}								
 					}						
 				},false);
@@ -1185,7 +1192,7 @@ var NSV = (function(NSV, $, undefined) {
 					var unquant_asset2 = parseInt(NSV_redeemed_assets[k].amountSent,10)/unquant2_mult;
 					out_message = out_message + unquant_asset1.toString() + ", " + NSV_redeemed_assets[k].sender + ", " + NSV_redeemed_assets[k].tran + ", " + unquant_asset2.toString() + ", " + NSV_redeemed_assets[k].tranSent + "\n";
 
-					var expected_asset_amt = unquant_asset1*ratio_f;
+					var expected_asset_amt = unquant_asset1*ratio_int/ratio_atens;
 					
 					if (Math.abs(expected_asset_amt/unquant_asset2-1) > 0.0001 ) {
 						out_message = out_message + "****WARNING, AMOUNT SENT DOESN'T MATCH******EXPECTED: " + expected_asset_amt.toString() + " ACTUAL: " + unquant_asset2.toString() + "\n";
@@ -1202,10 +1209,10 @@ var NSV = (function(NSV, $, undefined) {
 			for (var i=0; i<num_tobe_swapped; i++) {
 				unquant_asset1 = parseInt(NSV_shareswap_unredeemed[i].amount,10)/unquant1_mult;
 				
-				var adjusted_ratio = Math.pow(10,asset2_dec-asset1_dec)*ratio_f;
-				var send_amt = parseInt(NSV_shareswap_unredeemed[i].amount,10)*adjusted_ratio;				
-				NSV_shareswap_unredeemed[i].amount = send_amt;
-				var asset_send_unquant = send_amt/unquant2_mult;
+				var adjusted_ratio = Math.pow(10,asset2_dec-asset1_dec)*ratio_int;;
+				var send_amt = parseInt(NSV_shareswap_unredeemed[i].amount,10)*adjusted_ratio;
+				NSV_shareswap_unredeemed[i].amount = Math.round(send_amt/ratio_atens);
+				var asset_send_unquant = Math.round(send_amt/ratio_atens)/unquant2_mult;
 				out_message = out_message + unquant_asset1.toString() + ", " + NSV_shareswap_unredeemed[i].sender + ", " + NSV_shareswap_unredeemed[i].tran + ", (" + asset_send_unquant.toString() +  "), UNSWAPPED\n";
 				total_replacement_assets += asset_send_unquant;
 			}
@@ -1264,7 +1271,9 @@ var NSV = (function(NSV, $, undefined) {
 			var tmp_mess = NSV_shareswap_unredeemed[i].tran;		
 			NRS.sendRequest("transferAsset", {"secretPhrase":secret,feeNQT:"100000000",deadline:"1440","recipient":tmp_acc,"quantityQNT":tmp_amt,"asset":NSV_shareswap_repl_asset, "message":tmp_mess}, function(response, input) {
 				if (response.errorCode) {
-					out_message = out_message + "Problem with sending to Account " + input.account + "\n";
+					out_message = out_message + "***ERROR, can't send to Account " + input.recipient + ", " + response.errorDescription + "\n";
+					document.getElementById("nsv_shareswap_details").value = out_message;
+
 				} else {
 					var amt_unmult = parseInt(input.quantityQNT, 10)/NSV_shareswap_repl_unquant_mult;
 					out_message = out_message + amt_unmult. toString() + ", " + input.recipientRS + ", " + response.transaction + "\n";
@@ -1272,6 +1281,7 @@ var NSV = (function(NSV, $, undefined) {
 				}
 			},false);		
 		}
+		
 		document.getElementById("nsv_shareswap_but").disabled=true;	
 
 	};	
