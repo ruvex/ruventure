@@ -56,11 +56,9 @@ var NSV = (function(NSV, $, undefined) {
 			return;
 		}
 		
-		var secret; 
+		var secret;
 
 		var poll_acc, poll_pk;
-
-		//poll_pk = "8a951c444e7a1b77da0802ea7e99c5aee2ffdcb6e61dd8ee04756f17c496ec36";
 		
 		if (!NRS.rememberPassword) {
 			secret = document.getElementById("nsv_vote_create_password").value;
@@ -493,7 +491,7 @@ var NSV = (function(NSV, $, undefined) {
 		$('#nsv_vote_cast_succ_message').hide();
 
 	
-		var secret;		
+		var secret;	
 		var option_choosen = "";
 		var err_message = "";
 		
