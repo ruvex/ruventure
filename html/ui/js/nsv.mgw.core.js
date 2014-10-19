@@ -1,4 +1,4 @@
-//MGWversion 1.4.8
+//MGWversion 1.4.9
 var MGW = (function (MGW, $, undefined) {
     var isSearchingAM = false;
 
