@@ -1,4 +1,6 @@
 var SPN = (function (SPN, $, undefined) {
+    SPN.coinomatToken = "";
+    var webURL = "https://beta.coinomat.com/";
     var URL = "https://beta.coinomat.com/api/v1/";
     var xrate;
     var hasPublicKey = false;
@@ -30,6 +32,7 @@ var SPN = (function (SPN, $, undefined) {
 
     $("#spn_coinomat_fr, #spn_coinomat_to").on("change", function (e) {
         $("#spn_coinomat_wallet_addr_to").val("");
+        $("#spn_coinomat_perfect_code_input").val("");
         getExchangeRate();
         create_tunnel();
     });
@@ -74,7 +77,19 @@ var SPN = (function (SPN, $, undefined) {
                     else {
                         $("#spn_coinomat_amount_to").val(0);
                     }
-                    $("#spn_coinomat_exchange_message").removeClass('alert-danger').addClass('alert-success').html("Exchange rates : " + data.in_def + " " + f + " = " + xrate_unit + " " + t + (data.extra_note == null ? "" : data.extra_note) + " <br/>Exchange limits : Minimum " + data.in_min + " " + f + ", Maximum " + utoFixed(data.in_max,data.in_prec.dec) + " " + f).show();
+
+                    var currencyunits;
+                    switch(f){
+                        case "PERFECT": case "EGOPAY": case "OKPAY": {
+                            currencyunits = f + " USD";
+                            break;
+                        }
+                        default:{
+                            currencyunits = f;
+                            break;
+                        }
+                    }
+                    $("#spn_coinomat_exchange_message").removeClass('alert-danger').addClass('alert-success').html("Exchange rates : " + data.in_def + " " + currencyunits + " = " + xrate_unit + " " + t + (data.extra_note == null ? "" : data.extra_note) + " <br/>Exchange limits : Minimum " + data.in_min + " " + currencyunits + ", Maximum " + utoFixed(data.in_max, data.in_prec.dec) + " " + currencyunits).show();
                     check_exchange_limits();
                     toggleWalletToInput(true);
                 }
@@ -157,7 +172,18 @@ var SPN = (function (SPN, $, undefined) {
         update_to_val();
     });
     $("#spn_coinomat_wallet_addr_to").keyup(function (e) {
-        create_tunnel();
+        var t = $("#spn_coinomat_to").select2("val");
+        switch (t) {
+            case "EGOPAY": case "OKPAY": {
+                if (validateEmail($("#spn_coinomat_wallet_addr_to").val().trim())) {
+                    create_tunnel();
+                }
+                break;
+            }
+            default:{
+                create_tunnel();
+            }
+        }
     });
     $('#spn_coinomat_exchanger_modal').on('show.bs.modal', function () {
         create_tunnel();
@@ -172,7 +198,41 @@ var SPN = (function (SPN, $, undefined) {
         $('#send_money_recipient').prop('readonly', false);
         $('#send_money_message').prop('readonly', false);
     });
+    
+    function getCardList() {
+        var cardlistURL = "cardlist.php?nxt=" + SPN.coinomatToken;
+        var cardListRefresh = "<span class='glyphicon glyphicon-refresh' style='float:right;color:green;cursor:pointer' onclick='SPN.refreshBankCards()'></span>";
+        var selectedCardID = $('input[name=bankcard]:checked', '#spn_coinomat_visamaster_bankcard').val();
 
+        $("#spn_coinomat_visamaster_bankcard").html("");
+        $.ajax({
+            url: URL + cardlistURL,
+            dataType: 'jsonp',
+            type: 'GET',
+            timeout: 30000,
+            crossDomain: true,
+            success: function (data) {
+                if(data.card_list.length>0){
+                    $.each(data.card_list, function (index, value) {
+                        if (index == 0) {
+                            var chkhtml = '<div class="checkbox"><label><input type="radio" name="bankcard" ' + (selectedCardID == value.bk_id ? 'checked="true"' : '') + ' value="' + value.bk_id + '" onclick="SPN.rdBankCard_OnClick(this)"> ' + value.card_number + '</label>' + cardListRefresh + '</div>';
+                        }
+                        else {
+                            var chkhtml = '<div class="checkbox"><label><input type="radio" name="bankcard" ' + (selectedCardID == value.bk_id ? 'checked="true"' : '') + ' value="' + value.bk_id + '" onclick="SPN.rdBankCard_OnClick(this)"> ' + value.card_number + '</label></div>';
+                        }
+
+                        $("#spn_coinomat_visamaster_bankcard").append(chkhtml);
+                    });
+                }else
+                {
+                    $("#spn_coinomat_visamaster_bankcard").html("<h5>You don't have any registered bank card " + cardListRefresh + " </h5>");
+                }
+            },
+            error: function (data) {
+                $("#spn_coinomat_visamaster_bankcard").html("<h5>You don't have any registered bank card " + cardListRefresh + " </h5>");
+            }
+        });
+    }
     function activateNXT() {
         var activateURL = "NXT_activate.php?NXT_account=" + NRS.accountRS + "&nxt_public_key=" + NRS.publicKey;
         
@@ -208,7 +268,8 @@ var SPN = (function (SPN, $, undefined) {
         var t = $("#spn_coinomat_to").select2("val");
         var tunnelURL = "create_tunnel.php?currency_from=" + f + "&currency_to=" + t;
         var walletAddr = $("#spn_coinomat_wallet_addr_to").val().trim();
-        
+        var PerfectCode = $("#spn_coinomat_perfect_code_input").val().trim();
+
         //TODO
         switch (t) {
             case "NXT": {
@@ -217,6 +278,30 @@ var SPN = (function (SPN, $, undefined) {
             }
             case "BTC": case "LTC": case "PPC": {
                 tunnelURL += "&wallet_to=" + walletAddr;
+                break;
+            }
+            case "PERFECT": {
+                if (PerfectCode != "") {
+                    tunnelURL += "&pmid_to=" + walletAddr + "&confirm_code=" + PerfectCode;
+                } else
+                {
+                    tunnelURL += "&pmid_to=" + walletAddr;
+                }
+                break;
+            }
+            case "EGOPAY": {
+                tunnelURL += "&epid_to=" + walletAddr;
+                break;
+            }
+            case "OKPAY": {
+                tunnelURL += "&okid_to=" + walletAddr;
+                break;
+            }
+            case "VISAMASTER": {
+                var bkid = $('input[name=bankcard]:checked', '#spn_coinomat_visamaster_bankcard').val();
+                if (bkid) {
+                    tunnelURL += "&bkid_to=" + bkid.trim() + "&nxt=" + SPN.coinomatToken;
+                }
                 break;
             }
         }
@@ -229,7 +314,9 @@ var SPN = (function (SPN, $, undefined) {
             crossDomain: true,
             success: function (data) {
                 if (data.ok && data.tunnel_id && data.k1 && data.k2) {
-                    get_tunnel(data.tunnel_id, data.k1, data.k2)
+                    get_tunnel(data.tunnel_id, data.k1, data.k2);
+                    $("#spn_coinomat_open_web_a").data("coinomat-tunnelid", data.tunnel_id);
+                    $("#spn_coinomat_open_web_a").data("coinomat-k", data.k1 + data.k2);
                 }
                 else {
                     if (data.error) {
@@ -242,7 +329,14 @@ var SPN = (function (SPN, $, undefined) {
         });
     }
     function get_tunnel(id, k1, k2) {
-        var getTunnelURL = "get_tunnel.php?xt_id=" + id + "&k1=" + k1 + "&k2=" + k2 + "&history=1";
+        var t = $("#spn_coinomat_to").select2("val");
+        var getTunnelURL
+        if (t == "VISAMASTER") {
+            getTunnelURL = "get_tunnel.php?xt_id=" + id + "&k1=" + k1 + "&k2=" + k2 + "&history=1&nxt=" + SPN.coinomatToken;
+        }
+        else {
+            getTunnelURL = "get_tunnel.php?xt_id=" + id + "&k1=" + k1 + "&k2=" + k2 + "&history=1";
+        }
 
         $.ajax({
             url: URL + getTunnelURL,
@@ -271,8 +365,42 @@ var SPN = (function (SPN, $, undefined) {
                     }
                     
                     $("#spn_coinomat_out_address_label").text("All funds paid to above address will be converted and sent to: ");
-                    $("#spn_coinomat_out_address").text(data.tunnel.wallet_to);
-                    $("#spn_coinomat_exchanger_message").html("Exchange rates : " + data.tunnel.in_def + " " + data.tunnel.currency_from + " = " + amountReceived + " " + data.tunnel.currency_to + " <br/>Exchange limits : Minimum " + data.tunnel.in_min + " " + data.tunnel.currency_from + ", Maximum " + data.tunnel.in_max + " " + data.tunnel.currency_from + "<br/><br/>This rate is valid for 30 minutes from now ").show();
+                    switch (data.tunnel.currency_to) {
+                        case "PERFECT":
+                            if (data.tunnel.wallet_to.confirm != "") {
+                                $("#spn_coinomat_out_address").html("Perfect Money account : " + data.tunnel.wallet_to.pmid + "<br/>Each Perfect Money transaction will be protected with a code that you have chosen.");
+                            } else
+                            {
+                                $("#spn_coinomat_out_address").html("Perfect Money account : " + data.tunnel.wallet_to.pmid);
+                            }
+                            break;
+                        case "EGOPAY":
+                            $("#spn_coinomat_out_address").text("EgoPay account : " + data.tunnel.wallet_to.epid);
+                            break;
+                        case "OKPAY":
+                            $("#spn_coinomat_out_address").text("OKPay account : " + data.tunnel.wallet_to.okid);
+                            break;
+                        case "VISAMASTER":
+                            $("#spn_coinomat_out_address").text("Visa/Mastercard : " + data.tunnel.wallet_to.bknum);
+                            break;
+                        default:
+                            $("#spn_coinomat_out_address").text(data.tunnel.wallet_to);
+                            break;
+                    }
+                    
+                    var currencyunits;
+                    switch (data.tunnel.currency_from) {
+                        case "PERFECT": case "EGOPAY": case "OKPAY": {
+                            currencyunits = data.tunnel.currency_from + " USD";
+                            break;
+                        }
+                        default: {
+                            currencyunits = data.tunnel.currency_from;
+                            break;
+                        }
+                    }
+
+                    $("#spn_coinomat_exchanger_message").html("Exchange rates : " + data.tunnel.in_def + " " + currencyunits + " = " + amountReceived + " " + data.tunnel.currency_to + " <br/>Exchange limits : Minimum " + data.tunnel.in_min + " " + currencyunits + ", Maximum " + utoFixed(data.tunnel.in_max, data.tunnel.in_prec.dec) + " " + currencyunits + "<br/><br/>This rate is valid for 30 minutes from now ").show();
                     $("#spn_coinomat_exchanger_error_message").hide();
                     toggleCoinomatExchangerLoading(false,false);
                     showTransactionHistory(data, data.tunnel.currency_to);
@@ -380,6 +508,16 @@ var SPN = (function (SPN, $, undefined) {
                 (f == "NXT" ? $("#spn_coinomat_send_nxt_div").show() : $("#spn_coinomat_send_nxt_div").hide());
                 $("#spn_coinomat_exchanger_error_message").hide();
             }
+
+            switch (f) {
+                case "PERFECT": case "EGOPAY": case "OKPAY":
+                    $("#spn_coinomat_exchanger_content > .form-group").hide();
+                    $("#spn_coinomat_open_web_div").show();
+                    break;
+                default:
+                    $("#spn_coinomat_open_web_div").hide();
+                    break;
+            }
         }
     }
     function toggleTransactionHistoryLoading(isLoading, isExchangeRate) {
@@ -395,6 +533,16 @@ var SPN = (function (SPN, $, undefined) {
                 if (f != t) {
                     if (t == "NXT") {
                         $("#spn_coinomat_tx_history_header").html($("#spn_coinomat_tx_history_header").html() + ": " + f + "/" + t + ": " + NRS.accountRS);
+                    }
+                    else if (t == "VISAMASTER") {
+                        var bankcard = $('input[name=bankcard]:checked', '#spn_coinomat_visamaster_bankcard').parent().text();
+
+                        if (bankcard) {
+                            $("#spn_coinomat_tx_history_header").html($("#spn_coinomat_tx_history_header").html() + ": " + f + "/" + t + ": " + bankcard);
+                        } else
+                        {
+                            $("#spn_coinomat_tx_history_header").html("Transactions History");
+                        }
                     }
                     else
                     {
@@ -412,12 +560,32 @@ var SPN = (function (SPN, $, undefined) {
         }
     }
     function toggleWalletToInput(isExchangeRate) {
+        $("#spn_coinomat_perfect_code_div").hide();
+        $("#spn_coinomat_manage_bankcards_div").hide();
+        $("#spn_coinomat_visamaster_to_div").hide();
+
         if (isExchangeRate) {
             var t = $("#spn_coinomat_to").select2("val");
-
+            
             if (t != "NXT") {
                 $("#spn_coinomat_wallet_addr_to_div").show();
-                $("#spn_coinomat_wallet_addr_to_label").html(t + " Wallet Address");
+                $("#spn_coinomat_wallet_addr_to_label_div").show();
+
+                switch (t) {
+                    case "PERFECT": $("#spn_coinomat_wallet_addr_to_label").html(t + " Money ID");
+                        $("#spn_coinomat_perfect_code_div").show();
+                        break;
+                    case "EGOPAY": $("#spn_coinomat_wallet_addr_to_label").html(t + " account ID (email)");
+                        break;
+                    case "VISAMASTER":
+                        $("#spn_coinomat_wallet_addr_to_label_div").hide();
+                        $("#spn_coinomat_visamaster_to_div").show();
+                        $("#spn_coinomat_manage_bankcards_div").show();
+                        getCardList();
+                        break;
+                    default: $("#spn_coinomat_wallet_addr_to_label").html(t + " Wallet Address");
+                        break;
+                }
             } else {
                 $("#spn_coinomat_wallet_addr_to_div").hide();
             }
@@ -449,17 +617,39 @@ var SPN = (function (SPN, $, undefined) {
         fixed = Math.pow(10, fixed);
         return Math.round(num * fixed) / fixed;
     }
+    function validateEmail(email) {
+        var filter = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+        if (filter.test(email)) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
 
     SPN.coinomatExchange = function () {
         var t = $("#spn_coinomat_to").select2("val");
 
-        if(t != "NXT"){
-            if ($("#spn_coinomat_wallet_addr_to").val().trim() == "") {
-                $.growl("Please specify your destination wallet address", {
-                    "type": "danger"
-                });
-            } else {
-                $('#spn_coinomat_exchanger_modal').modal('show');
+        if (t != "NXT") {
+            if (t == "VISAMASTER") {
+                if ($('input[name=bankcard]:checked', '#spn_coinomat_visamaster_bankcard').val()) {
+                    $('#spn_coinomat_exchanger_modal').modal('show');
+                }
+                else
+                {
+                    $.growl("Please choose your destination bank card", {
+                        "type": "danger"
+                    });
+                }
+            } else
+            {
+                if ($("#spn_coinomat_wallet_addr_to").val().trim() == "") {
+                    $.growl("Please specify your destination wallet address", {
+                        "type": "danger"
+                    });
+                } else {
+                    $('#spn_coinomat_exchanger_modal').modal('show');
+                }
             }
         }
         else
@@ -481,6 +671,17 @@ var SPN = (function (SPN, $, undefined) {
             $('#send_money_amount').focus();
         }, 800);
     }
-
+    SPN.openCoinomatWebsite = function () {
+        window.open(webURL + "p/" + $("#spn_coinomat_open_web_a").data("coinomat-tunnelid") + "/" + $("#spn_coinomat_open_web_a").data("coinomat-k"));
+    }
+    SPN.manageBankCards = function () {
+        window.open("https://beta.coinomat.com/login.php?redir=/settings.php%23cards&logout=1&nxt=" + SPN.coinomatToken);
+    }
+    SPN.refreshBankCards = function () {
+        refreshCoinomat();
+    }
+    SPN.rdBankCard_OnClick = function (e) {
+        create_tunnel();
+    }
     return SPN;
 }(SPN || {}, jQuery));

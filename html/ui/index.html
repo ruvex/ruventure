@@ -1677,11 +1677,6 @@
                                             <option value="EGOPAY">EGOPAY - Ego Pay USD</option>
                                             <option value="OKPAY">OKPAY - OK Pay USD</option>
                                             <option value="VISAMASTER">VISAMASTER - withdrawal to Visa/Mastercard</option>
-                                            <option value="WMV">WMV - Webmoney VND (Vietname)</option>
-                                            <option value="VTC">VTC - VTC Pay VND (Vietname)</option>
-                                            <option value="SOHAPAY">SOHAPAY - Soha Pay VND (Vietname)</option>
-                                            <option value="COINO">COINO - CoinoUSD NXT asset</option>
-                                            <option value="BTCE">BTCE - BTC-e USD code</option>
                                         </select>
                                     </div>
                                 </div>
@@ -1710,11 +1705,6 @@
                                             <option value="EGOPAY">EGOPAY - Ego Pay USD</option>
                                             <option value="OKPAY">OKPAY - OK Pay USD</option>
                                             <option value="VISAMASTER">VISAMASTER - withdrawal to Visa/Mastercard</option>
-                                            <option value="WMV">WMV - Webmoney VND (Vietname)</option>
-                                            <option value="VTC">VTC - VTC Pay VND (Vietname)</option>
-                                            <option value="SOHAPAY">SOHAPAY - Soha Pay VND (Vietname)</option>
-                                            <option value="COINO">COINO - CoinoUSD NXT asset</option>
-                                            <option value="BTCE">BTCE - BTC-e USD code</option>
                                         </select>
                                     </div>
                                 </div>
@@ -1722,13 +1712,28 @@
                             <div id="spn_coinomat_wallet_addr_to_div" class="row show-grid" style="display:none">
                                 <div class="col-md-6 col-sm-6 col-xs-6">
                                     <form role="form" class="form-horizontal">
-                                        <div class="form-group">
+                                        <div class="form-group" id="spn_coinomat_wallet_addr_to_label_div">
                                             <label id="spn_coinomat_wallet_addr_to_label" for="spn_coinomat_wallet_addr_to" class="col-sm-4 control-label"></label>
                                             <div class="col-sm-8">
                                                 <input id="spn_coinomat_wallet_addr_to" type="text" class="form-control" />
                                             </div>
                                         </div>
+                                        <div class="form-group has-feedback" id="spn_coinomat_perfect_code_div">
+                                            <label id="spn_coinomat_perfect_code" for="spn_coinomat_perfect_code_input" class="col-sm-4 control-label">Confirmation Code</label>
+                                            <div class="col-sm-8">
+                                                <input id="spn_coinomat_perfect_code_input" type="text" class="form-control" />
+                                                <span class="glyphicon glyphicon-question-sign form-control-feedback show_popover" style="color:Green" data-html="true" data-content="Leave this field empty if you do not want to use Perfect Money transaction protection." data-container="body" data-original-title="" title=""></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" id="spn_coinomat_visamaster_to_div">
+                                            <label for="spn_coinomat_visamaster_bankcard" class="col-sm-4 control-label">Bank Card</label>
+                                            <div class="col-sm-8" id="spn_coinomat_visamaster_bankcard">
+                                            </div>
+                                        </div>
                                     </form>
+                                </div>
+                                <div id="spn_coinomat_manage_bankcards_div" class="col-md-3 col-xs-6">
+                                    <a href="#" class="btn btn-primary" role="button" onclick="SPN.manageBankCards()">Manage Bank Cards</a>
                                 </div>
                             </div>
                             <img id="spn_coinomat_loading" src="img/loading_indicator.gif" alt="Loading..." width="32" height="32" />
@@ -1793,6 +1798,12 @@
                                 </div>
                                 <div id="spn_coinomat_send_nxt_div" class="form-group" style="display:none">
                                     <a href="#" class="btn btn-primary" role="button" onclick="SPN.coinomatSendNxt()">Send NXT</a>
+                                </div>
+                                <div id="spn_coinomat_open_web_div" class="form-group" style="display:none">
+                                    <label for="spn_coinomat_in_address_note">
+                                        You need to complete your transaction on Coinomat website 
+                                    </label>
+                                    <a id="spn_coinomat_open_web_a" href="#" class="btn btn-primary" role="button" onclick="SPN.openCoinomatWebsite()">Open Coinomat website</a>
                                 </div>
                             </div>
                         </div>
