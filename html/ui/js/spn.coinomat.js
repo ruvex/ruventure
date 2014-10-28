@@ -1,7 +1,7 @@
 var SPN = (function (SPN, $, undefined) {
     SPN.coinomatToken = "";
-    var webURL = "https://beta.coinomat.com/";
-    var URL = "https://beta.coinomat.com/api/v1/";
+    var webURL = "https://www.coinomat.com/";
+    var URL = "https://www.coinomat.com/api/v1/";
     var xrate;
     var hasPublicKey = false;
     var exchangerWalletFrom;
@@ -330,6 +330,7 @@ var SPN = (function (SPN, $, undefined) {
     }
     function get_tunnel(id, k1, k2) {
         var t = $("#spn_coinomat_to").select2("val");
+        $("#spn_coinomat_in_address_qr_code").hide();
         var getTunnelURL
         if (t == "VISAMASTER") {
             getTunnelURL = "get_tunnel.php?xt_id=" + id + "&k1=" + k1 + "&k2=" + k2 + "&history=1&nxt=" + SPN.coinomatToken;
@@ -390,6 +391,26 @@ var SPN = (function (SPN, $, undefined) {
                     
                     var currencyunits;
                     switch (data.tunnel.currency_from) {
+                        case "BTC": case "LTC": case "PPC": {
+                            var strText;
+                            if (data.tunnel.currency_from == "BTC") {
+                                strText = "bitcoin:";
+                            }
+                            else if (data.tunnel.currency_from == "LTC") {
+                                strText = "litecoin:";
+                            }
+                            else if (data.tunnel.currency_from == "PPC") {
+                                strText = "peercoin:";
+                            }
+                            $("#spn_coinomat_in_address_qr_code").empty().qrcode({
+                                "text": strText + data.tunnel.wallet_from,
+                                "width": 150,
+                                "height": 150
+                            });
+                            $("#spn_coinomat_in_address_qr_code").show();
+                            currencyunits = data.tunnel.currency_from;
+                            break;
+                        }
                         case "PERFECT": case "EGOPAY": case "OKPAY": {
                             currencyunits = data.tunnel.currency_from + " USD";
                             break;
@@ -672,7 +693,7 @@ var SPN = (function (SPN, $, undefined) {
         }, 800);
     }
     SPN.openCoinomatWebsite = function () {
-        window.open(webURL + "p/" + $("#spn_coinomat_open_web_a").data("coinomat-tunnelid") + "/" + $("#spn_coinomat_open_web_a").data("coinomat-k"));
+        window.open(webURL + "p/" + $("#spn_coinomat_open_web_a").data("coinomat-tunnelid") + "/" + $("#spn_coinomat_open_web_a").data("coinomat-k") + "?amount=" + $("#spn_coinomat_amount_fr").val().trim());
     }
     SPN.manageBankCards = function () {
         window.open("https://beta.coinomat.com/login.php?redir=/settings.php%23cards&logout=1&nxt=" + SPN.coinomatToken);
