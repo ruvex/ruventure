@@ -696,7 +696,7 @@ var SPN = (function (SPN, $, undefined) {
         window.open(webURL + "p/" + $("#spn_coinomat_open_web_a").data("coinomat-tunnelid") + "/" + $("#spn_coinomat_open_web_a").data("coinomat-k") + "?amount=" + $("#spn_coinomat_amount_fr").val().trim());
     }
     SPN.manageBankCards = function () {
-        window.open("https://beta.coinomat.com/login.php?redir=/settings.php%23cards&logout=1&nxt=" + SPN.coinomatToken);
+        window.open(webURL + "login.php?redir=/settings.php%23cards&logout=1&nxt=" + SPN.coinomatToken);
     }
     SPN.refreshBankCards = function () {
         refreshCoinomat();
