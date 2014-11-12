@@ -1,10 +1,9 @@
-//MGWversion 1.4.9
 var MGW = (function (MGW, $, undefined) {
     var isSearchingAM = false;
 
     var mgwCoinDetails = [
-    { "coin": "BTC", "assetID": "4551058913252105307", "decimal": "8", "depositConfirmation": "6" },
-    { "coin": "LTC", "assetID": "2881764795164526882", "decimal": "4", "depositConfirmation": "6" },
+    { "coin": "BTC", "assetID": "17554243582654188572", "decimal": "8", "depositConfirmation": "6" },
+    //{ "coin": "LTC", "assetID": "2881764795164526882", "decimal": "4", "depositConfirmation": "6" },
     { "coin": "BTCD", "assetID": "11060861818140490423", "decimal": "4", "depositConfirmation": "10" },
     { "coin": "VIA", "assetID": "275548135983837356", "decimal": "4", "depositConfirmation": "10" },
     { "coin": "DOGE", "assetID": "2303962892272487643", "decimal": "4", "depositConfirmation": "5" },
@@ -13,7 +12,7 @@ var MGW = (function (MGW, $, undefined) {
 
     var mgwCoinFees = [
     { "coin": "BTC", "minDeposit": 0.0005, "minWithdraw": 0.0005, "mgwFees": 0.0001, "blockchainFees": 0.0001 },
-    { "coin": "LTC", "minDeposit": 0.05, "minWithdraw": 0.05, "mgwFees": 0.01, "blockchainFees": 0.001 },
+    //{ "coin": "LTC", "minDeposit": 0.05, "minWithdraw": 0.05, "mgwFees": 0.01, "blockchainFees": 0.001 },
     { "coin": "BTCD", "minDeposit": 0.05, "minWithdraw": 0.05, "mgwFees": 0.01, "blockchainFees": 0.0001 },
     { "coin": "VIA", "minDeposit": 1, "minWithdraw": 1, "mgwFees": 0.18, "blockchainFees": 0.006 },
     { "coin": "DOGE", "minDeposit": 1155, "minWithdraw": 1155, "mgwFees": 230, "blockchainFees": 1 },
@@ -21,8 +20,8 @@ var MGW = (function (MGW, $, undefined) {
     ];
 
     var mgwCoinMultigateway = [
-    { "coin": "BTC", "accountRS": "NXT-JXRD-GKMR-WD9Y-83CK7" },
-    { "coin": "LTC", "accountRS": "NXT-JXRD-GKMR-WD9Y-83CK7" },
+    { "coin": "BTC", "accountRS": "NXT-3TKA-UH62-478B-DQU6K" },
+    //{ "coin": "LTC", "accountRS": "NXT-JXRD-GKMR-WD9Y-83CK7" },
     { "coin": "BTCD", "accountRS": "NXT-JXRD-GKMR-WD9Y-83CK7" },
     { "coin": "VIA", "accountRS": "NXT-HHDX-PVDT-TV54-ADBHC" },
     { "coin": "DOGE", "accountRS": "NXT-HHDX-PVDT-TV54-ADBHC" },
@@ -30,8 +29,8 @@ var MGW = (function (MGW, $, undefined) {
     ];
 
     var mgwCoinMgwServer = [
-    { "coin": "BTC", "server": ["423766016895692955", "12240549928875772593", "8279528579993996036", "5723512772332443130", "15740288657919119263"] },
-    { "coin": "LTC", "server": ["423766016895692955", "12240549928875772593", "8279528579993996036", "5723512772332443130", "15740288657919119263"] },
+    { "coin": "BTC", "server": ["8593269027165738667", "2986384496629142530", "2406158154854548637", "12736719038753962716"] },
+    //{ "coin": "LTC", "server": ["423766016895692955", "12240549928875772593", "8279528579993996036", "5723512772332443130", "15740288657919119263"] },
     { "coin": "BTCD", "server": ["423766016895692955", "12240549928875772593", "8279528579993996036", "5723512772332443130", "15740288657919119263"] },
     { "coin": "VIA", "server": ["14055196676487904531", "14515002426250828177", "4683763953228439523"] },
     { "coin": "DOGE", "server": ["14055196676487904531", "14515002426250828177", "4683763953228439523"] },
@@ -39,9 +38,9 @@ var MGW = (function (MGW, $, undefined) {
     ];
 
     var mgwCoinDepositJson = [
-    { "coin": "BTC", "jsonAM": '{"BTC":"","LTC":"","DOGE":"","DRK":"","CGB":"","BTCD":""}', "gateway": "faeedbba" },
-    { "coin": "LTC", "jsonAM": '{"BTC":"","LTC":"","DOGE":"","DRK":"","CGB":""}', "gateway": "faeedbba" },
-    { "coin": "BTCD", "jsonAM": '{"BTC":"","LTC":"","DOGE":"","DRK":"","CGB":"","BTCD":""}', "gateway": "faeedbba" },
+    { "coin": "BTC", "jsonAM": '{"BTC":""}', "gateway": "94c8f273" },
+    //{ "coin": "LTC", "jsonAM": '{"BTC":"","LTC":"","DOGE":"","DRK":"","CGB":""}', "gateway": "faeedbba" },
+    { "coin": "BTCD", "jsonAM": '{"BTCD":""}', "gateway": "faeedbba" },
     { "coin": "VIA", "jsonAM": '{"VIA":"","DOGE":"","BC":""}', "gateway": "a11c7c21" },
     { "coin": "DOGE", "jsonAM": '{"VIA":"","DOGE":"","BC":""}', "gateway": "a11c7c21" },
     { "coin": "BC", "jsonAM": '{"VIA":"","DOGE":"","BC":""}', "gateway": "a11c7c21" }
@@ -49,7 +48,7 @@ var MGW = (function (MGW, $, undefined) {
 
     var mgwCoinDepositAddr = [
     { "coin": "BTC", "depositAddr": "" },
-    { "coin": "LTC", "depositAddr": "" },
+    //{ "coin": "LTC", "depositAddr": "" },
     { "coin": "BTCD", "depositAddr": "" },
     { "coin": "VIA", "depositAddr": "" },
     { "coin": "DOGE", "depositAddr": "" },
