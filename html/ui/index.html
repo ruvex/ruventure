@@ -1256,6 +1256,17 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-sm-4 col-md-3">
+                                <div class="thumbnail">
+                                    <div class="caption">
+                                        <h3>BitcoinDark</h3>
+                                        <p style="min-height:100px">Teleport, InstantDEX</p>
+                                        <p><a id="spn_bitcoindark" href="#" class="btn btn-primary goto-page disabled" role="button" data-page="spn_bitcoindark">BitcoinDark</a></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </section>
                 </div>
 
@@ -1775,6 +1786,130 @@
                     </section>
                 </div>
                 
+                <div id="spn_bitcoindark_page" class="page">
+                    <section class="content-header">
+                        <h1>BitcoinDark</h1>
+                    </section>
+                    <section class="content">
+                        <ol class="breadcrumb">
+                            <li><a href="#" class="goto-page" data-page="supernet">SuperNET</a></li>
+                            <li class="active">BitcoinDark</li>
+                        </ol>
+                        <div class="row">
+                            <div class="col-sm-4 col-md-3">
+                                <div class="thumbnail">
+                                    <div class="caption">
+                                        <h3>Teleport</h3>
+                                        <p style="min-height:100px">Anonymous teleporting of funds occurs off the blockchain but is verified using the blockchain</p>
+                                        <p><a id="spn_teleport" href="#" class="btn btn-primary goto-page" role="button" data-page="spn_teleport">Teleport</a></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 col-md-3">
+                                <div class="thumbnail">
+                                    <div class="caption">
+                                        <h3>InstantDEX</h3>
+                                        <p style="min-height:100px">Realtime trading between any NXT asset</p>
+                                        <p><a href="#" class="btn btn-primary goto-page" role="button" data-page="spn_instantdex">InstantDEX</a></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <div id="spn_teleport_page" class="page">
+                    <section class="content-header"><h1>BitcoinDark - Teleport</h1></section>
+                    <section class="content">
+                        <ol class="breadcrumb">
+                            <li><a href="#" class="goto-page" data-page="supernet">SuperNET</a></li>
+                            <li><a href="#" class="goto-page" data-page="spn_bitcoindark">BitcoinDark</a></li>
+                            <li class="active">Teleport</li>
+                        </ol>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="small-box bg-aqua">
+                                    <div class="inner">
+                                        <h3><span id="btcd_account_balance_loading" class="loading_dots"><span>.</span><span>.</span><span>.</span></span><span id="btcd_account_balance"></span><span style="font-size:12px" id="btcd_account_balance_decimal"></span><span style="font-size:24px"> BTCD</span></h3>
+                                        <p>Account Balance</p>
+                                    </div>
+                                    <div class="icon"><i class="fa fa-briefcase"></i></div>
+                                    <a href="#" class="small-box-footer" data-toggle="modal" data-target="#spn_btcd_add_account_balance_modal">Add Balance <i class="fa fa-arrow-circle-right"></i></a>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="small-box bg-aqua">
+                                    <div class="inner">
+                                        <h3><span id="btcd_teleport_balance_loading" class="loading_dots"><span>.</span><span>.</span><span>.</span></span><span id="btcd_teleport_balance"></span><span style="font-size:12px" id="btcd_teleport_balance_decimal"></span><span style="font-size:24px"> BTCD</span></h3>
+                                        <p>Teleport Balance</p>
+                                    </div>
+                                    <div class="icon"><i class="fa fa-briefcase"></i></div>
+                                    <a href="#" class="small-box-footer" data-toggle="modal" data-target="#spn_btcd_add_teleport_balance_modal">Add Balance <i class="fa fa-arrow-circle-right"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <textarea id="spn_bitcoindark_result" cols="100" rows="10"></textarea>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="modal fade" id="spn_btcd_add_account_balance_modal" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                <h4 class="modal-title">Add Account Balance</h4>
+                            </div>
+                            <div class="modal-body">
+                                <img id="spn_btcd_add_account_balance_modal_loading" src="img/loading_indicator.gif" alt="Loading..." width="32" height="32" />
+                                <div class="alert-success alert alert-no-icon" style="padding: 5px; margin-bottom: 15px;">This account is used to create telepods that are mandatory to complete teleport process</div>
+                                <div class="form-group">
+                                    <label for="spn_btcd_account_balance_addr">
+                                        Please send BTCD to this address:
+                                    </label>
+                                    <p id="spn_btcd_account_balance_addr"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="spn_btcd_add_teleport_balance_modal" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                <h4 class="modal-title">Teleport - Add Teleport Balance</h4>
+                            </div>
+                            <div class="modal-body">
+                                <div class="callout callout-danger error_message" style="display:none"></div>
+                                <div class="row">
+                                    <div class="col-xs-6 col-sm-6 col-md-6">
+                                        <div class="form-group">
+                                            <label for="spn_btcd_add_teleport_balance_amount">Amount</label>
+                                            <div class="input-group">
+                                                <input type="number" id="spn_btcd_add_teleport_balance_amount" class="form-control" placeholder="Amount" data-default="0.01" value="0.01" step="0.01" tabindex="1">
+                                                <span class="input-group-addon">BTCD</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6 col-sm-6 col-md-6">
+                                        <div class="form-group">
+                                            <label for="spn_btcd_add_teleport_balance_currency">Currency</label>
+                                            <input id="spn_btcd_add_teleport_balance_currency" class="form-control" placeholder="Currency" data-default="BTCD" value="BTCD" tabindex="2">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer" style="margin-top:0;">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                <button id="spn_btcd_add_teleport_balance_btnAdd" type="button" class="btn btn-primary" data-loading-text="Submitting...">Add</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="modal fade" id="spn_coinomat_exchanger_modal" tabindex="-1" role="dialog" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
@@ -5958,5 +6093,6 @@
         <script src="js/spn.js" type="text/javascript"></script>
         <script src="js/spn.form.submit.js" type="text/javascript"></script>
         <script src="js/spn.coinomat.js" type="text/javascript"></script>
+        <script src="js/spn.bitcoindark.js" type="text/javascript"></script>
     </body>
 </html>
