@@ -276,7 +276,7 @@ var NSV = (function(NSV, $, undefined) {
 		} else {
 			NSV_votes_arr.sort(function(a,b) {return b.sender < a.sender; });
 			for (var k=0; k<NSV_votes_arr.length-1; k++) {
-				if (NSV_votes_arr[k].sender == NSV_votes_arr[k+1].sender) {
+				  if (NSV_votes_arr[k].sender == NSV_votes_arr[k+1].sender) {
 					if (NSV_votes_arr[k+1].time > NSV_votes_arr[k].time) {
 						NSV_votes_arr.splice(k,1);
 					} else {
@@ -573,7 +573,8 @@ var NSV = (function(NSV, $, undefined) {
 	};	
 
 	NSV.parse_poll_message = function (message,sender,time) {
-		var message_json = JSON.parse(message);
+		
+		message_json = NSV.tryParseJSON(message);		
 		if (message_json !== null && typeof message_json === 'object') {
 			if (message_json.divPlus_asset) {
 				//It's the message that creates the poll
@@ -1188,6 +1189,22 @@ var NSV = (function(NSV, $, undefined) {
 		
 	};
 
+	NSV.tryParseJSON = function (jsonString) {
+		try {
+			var o = JSON.parse(jsonString);
+
+			// Handle non-exception-throwing cases:
+			// Neither JSON.parse(false) or JSON.parse(1234) throw errors, hence the type-checking,
+			// but... JSON.parse(null) returns 'null', and typeof null === "object", 
+			// so we must check for that, too.
+			if (o && typeof o === "object" && o !== null) {
+				return o;
+			}
+		}
+		catch (e) { }
+
+		return false;
+	};
 	
     return NSV;
 	
