@@ -2106,7 +2106,7 @@ body > .header .navbar .nav > li > a:hover > .label {
 /* Contains the password input and the login button */
 
 .lockscreen-item > .lockscreen-credentials input {
-  border: 0 !important;
+  /*border: 0 !important;*/
 }
 .lockscreen-item > .lockscreen-credentials .btn {
   background-color: #fff;
@@ -2114,16 +2114,16 @@ body > .header .navbar .nav > li > a:hover > .label {
 }
 /* Extra to give the user an option to navigate the website [optional]*/
 #registration_link {
-  color: #fff;
+  color: #000;
   margin-top: 30px;
   text-align: center;
   text-transform: uppercase;
 }
 #registration_link a {
-  color: rgba(255,255,255,0.5);
+  color: rgba(0,0,0,0.5);
 }
 #registration_link a:hover {
-  color: rgba(255,255,255,1.0);
+  color: rgba(0,0,0,1.0);
   text-decoration: none;
 }
 /* 
@@ -3060,8 +3060,9 @@ label .popover-content {
   background-color: #3c8dbc;
   color: #f9f9f9;
 }
+
 #remember_password_container {
-	color:#fff;
+    color:#000;
 	text-align:center;
 }
 #remember_password_container label {
@@ -3235,6 +3236,9 @@ a.list-group-item.active h4 span {
 */
 .sidebar-menu a[data-page~='dashboard'] i { background: #002e43 url(../img/corporate/nav/dashboard.svg) no-repeat center center; background-size: 18px; height: 50px; width: 50px;}
 .sidebar-menu a[data-page~='dashboard'] i:before {content: "";}
+
+.sidebar-menu a[data-page~='supernet'] i { background: #003147 url(../img/supernet/supernet-mini.png) no-repeat center center; background-size: 18px; height: 50px; width: 50px;}
+.sidebar-menu a[data-page~='supernet'] i:before {content: "";}
 
 .sidebar-menu a[data-page~='transactions'] i { background: #00344b url(../img/corporate/nav/paperplane.svg) no-repeat center center; background-size: 20px; height: 50px; width: 50px;}
 .sidebar-menu a[data-page~='transactions'] i:before {content: "";}
