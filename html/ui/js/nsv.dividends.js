@@ -12,6 +12,7 @@ var NSV = (function(NSV, $, undefined) {
 	var NSV_div_send_out_asset;
 	var NSV_div_send_out_amount;
 	var NSV_div_unquant_out_mult;
+	var NSV_div_dividend_message;
 
 	var NSV_shareswap_unredeemed = [];
 	var NSV_shareswap_repl_asset;
@@ -51,14 +52,9 @@ var NSV = (function(NSV, $, undefined) {
 		}		
 
 		document.getElementById("nsv_div_ad_gen_but").disabled=true;		
-		//var modal = $(this).closest(".modal");
-		//$modal.modal("lock");
-
-
 		
         var btn = $("#nsv_div_ad_calc_but");
 		btn.button('loading');
-		/*btn.prop('disabled', true);*/
 		
 		var asset = $("#nsv_div_ad_asset").val();
 		asset = $.trim(asset);	
@@ -351,9 +347,6 @@ var NSV = (function(NSV, $, undefined) {
 		$("#nsv_div_send_error_message").hide();
 		$("#nsv_div_send_succ_message").hide();
 		$("#nsv_div_send_warn_message").hide();		
-		//document.getElementById("nsv_div_send_error_message").style.display = 'none';
-		//document.getElementById("nsv_div_send_succ_message").style.display = 'none';
-		//document.getElementById("nsv_div_send_warn_message").style.display = 'none';
 		document.getElementById("nsv_div_send_outasset").disabled=true;	
 		document.getElementById("nsv_div_send_nodist_acc").disabled=true;
 		document.getElementById("nsv_div_send_timestamp").disabled=true;		
@@ -398,8 +391,6 @@ var NSV = (function(NSV, $, undefined) {
 		}		
 
 		document.getElementById("nsv_div_send_gen_but").disabled=true;		
-
-
 		
         var btn = $("#nsv_div_send_calc_but");
 		btn.button('loading');
@@ -434,8 +425,10 @@ var NSV = (function(NSV, $, undefined) {
 		var outasset_name,asset_name;
 		var aa_len;
 		var no_dist_arr = [];
-			
-				
+		var block_height = 	0;
+		var block_height_now = 	0;
+		var mode_recent_block = true;	
+		var present_time;
 				
 		if (!(/^\d+$/.test(asset))) {
 			$('#nsv_div_send_error_message').html("Asset ID is invalid.");
@@ -515,7 +508,7 @@ var NSV = (function(NSV, $, undefined) {
 					if (response.errorCode) {
 						err_message = "Unknown error, couldn't getTime.";
 					} else {
-						var present_time = response.time;
+						present_time = response.time;
 						time_in = $.trim(document.getElementById("nsv_div_send_timestamp").value); 
 						if (time_in === "") {
 							activate_timestamp = present_time;
@@ -535,6 +528,48 @@ var NSV = (function(NSV, $, undefined) {
 					}
 				},false);
 				
+				if (err_message !== "") {
+					$('#nsv_div_send_error_message').html(err_message);
+					$('#nsv_div_send_error_message').show();
+					btn.button('reset');
+					return;
+				}
+				NRS.sendOutsideRequest("/nxt?requestType=" + "getBlock", {"timestamp": present_time}, function(response) {
+					if (response.errorCode) {
+						err_message = "Unknown error, couldn't getBlock.";
+					} else {
+						block_height_now = response.height;
+					}
+
+				},false);
+	
+				if (time_in !== "") {
+					NRS.sendOutsideRequest("/nxt?requestType=" + "getBlock", {"timestamp": activate_timestamp}, function(response) {
+						if (response.errorCode) {
+							err_message = "Unknown error, couldn't getBlock.";
+						} else {
+							block_height = response.height;
+						}
+					},false);
+					if (block_height + 1430 < block_height_now) {    //1440 blocks, but reduce to 1430 to give some allowance
+						mode_recent_block = false;
+					} else { 
+						mode_recent_block = true;
+					}					
+				} else {
+					block_height = block_height_now;
+					mode_recent_block = true;
+				}
+				
+				
+				
+				if (err_message !== "") {
+					$('#nsv_div_send_error_message').html(err_message);
+					$('#nsv_div_send_error_message').show();
+					btn.button('reset');
+					return;
+				}
+				
 				if (list_nodist_acc !== "") {
 					if (list_nodist_acc !== "ISSUER") {
 						var account_array = list_nodist_acc.split(',');
@@ -549,7 +584,7 @@ var NSV = (function(NSV, $, undefined) {
 								} else {
 									no_dist_arr.push(response.accountRS);
 								}									
-							});					
+							},false);				
 						}
 					} else {
 						no_dist_arr.push(issued_account);
@@ -562,107 +597,129 @@ var NSV = (function(NSV, $, undefined) {
 					btn.button('reset');
 					return;
 				}
-				
-				
-				$("#nsv_div_send_warn_message").html("This calculation can take several minutes, please be patient. Progress 0%");
-				$("#nsv_div_send_warn_message").show();
-				
-				NSV_div_cur_ass_issued_amount = parseInt(issued_amount,10);
-				var init_object = new Object();
-				init_object.account = issued_account;		
-				init_object.amount = NSV_div_cur_ass_issued_amount;
-				NSV_div_send_acc_array.push(init_object);		
-				
-				NRS.sendOutsideRequest("/nxt?requestType=" + "getTrades", {
-					"asset": asset
-				}, function(response) {
-					if (response.errorCode) {
-						err_message = "Unknown bug. Problem accessing trades.";
-						return;
-						
-					} else {
-						var trade_arr = response.trades;
-						for (var i=0;i<trade_arr.length;i++) {
-							if (trade_arr[i].timestamp <= activate_timestamp) {
-								var tmp_tran_ask = trade_arr[i].askOrder;
-								var tmp_tran_bid = trade_arr[i].bidOrder;							
-								var trade_amt = parseInt(trade_arr[i].quantityQNT,10);
-								var sender, recip,sender_amt,recip_amt;
-								NRS.sendOutsideRequest("/nxt?requestType=" + "getTransaction", {
-									"transaction": tmp_tran_ask, "_extra":tmp_tran_bid
-								}, function(response,input) {
-									tmp2_tran_bid = input._extra;
-									if (response.errorCode) {
-										err_message = "Unknown bug. Problem accessing askOrder.";
-										return;
-										
-									} else {
-										sender = response.senderRS;
-										sender_amt = parseInt(response.attachment.quantityQNT,10);
-									}
 
+				var tot_assets = parseInt(issued_amount,10);
+				NSV_div_cur_ass_issued_amount = tot_assets;
+
+				if (mode_recent_block) {
+					no_dist_arr.push("NXT-MRCC-2YLS-8M54-3CMAJ"); //genesis account
+					
+					NRS.sendOutsideRequest("/nxt?requestType=" + "getAssetAccounts", {
+						"asset": asset, "height": block_height
+					}, function(response) {
+						if (response.errorCode) {
+							err_message = "Unknown bug. Problem accessing getAssetAccounts.";
+							return;
+							
+						} else {
+							var asset_acc_arr = response.accountAssets;
+							for (var n=0;n<asset_acc_arr.length;n++) {
+								var asset_obj = new Object();
+								asset_obj.account = asset_acc_arr[n].accountRS;		
+								//asset_obj.amount = parseInt(asset_acc_arr[n].unconfirmedQuantityQNT,10);
+								asset_obj.amount = parseInt(asset_acc_arr[n].quantityQNT,10);							
+								NSV_div_send_acc_array.push(asset_obj);
+							}
+						}
+					},false);				
+				
+				} else {
+				
+					$("#nsv_div_send_warn_message").html("Calculation can take several minutes, for fast calculation use a recent timestamp. Progress 0%");
+					$("#nsv_div_send_warn_message").show();
+					
+					var init_object = new Object();
+					init_object.account = issued_account;		
+					init_object.amount = NSV_div_cur_ass_issued_amount;
+					NSV_div_send_acc_array.push(init_object);		
+					
+					NRS.sendOutsideRequest("/nxt?requestType=" + "getTrades", {
+						"asset": asset
+					}, function(response) {
+						if (response.errorCode) {
+							err_message = "Unknown bug. Problem accessing trades.";
+							return;
+							
+						} else {
+							var trade_arr = response.trades;
+							for (var i=0;i<trade_arr.length;i++) {
+								if (trade_arr[i].timestamp <= activate_timestamp) {
+									var tmp_tran_ask = trade_arr[i].askOrder;
+									var tmp_tran_bid = trade_arr[i].bidOrder;							
+									var trade_amt = parseInt(trade_arr[i].quantityQNT,10);
+									var sender, recip,sender_amt,recip_amt;
 									NRS.sendOutsideRequest("/nxt?requestType=" + "getTransaction", {
-										"transaction": tmp2_tran_bid
-									}, function(response) {
+										"transaction": tmp_tran_ask, "_extra":tmp_tran_bid
+									}, function(response,input) {
+										tmp2_tran_bid = input._extra;
 										if (response.errorCode) {
-											err_message = "Unknown bug. Problem accessing bidOrder.";
+											err_message = "Unknown bug. Problem accessing askOrder.";
 											return;
 											
 										} else {
-											recip = response.senderRS;	
-											recip_amt = parseInt(response.attachment.quantityQNT,10);
+											sender = response.senderRS;
+											sender_amt = parseInt(response.attachment.quantityQNT,10);
 										}
-										NSV.div_send_add_acc(recip,trade_amt);
-										NSV.div_send_add_acc(sender,trade_amt*-1);
-											
-										},false);
 
-								},false);	
+										NRS.sendOutsideRequest("/nxt?requestType=" + "getTransaction", {
+											"transaction": tmp2_tran_bid
+										}, function(response) {
+											if (response.errorCode) {
+												err_message = "Unknown bug. Problem accessing bidOrder.";
+												return;
+												
+											} else {
+												recip = response.senderRS;	
+												recip_amt = parseInt(response.attachment.quantityQNT,10);
+											}
+											NSV.div_send_add_acc(recip,trade_amt);
+											NSV.div_send_add_acc(sender,trade_amt*-1);
+												
+											},false);
 
+									},false);	
+
+								}
 							}
 						}
+					},false);
+
+					if (err_message === "") {				
+						err_message = NSV.div_send_get_transactions(asset,NSV_div_send_acc_array,issued_time,activate_timestamp);
 					}
-				},false);
-
-				if (err_message === "") {				
-					err_message = NSV.div_send_get_transactions(asset,NSV_div_send_acc_array,issued_time,activate_timestamp);
-				}
-				if (err_message !== "") {
-					$('#nsv_div_send_error_message').html(err_message);
-					$('#nsv_div_send_error_message').show();
-					btn.button('reset');
-					return;
-				}
-
-				var splice_arr = [];	
-				aa_len = NSV_div_send_acc_array.length;
-				var tot_assets = 0;
-				var tot2_assets = 0;
-				//output = NSV_div_send_out_err;
-				for (var i=0; i<aa_len; ++i) {
-					tot_assets += NSV_div_send_acc_array[i].amount;					
+					if (err_message !== "") {
+						$('#nsv_div_send_error_message').html(err_message);
+						$('#nsv_div_send_error_message').show();
+						btn.button('reset');
+						return;
+					}
+				}	
+	
+				for (var i=0; i<NSV_div_send_acc_array.length; ++i) {
 					if (NSV_div_send_acc_array[i].amount === 0) {
-						splice_arr.push(i);
+						NSV_div_send_acc_array.splice(i,1);
+						i--;						
 						continue;
 					}
 					for (var k=0; k<no_dist_arr.length; k++) {
 						if (NSV_div_send_acc_array[i].account == no_dist_arr[k]) {
-							tot2_assets += NSV_div_send_acc_array[i].amount;
-							splice_arr.push(i);
+							NSV_div_send_acc_array.splice(i,1);
+							i--;
 							break;
 						}
 					}
 				}
-				tot2_assets = tot_assets - tot2_assets;
+				
+				var tot2_assets = 0;				
+				for (i=0; i<NSV_div_send_acc_array.length; ++i) {
+					tot2_assets += NSV_div_send_acc_array[i].amount;
+				}	
 				$("#nsv_div_send_warn_message").hide();
 
 				$("#nsv_div_ad_succ_message").html("Calculation Succeeded. Hit <b>Activate Distribution</b> to proceed with the below distributions.");
 				$("#nsv_div_ad_succ_message").show();							
 
 				
-				for (i=splice_arr.length-1; i>=0; --i) {
-					NSV_div_send_acc_array.splice(splice_arr[i],1);
-				}
 				aa_len = NSV_div_send_acc_array.length;
 				NSV_div_send_acc_array.sort(function(a,b) {return b.amount - a.amount; });
 				
@@ -672,23 +729,20 @@ var NSV = (function(NSV, $, undefined) {
 				NSV_div_unquant_out_mult = Math.pow(10,outasset_dec1);
 				var mult = qnt_amt/tot2_assets;
 				NSV_div_send_out_amount = qnt_amt;
+				NSV_div_dividend_message = "Dividend from asset " + asset_name + "(" + String(asset) + ")";
+				//var prt_issued_amount = String(NSV_div_cur_ass_issued_amount/unquant_mult);
 				
-				var prt_issued_amount = String(NSV_div_cur_ass_issued_amount/unquant_mult);
-				
-				if (NSV_div_cur_ass_issued_amount != tot_assets) {
-					err_message = "Found assets and expected assets don't match up. Try again. If that fails, forward the output log to the developer.";
-				}
 				if (NSV_div_send_acc_array[aa_len-1] < 0) {
 					err_message = "Negative balances in calculation. Try again. If that fails, forward the output log to the developer.";
 				}
-				output = output.concat(asset_name, " (",String(asset),") Total found assets: ", String(tot_assets/unquant_mult), ", Assets to be distributed: ", String(tot2_assets/unquant_mult), "\n");
+				output = output.concat(asset_name, " (",String(asset),") Total issued assets: ", String(tot_assets/unquant_mult), ", Assets to be distributed to: ", String(tot2_assets/unquant_mult), "\n");
 				if (NSV_div_send_out_nxt) {
-					output = output.concat("Summary of proposed distribution of  ", amount, "NXT to ", String(aa_len),"\n");
+					output = output.concat("Summary of proposed distribution of  ", amount, "NXT to ", String(aa_len)," assetholders\n");
 				} else {
-					output = output.concat("Summary of proposed distribution of ", amount, " [",outasset_name, "] assets to ", String(aa_len),"\n");
+					output = output.concat("Summary of proposed distribution of ", amount, " [",outasset_name, "] assets to ", String(aa_len)," assetholders\n");
 				}
 				var datetime = NSV.timestamp_to_time(activate_timestamp);
-				output = output.concat("Based on asset holders at timestamp ", String(activate_timestamp)," (", datetime, ")\n");
+				output = output.concat("Based on ownership at timestamp ", String(activate_timestamp)," (", datetime, ")\n");
 				output = output.concat("----------------------\n");
 				output = output.concat("Number of assets, Account, Payout amount\n");
 
@@ -799,7 +853,7 @@ var NSV = (function(NSV, $, undefined) {
 				tmp_sm_acc = NSV_div_send_acc_array[i].account;
 				tmp_sm_amt = String(NSV_div_send_acc_array[i].amount);		
 				document.getElementById("nsv_div_send_disp_results").value = out_message;	  
-				NRS.sendRequest("sendMoney", {"secretPhrase":secret,feeNQT:"100000000",deadline:"1440","recipient":tmp_sm_acc,"amountNQT":tmp_sm_amt}, function(response, input) {
+				NRS.sendRequest("sendMoney", {"secretPhrase":secret,feeNQT:"100000000",deadline:"1440","recipient":tmp_sm_acc,"amountNQT":tmp_sm_amt,"message":NSV_div_dividend_message}, function(response, input) {
 					tmp_sm_amt2 = String(parseInt(input.amountNQT, 10 )/NSV_div_unquant_out_mult);				
 					if (response.errorCode) {
 						out_message = out_message.concat("***",tmp_sm_amt2,", ",input.recipientRS,", Encountered a problem. ",String(response.errorDescription),"\n"); 
@@ -877,7 +931,7 @@ var NSV = (function(NSV, $, undefined) {
 				tmp_sm_acc = NSV_div_send_acc_array[i].account;	
 				tmp_sm_amt = String(NSV_div_send_acc_array[i].amount);						
 				document.getElementById("nsv_div_send_disp_results").value = out_message;
-				NRS.sendRequest("transferAsset", {"secretPhrase":secret,feeNQT:"100000000",deadline:"1440","recipient":tmp_sm_acc,"quantityQNT":tmp_sm_amt,"asset":NSV_div_send_out_asset}, function(response, input) {
+				NRS.sendRequest("transferAsset", {"secretPhrase":secret,feeNQT:"100000000",deadline:"1440","recipient":tmp_sm_acc,"quantityQNT":tmp_sm_amt,"asset":NSV_div_send_out_asset,"message":NSV_div_dividend_message}, function(response, input) {
 					tmp_sm_amt2 = String(parseInt(input.quantityQNT, 10 )/NSV_div_unquant_out_mult);
 					if (response.errorCode) {
 						out_message = out_message.concat("***",tmp_sm_amt2,", ",input.recipientRS,", Encountered a problem. ",String(response.errorDescription),"\n"); 
@@ -1192,7 +1246,7 @@ var NSV = (function(NSV, $, undefined) {
 					var unquant_asset2 = parseInt(NSV_redeemed_assets[k].amountSent,10)/unquant2_mult;
 					out_message = out_message + unquant_asset1.toString() + ", " + NSV_redeemed_assets[k].sender + ", " + NSV_redeemed_assets[k].tran + ", " + unquant_asset2.toString() + ", " + NSV_redeemed_assets[k].tranSent + "\n";
 
-					var expected_asset_amt = unquant_asset1*ratio_int/ratio_atens;
+					var expected_asset_amt = Math.round(parseInt(NSV_redeemed_assets[k].amount,10)*ratio_int/ratio_atens)/unquant1_mult;
 					
 					if (Math.abs(expected_asset_amt/unquant_asset2-1) > 0.0001 ) {
 						out_message = out_message + "****WARNING, AMOUNT SENT DOESN'T MATCH******EXPECTED: " + expected_asset_amt.toString() + " ACTUAL: " + unquant_asset2.toString() + "\n";
@@ -1209,7 +1263,7 @@ var NSV = (function(NSV, $, undefined) {
 			for (var i=0; i<num_tobe_swapped; i++) {
 				unquant_asset1 = parseInt(NSV_shareswap_unredeemed[i].amount,10)/unquant1_mult;
 				
-				var adjusted_ratio = Math.pow(10,asset2_dec-asset1_dec)*ratio_int;;
+				var adjusted_ratio = Math.pow(10,asset2_dec-asset1_dec)*ratio_int;
 				var send_amt = parseInt(NSV_shareswap_unredeemed[i].amount,10)*adjusted_ratio;
 				NSV_shareswap_unredeemed[i].amount = Math.round(send_amt/ratio_atens);
 				var asset_send_unquant = Math.round(send_amt/ratio_atens)/unquant2_mult;
