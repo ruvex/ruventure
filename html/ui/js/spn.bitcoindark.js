@@ -26,16 +26,17 @@ $("#spn_teleport").click(function () {
         refreshTeleport();
     }, 60000);
 });
-$("#spn_btcd_add_teleport_balance_btnAdd").click(function () {
-    alert("reach");
-    var btn = $(this);
-    btn.button('loading');
-
+NRS.forms.spnBTCDMakeTelepods = function ($modal) {
     var str = "{\"requestType\":\"maketelepods\",\"amount\":\"" + $("#spn_btcd_add_teleport_balance_amount").val() + "\",\"coin\":\"" + $("#spn_btcd_add_teleport_balance_currency").val() + "\"}";
-    //var result = initSuperNETrpc();
-    alert(str);
+    var result = initSuperNETrpc(str);
 
-});
+    $("#spn_btcd_add_teleport_balance_btnAdd").button('reset');
+    $modal.modal("unlock");
+    $modal.modal("hide");
+
+    setTimeout(function () { getTeleportFund(); }, 3000);
+}
+
 function refreshTeleport() {
     if (NRS.currentPage == "spn_teleport") {
         getTeleportFund();
@@ -70,7 +71,7 @@ function getTeleportFund() {
         }
 
         if (!bFound && !bNothing) {
-            setTimeout(function () { guiPOLL(); }, 1000);
+            setTimeout(function () { guiPOLL(); }, 2000);
         }
 
         if (!bFound && bNothing) {
