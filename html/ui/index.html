@@ -1814,6 +1814,15 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="col-sm-4 col-md-3">
+                                <div class="thumbnail">
+                                    <div class="caption">
+                                        <h3>Telepathy</h3>
+                                        <p style="min-height:100px">Secure peer-to-peer communication </p>
+                                        <p><a id="spn_telepathy" href="#" class="btn btn-primary goto-page" role="button" data-page="spn_telepathy">Telepathy</a></p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </section>
                 </div>
@@ -1852,6 +1861,130 @@
                             <textarea id="spn_bitcoindark_result" cols="100" rows="10"></textarea>
                         </div>
                     </section>
+                </div>
+
+                <div id="spn_telepathy_page" class="page">
+                    <section class="content-header"><h1>BitcoinDark - Telepathy</h1></section>
+                    <section class="content">
+                        <ol class="breadcrumb">
+                            <li><a href="#" class="goto-page" data-page="supernet">SuperNET</a></li>
+                            <li><a href="#" class="goto-page" data-page="spn_bitcoindark">BitcoinDark</a></li>
+                            <li class="active">Telepathy</li>
+                        </ol>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="small-box bg-aqua">
+                                    <div class="inner">
+                                        <h3><span id="spn_telepathy_contacts_loading" class="loading_dots"><span>.</span><span>.</span><span>.</span></span><span id="spn_telepathy_contacts_total"></span></h3>
+                                        <p>Total Contacts</p>
+                                    </div>
+                                    <div class="icon"><i class="fa fa-user"></i></div>
+                                    <a href="#" class="small-box-footer" data-toggle="modal" data-target="#spn_telepathy_info_modal" data-info="contacts"><span>More info</span> <i class="fa fa-arrow-circle-right"></i></a>
+                                    
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="small-box bg-aqua">
+                                    <div class="inner">
+                                        <h3><span id="spn_telepathy_peers_loading" class="loading_dots"><span>.</span><span>.</span><span>.</span></span><span id="spn_telepathy_peers_total"></span></h3>
+                                        <p>Connected Peers</p>
+                                    </div>
+                                    <div class="icon"><i class="fa fa-cloud"></i></div>
+                                    <a href="#" class="small-box-footer" data-toggle="modal" data-target="#spn_telepathy_info_modal" data-info="peers"><span>More info</span> <i class="fa fa-arrow-circle-right"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <textarea id="spn_telepathy_result" cols="100" rows="10"></textarea>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="modal fade" id="spn_telepathy_info_modal" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-wider">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                <h4 class="modal-title">Telepathy Info</h4>
+                            </div>
+                            <div class="modal-body">
+                                <ul class="nav nav-pills nav-justified" style="margin-bottom:10px">
+                                    <li id="spn_telepathy_info_contacts" data-tab="contacts" class="telepathy-tab"><a href="#">Contacts</a></li>
+                                    <li id="spn_telepathy_info_peers" data-tab="peers" class="telepathy-tab"><a href="#">Peers</a></li>
+                                    <li><a href="#" class="dropdown-toggle" data-toggle="dropdown">Actions <span class="caret"></span></a>
+                                        <ul class="dropdown-menu" role="menu">
+                                            <li id="spn_telepathy_info_add_contact" data-tab="add_contact"><a href="#">Add Contacts</a></li>
+                                            <li id="spn_telepathy_info_ping_peers" data-tab="ping_peers"><a href="#">Ping Peers</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+
+                                <div class="data-container spn_telepathy_info_modal_content" id="spn_telepathy_info_modal_contacts" style="max-height:350px;overflow:auto;">
+                                    <table class="table table-striped" id="spn_telepathy_info_modal_contacts_table">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Account ID</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                    <div class="data-loading-container"><img src="img/loading_indicator.gif" alt="Loading..." width="32" height="32" /></div>
+                                    <div class="data-empty-container" style="padding-top:10px">No contacts.</div>
+                                </div>
+
+                                <div class="data-container spn_telepathy_info_modal_content" id="spn_telepathy_info_modal_peers" style="display:none;max-height:350px;overflow:auto;">
+                                    <table class="table table-striped" id="spn_telepathy_info_modal_peers_table">
+                                        <thead>
+                                            <tr>
+                                                <th>Address</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                    <div class="data-loading-container"><img src="img/loading_indicator.gif" alt="Loading..." width="32" height="32" /></div>
+                                    <div class="data-empty-container" style="padding-top:10px">No peers.</div>
+                                </div>
+
+                                <div class="data-ontainer spn_telepathy_info_modal_content" id="spn_telepathy_info_modal_add_contact" style="display:none;max-height:350px;overflow:auto;">
+                                    <div class="modal-body">
+                                            <div class="col-xs-6 col-sm-6 col-md-6">
+                                                <div class="form-group">
+                                                    <label for="spn_telepathy_add_contact_name">Name</label>
+                                                    <div>
+                                                        <input type="text" id="spn_telepathy_add_contact_name" class="form-control" placeholder="Name" tabindex="1" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-6 col-sm-6 col-md-6">
+                                                <div class="form-group">
+                                                    <label for="spn_telepathy_add_contact_account_id">Account ID</label>
+                                                    <div>
+                                                        <input type="text" class="form-control" id="spn_telepathy_add_contact_account_id" placeholder="NXT Account ID" tabindex="2" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                    </div>
+                                </div>
+
+                                <div class="data-container spn_telepathy_info_modal_content" id="spn_telepathy_info_modal_ping_peers" style="display:none;max-height:350px;overflow:auto;">
+                                    <div class="col-xs-6 col-sm-6 col-md-6">
+                                        <div class="form-group">
+                                            <label for="spn_telepathy_actions_name">IP Address</label>
+                                            <div>
+                                                <input type="text" id="spn_telepathy_actions_name" class="form-control" placeholder="Name" tabindex="1" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer" style="margin-top:0;">
+                                <button type="button" class="btn btn-primary" data-dismiss="modal" data-i18n="close" data-action="close">Close</button>
+                                <button type="button" class="btn btn-primary" data-action="add_contact" data-ignore="true">Add Contact</button>
+                                <button type="button" class="btn btn-primary" data-action="ping_peers" data-ignore="true">Ping</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="modal fade" id="spn_btcd_add_account_balance_modal" tabindex="-1" role="dialog" aria-hidden="true">

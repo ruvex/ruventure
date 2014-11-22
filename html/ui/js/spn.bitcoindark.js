@@ -6,7 +6,7 @@ function initSuperNETrpc(params) {
         url: 'http://127.0.0.1:' + rpcport,
         dataType: 'json',
         type: 'POST',
-        timeout: 10000,
+        timeout: 5000,
         async:false,
         data: {
             method: "SuperNET",
@@ -14,6 +14,9 @@ function initSuperNETrpc(params) {
         },
         success: function (data) {
             result = data;
+        },
+        error: function(x, t, m) {
+            alert(t);
         }
     });
     return JSON.parse(result);
@@ -26,6 +29,110 @@ $("#spn_teleport").click(function () {
         refreshTeleport();
     }, 60000);
 });
+$("#spn_telepathy").click(function () {
+    telepathyOnLoad();
+});
+
+function telepathyOnLoad() {
+    getTelepathyContacts();
+    getTelepathyPeers();
+}
+
+function getTelepathyContacts() {
+    var rows;
+    $("#spn_telepathy_contacts_loading").show();
+    $("#spn_telepathy_contacts_total").hide();
+
+    var result = initSuperNETrpc("{\"requestType\":\"dispcontact\",\"contact\":\"*\"}");
+
+    $.each(result, function (i, v) {
+        rows += "<tr><td>" + v.handle + "</td><td>" + v.acct + "</td></tr>";
+    });
+
+    $("#spn_telepathy_info_modal_contacts_table tbody").empty().append(rows);
+
+    $("#spn_telepathy_result").html(JSON.stringify(result));
+    $("#spn_telepathy_contacts_total").text(result.length);
+
+    $("#spn_telepathy_contacts_loading").hide();
+    $("#spn_telepathy_contacts_total").show();
+}
+function getTelepathyPeers() {
+    var rows;
+    $("#spn_telepathy_peers_loading").show();
+    $("#spn_telepathy_peers_total").hide();
+
+    var result = initSuperNETrpc("{\"requestType\":\"getpeers\"}");
+
+    $.each(result.peers, function (i, v) {
+        if (v.srvipaddr) {
+            rows += "<tr><td>" + v.srvipaddr + "</td></tr>";
+        }
+    });
+
+    $("#spn_telepathy_info_modal_peers_table tbody").empty().append(rows);
+
+    $("#spn_telepathy_result").html(JSON.stringify(result));
+    $("#spn_telepathy_peers_total").text(result.num);
+
+    $("#spn_telepathy_peers_loading").hide();
+    $("#spn_telepathy_peers_total").show();
+}
+
+$('#spn_telepathy_info_modal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);
+    var type = button.data('info');
+
+    if (type == "contacts") {
+        $("#spn_telepathy_info_contacts").click();
+    } else {
+        $("#spn_telepathy_info_peers").click();
+    }
+});
+$("#spn_telepathy_info_modal ul.nav .telepathy-tab").click(function (e) {
+    e.preventDefault();
+
+    $("#spn_telepathy_info_modal .modal-title").text("Telepathy Info - " + e.currentTarget.innerText);
+
+    var tab = $(this).data("tab");
+
+    $(this).siblings().removeClass("active");
+    $(this).addClass("active");
+
+    $(".spn_telepathy_info_modal_content").hide();
+
+    var content = $("#spn_telepathy_info_modal_" + tab);
+
+    content.show();
+
+    $("#spn_telepathy_info_modal .modal-footer").find("[data-action='close']").show();
+    $("#spn_telepathy_info_modal .modal-footer").find("[data-action='close']").siblings().hide();
+    
+});
+$("#spn_telepathy_info_modal ul.nav li ul li").click(function (e) {
+    e.preventDefault();
+
+    $("#spn_telepathy_info_modal .modal-title").text("Telepathy Info - " + e.currentTarget.innerText);
+
+    var tab = $(this).data("tab");
+
+    var parent = $(this).parent().parent();
+    parent.addClass("active");
+
+    $(this).parent().parent().siblings().removeClass("active");
+    $(this).parent().parent().addClass("active");
+
+    $(".spn_telepathy_info_modal_content").hide();
+
+    var content = $("#spn_telepathy_info_modal_" + tab);
+
+    content.show();
+
+    $("#spn_telepathy_info_modal .modal-footer").find("[data-action='" + tab + "']").show();
+    $("#spn_telepathy_info_modal .modal-footer").find("[data-action='" + tab + "']").siblings().hide();
+});
+
+
 NRS.forms.spnBTCDMakeTelepods = function ($modal) {
     var str = "{\"requestType\":\"maketelepods\",\"amount\":\"" + $("#spn_btcd_add_teleport_balance_amount").val() + "\",\"coin\":\"" + $("#spn_btcd_add_teleport_balance_currency").val() + "\"}";
     var result = initSuperNETrpc(str);
