@@ -22,7 +22,7 @@ var SPN = (function (SPN, $, undefined) {
 
     $("#spn_coinomat").click(function () {
         setDefaultCoinomatExchangePair();
-        getExchangeRate();
+        getExchangeRate(true);
         create_tunnel();
 
         setInterval(function () {
@@ -33,17 +33,17 @@ var SPN = (function (SPN, $, undefined) {
     $("#spn_coinomat_fr, #spn_coinomat_to").on("change", function (e) {
         $("#spn_coinomat_wallet_addr_to").val("");
         $("#spn_coinomat_perfect_code_input").val("");
-        getExchangeRate();
+        getExchangeRate(true);
         create_tunnel();
     });
 
     function refreshCoinomat(){
         if (NRS.currentPage == "spn_coinomat") {
-            getExchangeRate();
+            getExchangeRate(false);
             create_tunnel();
         }
     }
-    function getExchangeRate() {
+    function getExchangeRate(isFirstTime) {
         toggleLoadingMessage(true)
         var f = $("#spn_coinomat_fr").select2("val");
         var t = $("#spn_coinomat_to").select2("val");
@@ -68,28 +68,42 @@ var SPN = (function (SPN, $, undefined) {
                     var nv = xrate_unit - data.out_prec.fee;
                     nv = utoFixed(nv,data.out_prec.dec);
 
-                    $("#spn_coinomat_amount_fr").val(data.in_def);
+                    if(isFirstTime){
+                        $("#spn_coinomat_amount_fr").val(data.in_def);
+                    }
                     $('#spn_coinomat_amount_fr').prop('disabled', false);
                     if (!isNaN(nv) && (nv > 0)) {
-                        $("#spn_coinomat_amount_to").val(nv);
+                        if (isFirstTime) {
+                            $("#spn_coinomat_amount_to").val(nv);
+                        }
+                        else {
+                            var xrate_custom = xrate.xrate_global * parseFloat($("#spn_coinomat_amount_fr").val());
+                            xrate_custom = xrate_custom - data.out_prec.fee;
+                            xrate_custom = utoFixed(xrate_custom,(data.out_prec.dec));
+
+                            $("#spn_coinomat_amount_to").val(xrate_custom);
+                        }
                         $("#spn_coinomat_main_exchange").removeClass('disabled');
                     }
                     else {
                         $("#spn_coinomat_amount_to").val(0);
                     }
 
-                    var currencyunits;
-                    switch(f){
-                        case "PERFECT": case "EGOPAY": case "OKPAY": {
-                            currencyunits = f + " USD";
-                            break;
-                        }
-                        default:{
-                            currencyunits = f;
+                    var fcurrencyunits = "";
+                    var tcurrencyunits = "";
+                    switch (f) {
+                        case "PERFECT": case "EGOPAY": case "OKPAY": case "COINO": {
+                            fcurrencyunits = " USD";
                             break;
                         }
                     }
-                    $("#spn_coinomat_exchange_message").removeClass('alert-danger').addClass('alert-success').html("Exchange rates : " + data.in_def + " " + currencyunits + " = " + xrate_unit + " " + t + (data.extra_note == null ? "" : data.extra_note) + " <br/>Exchange limits : Minimum " + data.in_min + " " + currencyunits + ", Maximum " + utoFixed(data.in_max, data.in_prec.dec) + " " + currencyunits).show();
+                    switch (t) {
+                        case "PERFECT": case "EGOPAY": case "OKPAY": case "COINO": {
+                            tcurrencyunits = " USD";
+                            break;
+                        }
+                    }
+                    $("#spn_coinomat_exchange_message").removeClass('alert-danger').addClass('alert-success').html("Exchange rates : " + data.in_def + " " + f + fcurrencyunits + " = " + xrate_unit + " " + t + tcurrencyunits + (data.extra_note == null ? "" : data.extra_note) + " <br/>Exchange limits : Minimum " + data.in_min + " " + f + fcurrencyunits + ", Maximum " + utoFixed(data.in_max, data.in_prec.dec) + " " + f + fcurrencyunits).show();
                     check_exchange_limits();
                     toggleWalletToInput(true);
                 }
@@ -197,6 +211,8 @@ var SPN = (function (SPN, $, undefined) {
     $('#send_money_modal').on('hidden.bs.modal', function () {
         $('#send_money_recipient').prop('readonly', false);
         $('#send_money_message').prop('readonly', false);
+        $("#send_money_recipient").siblings(".recipient_selector").show();
+        $("#send_money_recipient").parent().addClass("input-group");
     });
     
     function getCardList() {
@@ -272,7 +288,7 @@ var SPN = (function (SPN, $, undefined) {
 
         //TODO
         switch (t) {
-            case "NXT": {
+            case "NXT": case "COINO": {
                 tunnelURL += "&wallet_to=" + NRS.accountRS;
                 break;
             }
@@ -358,6 +374,8 @@ var SPN = (function (SPN, $, undefined) {
                         $("#spn_coinomat_in_address_note_div").show();
                         $("#spn_coinomat_in_address").text(data.tunnel.wallet_from.wallet);
                         $("#spn_coinomat_in_address_note").text(data.tunnel.wallet_from.note);
+                        $("#btn_send_coinousd").data("recipient", data.tunnel.wallet_from.wallet);
+                        $("#btn_send_coinousd").data("note", data.tunnel.wallet_from.note);
                     }
                     else
                     {
@@ -389,7 +407,8 @@ var SPN = (function (SPN, $, undefined) {
                             break;
                     }
                     
-                    var currencyunits;
+                    var fcurrencyunits = "";
+                    var tcurrencyunits = "";
                     switch (data.tunnel.currency_from) {
                         case "BTC": case "LTC": case "PPC": {
                             var strText;
@@ -408,20 +427,21 @@ var SPN = (function (SPN, $, undefined) {
                                 "height": 150
                             });
                             $("#spn_coinomat_in_address_qr_code").show();
-                            currencyunits = data.tunnel.currency_from;
                             break;
                         }
-                        case "PERFECT": case "EGOPAY": case "OKPAY": {
-                            currencyunits = data.tunnel.currency_from + " USD";
+                        case "PERFECT": case "EGOPAY": case "OKPAY": case "COINO": {
+                            fcurrencyunits = " USD";
                             break;
                         }
-                        default: {
-                            currencyunits = data.tunnel.currency_from;
+                    }
+                    switch (data.tunnel.currency_to) {
+                        case "PERFECT": case "EGOPAY": case "OKPAY": case "COINO": {
+                            tcurrencyunits = " USD";
                             break;
                         }
                     }
 
-                    $("#spn_coinomat_exchanger_message").html("Exchange rates : " + data.tunnel.in_def + " " + currencyunits + " = " + amountReceived + " " + data.tunnel.currency_to + " <br/>Exchange limits : Minimum " + data.tunnel.in_min + " " + currencyunits + ", Maximum " + utoFixed(data.tunnel.in_max, data.tunnel.in_prec.dec) + " " + currencyunits + "<br/><br/>This rate is valid for 30 minutes from now ").show();
+                    $("#spn_coinomat_exchanger_message").html("Exchange rates : " + data.tunnel.in_def + " " + data.tunnel.currency_from + fcurrencyunits + " = " + amountReceived + " " + data.tunnel.currency_to + tcurrencyunits + " <br/>Exchange limits : Minimum " + data.tunnel.in_min + " " + data.tunnel.currency_from + fcurrencyunits + ", Maximum " + utoFixed(data.tunnel.in_max, data.tunnel.in_prec.dec) + " " + data.tunnel.currency_from + fcurrencyunits + "<br/><br/>This rate is valid for 30 minutes from now ").show();
                     $("#spn_coinomat_exchanger_error_message").hide();
                     toggleCoinomatExchangerLoading(false,false);
                     showTransactionHistory(data, data.tunnel.currency_to);
@@ -527,6 +547,7 @@ var SPN = (function (SPN, $, undefined) {
             else
             {
                 (f == "NXT" ? $("#spn_coinomat_send_nxt_div").show() : $("#spn_coinomat_send_nxt_div").hide());
+                (f == "COINO" ? $("#spn_coinomat_send_coinousd_div").show() : $("#spn_coinomat_send_coinousd_div").hide());
                 $("#spn_coinomat_exchanger_error_message").hide();
             }
 
@@ -552,7 +573,7 @@ var SPN = (function (SPN, $, undefined) {
 
                 $("#spn_coinomat_tx_history_header").html("Transactions History");
                 if (f != t) {
-                    if (t == "NXT") {
+                    if (t == "NXT" || t == "COINO") {
                         $("#spn_coinomat_tx_history_header").html($("#spn_coinomat_tx_history_header").html() + ": " + f + "/" + t + ": " + NRS.accountRS);
                     }
                     else if (t == "VISAMASTER") {
@@ -560,15 +581,13 @@ var SPN = (function (SPN, $, undefined) {
 
                         if (bankcard) {
                             $("#spn_coinomat_tx_history_header").html($("#spn_coinomat_tx_history_header").html() + ": " + f + "/" + t + ": " + bankcard);
-                        } else
-                        {
+                        } else {
                             $("#spn_coinomat_tx_history_header").html("Transactions History");
                         }
                     }
-                    else
-                    {
+                    else {
                         $("#spn_coinomat_tx_history_header").html($("#spn_coinomat_tx_history_header").html() + ": " + f + "/" + t + ": " + $("#spn_coinomat_wallet_addr_to").val().trim());
-                    } 
+                    }
                 }
             }
             else {
@@ -587,8 +606,10 @@ var SPN = (function (SPN, $, undefined) {
 
         if (isExchangeRate) {
             var t = $("#spn_coinomat_to").select2("val");
-            
-            if (t != "NXT") {
+
+            if (t == "NXT" || t == "COINO") {
+                $("#spn_coinomat_wallet_addr_to_div").hide();
+            } else {
                 $("#spn_coinomat_wallet_addr_to_div").show();
                 $("#spn_coinomat_wallet_addr_to_label_div").show();
 
@@ -607,11 +628,8 @@ var SPN = (function (SPN, $, undefined) {
                     default: $("#spn_coinomat_wallet_addr_to_label").html(t + " Wallet Address");
                         break;
                 }
-            } else {
-                $("#spn_coinomat_wallet_addr_to_div").hide();
             }
-        }else
-        {
+        } else {
             $("#spn_coinomat_wallet_addr_to_div").hide();
         }
     }
@@ -651,19 +669,21 @@ var SPN = (function (SPN, $, undefined) {
     SPN.coinomatExchange = function () {
         var t = $("#spn_coinomat_to").select2("val");
 
-        if (t != "NXT") {
+        if (t == "NXT" || t == "COINO") {
+            $('#spn_coinomat_exchanger_modal').modal('show');
+        }
+        else
+        {
             if (t == "VISAMASTER") {
                 if ($('input[name=bankcard]:checked', '#spn_coinomat_visamaster_bankcard').val()) {
                     $('#spn_coinomat_exchanger_modal').modal('show');
                 }
-                else
-                {
+                else {
                     $.growl("Please choose your destination bank card", {
                         "type": "danger"
                     });
                 }
-            } else
-            {
+            } else {
                 if ($("#spn_coinomat_wallet_addr_to").val().trim() == "") {
                     $.growl("Please specify your destination wallet address", {
                         "type": "danger"
@@ -671,13 +691,8 @@ var SPN = (function (SPN, $, undefined) {
                 } else {
                     $('#spn_coinomat_exchanger_modal').modal('show');
                 }
-            }
+            } 
         }
-        else
-        {
-            $('#spn_coinomat_exchanger_modal').modal('show');
-        }
-
     }
     SPN.coinomatSendNxt = function () {
         $('#send_money_modal').modal('show');
@@ -687,6 +702,9 @@ var SPN = (function (SPN, $, undefined) {
         $('#send_money_message').prop('readonly', true);
         $('#send_money_add_message').prop('checked', true);
         $('#send_money_modal').find(".optional_message").show();
+
+        $("#send_money_recipient").siblings(".recipient_selector").hide();
+        $("#send_money_recipient").parent().removeClass("input-group");
 
         setTimeout(function () {
             $('#send_money_amount').focus();

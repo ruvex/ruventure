@@ -1783,7 +1783,35 @@ var NRS = (function(NRS, $, undefined) {
 		var assetId = $invoker.data("asset");
 		var assetName = $invoker.data("name");
 		var decimals = $invoker.data("decimals");
+		var recipient = $invoker.data("recipient");
+		var note = $invoker.data("note");
 
+		if (recipient) {
+		    $("#transfer_asset_recipient").val(recipient);
+		    $("#transfer_asset_recipient").prop('readonly', true);
+		    $("#transfer_asset_recipient").siblings(".recipient_selector").hide();
+		    $("#transfer_asset_recipient").parent().removeClass("input-group");
+		    setTimeout(function () {
+		        $('#transfer_asset_quantity').focus();
+		    }, 800);
+		}
+		else {
+		    $("#transfer_asset_recipient").val("");
+		    $("#transfer_asset_recipient").prop('readonly', false);
+		    $("#transfer_asset_recipient").siblings(".recipient_selector").show();
+		    $("#transfer_asset_recipient").parent().addClass("input-group");
+		}
+		if (note) {
+		    $("#transfer_asset_message").val(note);
+		    $("#transfer_asset_message").prop('readonly', true);
+		    $("#transfer_asset_add_message").prop('checked', true);
+		    $("#transfer_asset_modal").find(".optional_message").show();
+		} else {
+		    $("#transfer_asset_message").val("");
+		    $("#transfer_asset_message").prop('readonly', false);
+		    $("#transfer_asset_add_message").prop('checked', false);
+		    $("#transfer_asset_modal").find(".optional_message").hide();
+		}
 		$("#transfer_asset_asset").val(assetId);
 		$("#transfer_asset_decimals").val(decimals);
 		$("#transfer_asset_name, #transfer_asset_quantity_name").html(String(assetName).escapeHTML());
