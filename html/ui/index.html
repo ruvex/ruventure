@@ -1925,6 +1925,7 @@
                                             <tr>
                                                 <th>Name</th>
                                                 <th>Account ID</th>
+                                                <th>Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody></tbody>
@@ -1970,9 +1971,9 @@
                                 <div class="data-container spn_telepathy_info_modal_content" id="spn_telepathy_info_modal_ping_peers" style="display:none;max-height:350px;overflow:auto;">
                                     <div class="col-xs-6 col-sm-6 col-md-6">
                                         <div class="form-group">
-                                            <label for="spn_telepathy_actions_name">IP Address</label>
+                                            <label for="spn_telepathy_ping_peers_ip">IP Address</label>
                                             <div>
-                                                <input type="text" id="spn_telepathy_actions_name" class="form-control" placeholder="Name" tabindex="1" />
+                                                <input type="text" id="spn_telepathy_ping_peers_ip" class="form-control" placeholder="IP Address" tabindex="1" />
                                             </div>
                                         </div>
                                     </div>
@@ -1980,8 +1981,8 @@
                             </div>
                             <div class="modal-footer" style="margin-top:0;">
                                 <button type="button" class="btn btn-primary" data-dismiss="modal" data-i18n="close" data-action="close">Close</button>
-                                <button type="button" class="btn btn-primary" data-action="add_contact" data-ignore="true">Add Contact</button>
-                                <button type="button" class="btn btn-primary" data-action="ping_peers" data-ignore="true">Ping</button>
+                                <button type="button" class="btn btn-primary" data-action="add_contact" data-ignore="true" onclick="SPN.telepathyAddContact()">Add Contact</button>
+                                <button type="button" class="btn btn-primary" data-action="ping_peers" data-ignore="true" onclick="SPN.telepathyPing()">Ping</button>
                             </div>
                         </div>
                     </div>

@@ -46,7 +46,7 @@ function getTelepathyContacts() {
     var result = initSuperNETrpc("{\"requestType\":\"dispcontact\",\"contact\":\"*\"}");
 
     $.each(result, function (i, v) {
-        rows += "<tr><td>" + v.handle + "</td><td>" + v.acct + "</td></tr>";
+        rows += "<tr><td>" + v.handle + "</td><td>" + v.acct + "</td><td><button type='button' class='btn btn-xs btn-default' onclick='SPN.telepathyDeleteContact($(this))' data-contact='" + v.handle + "'>Delete</button></td></tr>";
     });
 
     $("#spn_telepathy_info_modal_contacts_table tbody").empty().append(rows);
@@ -131,7 +131,6 @@ $("#spn_telepathy_info_modal ul.nav li ul li").click(function (e) {
     $("#spn_telepathy_info_modal .modal-footer").find("[data-action='" + tab + "']").show();
     $("#spn_telepathy_info_modal .modal-footer").find("[data-action='" + tab + "']").siblings().hide();
 });
-
 
 NRS.forms.spnBTCDMakeTelepods = function ($modal) {
     var str = "{\"requestType\":\"maketelepods\",\"amount\":\"" + $("#spn_btcd_add_teleport_balance_amount").val() + "\",\"coin\":\"" + $("#spn_btcd_add_teleport_balance_currency").val() + "\"}";
@@ -255,4 +254,53 @@ function toggleTeleportLoading(isLoading) {
         $("#spn_btcd_add_account_balance_modal_loading").hide();
         $("#spn_btcd_add_account_balance_modal_loading > .form-group").show();
     }
+}
+
+SPN.telepathyAddContact = function () {
+    var str = "{\"requestType\":\"addcontact\",\"handle\":\"" + $("#spn_telepathy_add_contact_name").val() + "\",\"acct\":\"" + $("#spn_telepathy_add_contact_account_id").val() + "\"}";
+    var result = initSuperNETrpc(str);
+
+    if (result.result) {
+        $.growl(result.result, {
+            "type": "success"
+        });
+    }
+    else if(result.error){
+        $.growl(result.error, {
+            "type": "danger"
+        });
+    }
+    else{
+        $.growl("Exception : telepathyAddContact", {
+            "type": "danger"
+        });
+    }
+
+    getTelepathyContacts();
+}
+SPN.telepathyDeleteContact = function (e) {
+    var str = "{\"requestType\":\"removecontact\",\"contact\":\"" + e.data("contact") + "\"}";
+    var result = initSuperNETrpc(str);
+
+    if (result.result) {
+        $.growl(result.result, {
+            "type": "success"
+        });
+    }
+    else if (result.error) {
+        $.growl(result.error, {
+            "type": "danger"
+        });
+    }
+    else {
+        $.growl("Exception : telepathyAddContact", {
+            "type": "danger"
+        });
+    }
+
+    getTelepathyContacts();
+}
+SPN.telepathyPing = function () {
+    var str = "{\"requestType\":\"ping\",\"destip\":\"" + $("#spn_telepathy_ping_peers_ip").val() + "\"}";
+    var result = initSuperNETrpc(str);
 }
