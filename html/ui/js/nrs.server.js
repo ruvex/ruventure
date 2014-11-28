@@ -217,7 +217,7 @@ var NRS = (function(NRS, $, undefined) {
 			}
 		}
 
-		if (!NRS.isLocalHost && type == "POST" && requestType != "startForging" && requestType != "stopForging") {
+		if (!NRS.isLocalHost && type == "POST" && requestType != "startForging" && requestType != "stopForging" && requestType != "generateToken") {
 			if (NRS.rememberPassword) {
 				secretPhrase = _password;
 			} else {
