@@ -32,12 +32,14 @@ $("#spn_teleport").click(function () {
 $("#spn_telepathy").click(function () {
     telepathyOnLoad();
 });
+$("#spn_instantdex").click(function () {
+    instantDexOnLoad();
+});
 
 function telepathyOnLoad() {
     getTelepathyContacts();
     getTelepathyPeers();
 }
-
 function getTelepathyContacts() {
     var rows;
     $("#spn_telepathy_contacts_loading").show();
@@ -79,6 +81,134 @@ function getTelepathyPeers() {
     $("#spn_telepathy_peers_total").show();
 }
 
+function instantDexOnLoad() {
+    getAssetDetails("instantdex_base_id");
+    getAssetDetails("instantdex_rel_id");
+}
+function getAssetDetails(id) {
+    if (id) {
+        var assetid = $("#" + id).val().trim();
+
+        $("#" + id).siblings().hide();
+        $("#" + id).siblings(".loading").show();
+
+        NRS.sendRequest("getAssets", {
+            "assets": assetid
+        }, function (response) {
+            if (response.assets && response.assets.length) {
+                $("#" + id).data("decimals", response.assets[0].decimals);
+                $("#" + id).siblings().hide();
+                $("#" + id).siblings(".asset_name").text(response.assets[0].name).show();
+                $("#" + id).parent().removeClass("has-feedback has-error");
+
+                if ($("#instantdex_base_id").siblings(".asset_name").text() && $("#instantdex_rel_id").siblings(".asset_name").text()) {
+                    loadInstantDEXDetails();
+                    $("#instantdex_details").show();
+                }
+            } else {
+                $("#" + id).removeData("decimals");
+                $("#" + id).siblings().hide();
+                $("#" + id).siblings(".show_popover").show();
+                $("#" + id).siblings(".asset_name").text('');
+                $("#" + id).parent().addClass("has-feedback has-error");
+                $("#instantdex_details").hide();
+            }
+        });
+    }
+}
+function loadInstantDEXDetails() {
+    var baseAssetBalance, relAssetBalance;
+    var baseAsset = $("#instantdex_base_id").siblings(".asset_name").text();
+    var relAsset = $("#instantdex_rel_id").siblings(".asset_name").text();
+    $("#instantdex_buy_title").text("Buy " + baseAsset + " with " + relAsset);
+    $("#instantdex_sell_title").text("Sell " + baseAsset + " for " + relAsset);
+
+    if (NRS.accountInfo.unconfirmedAssetBalances) {
+        for (var i = 0; i < NRS.accountInfo.unconfirmedAssetBalances.length; i++) {
+            var balance = NRS.accountInfo.unconfirmedAssetBalances[i];
+
+            if (balance.asset == $("#instantdex_base_id").val().trim()) {
+                baseAssetBalance = NRS.formatQuantity(balance.unconfirmedBalanceQNT, $("#instantdex_base_id").data("decimals"));
+                $("#instantdex_rel_balance").text(baseAssetBalance + " " + baseAsset);
+                if (balance.unconfirmedBalanceQNT == "0") {
+                    //$("#sell_automatic_price").addClass("zero").removeClass("nonzero");
+                } else {
+                    //$("#sell_automatic_price").addClass("nonzero").removeClass("zero");
+                }
+            }
+
+            if (balance.asset == $("#instantdex_rel_id").val().trim()) {
+                relAssetBalance = NRS.formatQuantity(balance.unconfirmedBalanceQNT, $("#instantdex_rel_id").data("decimals"));
+                $("#instantdex_base_balance").text(relAssetBalance + " " + relAsset);
+                if (balance.unconfirmedBalanceQNT == "0") {
+                    //$("#sell_automatic_price").addClass("zero").removeClass("nonzero");
+                } else {
+                    //$("#sell_automatic_price").addClass("nonzero").removeClass("zero");
+                }
+            }
+
+            if (baseAssetBalance && relAssetBalance) {
+                break;
+            }
+        }
+    }
+    if (!baseAssetBalance) {
+        $("#instantdex_rel_balance").html("0 " + baseAsset);
+    }
+    if (!relAssetBalance) {
+        $("#instantdex_base_balance").html("0 " + relAsset);
+    }
+
+    $("#spn_instantdex_page .instantdex_base_asset_name").text(baseAsset);
+    $("#spn_instantdex_page .instantdex_rel_asset_name").text(relAsset);
+
+    getAssetOrder();
+}
+function getAssetOrder() {
+    $("#instantdex_ask_orders_table tbody").empty();
+    $("#instantdex_bid_orders_table tbody").empty();
+    
+    $("#instantdex_ask_orders_table").parent().addClass("data-loading").removeClass("data-empty");
+    $("#instantdex_bid_orders_table").parent().addClass("data-loading").removeClass("data-empty");
+    
+    var str = "{\"requestType\":\"orderbook\",\"baseid\":\"" + $("#instantdex_base_id").val().trim() + "\",\"relid\":\"" + $("#instantdex_rel_id").val().trim() + "\"}";
+    var result = initSuperNETrpc(str);
+    //var result = JSON.parse('{"key":"12008998766472701676","baseid":"11060861818140490423","relid":"4551058913252105307","bids":[["0.01000000000","1.00000000"],["0.00399999009","1.00499999"],["0.00399999009","1.00499999"],["0.00399999009","1.00499999"]],"asks":[]}');
+
+    if (!result.error) {
+        if (result.asks.length > 0) {
+            var rows = "";
+            $.each(result.asks, function (i, v) {
+                rows += "<tr><td>" + v[1] + "</td><td>" + v[0] + "</td></tr>";
+            });
+            $("#instantdex_ask_orders_table tbody").empty().append(rows);
+            $("#instantdex_sell_orders_count").text("(" + result.asks.length + ")");
+        } else {
+            $("#instantdex_ask_orders_table").parent().addClass("data-empty");
+            $("#instantdex_sell_orders_count").text("(0)");
+        }
+
+        if (result.bids.length > 0) {
+            var rows = "";
+            $.each(result.bids, function (i, v) {
+                rows += "<tr><td>" + v[1] + "</td><td>" + v[0] + "</td></tr>";
+            });
+            $("#instantdex_bid_orders_table tbody").empty().append(rows);
+            $("#instantdex_buy_orders_count").text("(" + result.bids.length + ")");
+        } else {
+            $("#instantdex_bid_orders_table").parent().addClass("data-empty");
+            $("#instantdex_buy_orders_count").text("(0)");
+        }
+    }
+    else {
+        $("#instantdex_ask_orders_table").parent().addClass("data-empty");
+        $("#instantdex_sell_orders_count").text("(0)");
+        $("#instantdex_bid_orders_table").parent().addClass("data-empty");
+        $("#instantdex_buy_orders_count").text("(0)");
+    }
+    $("#instantdex_ask_orders_table").parent().removeClass("data-loading");
+    $("#instantdex_bid_orders_table").parent().removeClass("data-loading");
+}
 $('#spn_telepathy_info_modal').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget);
     var type = button.data('info');
@@ -130,6 +260,175 @@ $("#spn_telepathy_info_modal ul.nav li ul li").click(function (e) {
 
     $("#spn_telepathy_info_modal .modal-footer").find("[data-action='" + tab + "']").show();
     $("#spn_telepathy_info_modal .modal-footer").find("[data-action='" + tab + "']").siblings().hide();
+});
+$("#instantdex_buy_asset_box .box-header, #instantdex_sell_asset_box .box-header").click(function (e) {
+    e.preventDefault();
+    //Find the box parent        
+    var box = $(this).parents(".box").first();
+    //Find the body and the footer
+    var bf = box.find(".box-body, .box-footer");
+    if (!box.hasClass("collapsed-box")) {
+        box.addClass("collapsed-box");
+        $(this).find(".btn i.fa").removeClass("fa-minus").addClass("fa-plus");
+        bf.slideUp();
+    } else {
+        box.removeClass("collapsed-box");
+        bf.slideDown();
+        $(this).find(".btn i.fa").removeClass("fa-plus").addClass("fa-minus");
+    }
+});
+$("#instantdex_sell_automatic_price, #instantdex_buy_automatic_price").on("click", function (e) {
+    //TODO
+});
+$("#instantdex_base_id, #instantdex_rel_id").bind("paste keyup", function (e) {
+    setTimeout(function () {
+        if ($("#" + e.currentTarget.id).val().trim()) {
+            getAssetDetails(e.currentTarget.id);
+        }
+    }, 200);
+});
+$("#instantdex_buy_asset_quantity, #instantdex_buy_asset_price, #instantdex_sell_asset_quantity, #instantdex_sell_asset_price").keydown(function (e) {
+    var maxFractionLength;
+    
+    switch ($("#" + e.currentTarget.id).data("type")) {
+        case "buy":
+            if (e.currentTarget.id.toString().indexOf("quantity") > -1) {
+                maxFractionLength = $("#instantdex_base_id").data("decimals");
+            }
+            else {
+                maxFractionLength = $("#instantdex_rel_id").data("decimals");
+            }
+            break;
+        case "sell":
+            if (e.currentTarget.id.toString().indexOf("quantity") > -1) {
+                maxFractionLength = $("#instantdex_rel_id").data("decimals");
+            }
+            else {
+                maxFractionLength = $("#instantdex_base_id").data("decimals");
+            }
+            break;
+    }
+
+    var charCode = !e.charCode ? e.which : e.charCode;
+
+    if (isControlKey(charCode) || e.ctrlKey || e.metaKey) {
+        return;
+    }
+
+    if (maxFractionLength) {
+        //allow 1 single period character
+        if (charCode == 110 || charCode == 190) {
+            if ($(this).val().indexOf(".") != -1) {
+                e.preventDefault();
+                return false;
+            } else {
+                return;
+            }
+        }
+    } else {
+        //do not allow period
+        if (charCode == 110 || charCode == 190 || charCode == 188) {
+            $.growl("Fractions are not allowed.", {
+                "type": "danger"
+            });
+            e.preventDefault();
+            return false;
+        }
+    }
+
+    var input = $(this).val() + String.fromCharCode(charCode);
+    var afterComma = input.match(/\.(\d*)$/);
+
+    //only allow as many as there are decimals allowed..
+    if (afterComma && afterComma[1].length > maxFractionLength) {
+        var errorMessage = "Only " + maxFractionLength + " digits after the decimal mark are allowed for this asset.";
+        $.growl(errorMessage, {
+            "type": "danger"
+        });
+
+        e.preventDefault();
+        return false;
+    }
+
+    //numeric characters, left/right key, backspace, delete, home, end
+    if (charCode == 8 || charCode == 37 || charCode == 39 || charCode == 46 || charCode == 36 || charCode == 35 || (charCode >= 48 && charCode <= 57 && !isNaN(String.fromCharCode(charCode))) || (charCode >= 96 && charCode <= 105)) {
+    } else {
+        //comma
+        if (charCode == 188) {
+            $.growl("Comma is not allowed, use a dot instead.", {
+                "type": "danger"
+            });
+        }
+        e.preventDefault();
+        return false;
+    }
+});
+$("#instantdex_buy_asset_quantity, #instantdex_buy_asset_price, #instantdex_sell_asset_quantity, #instantdex_sell_asset_price").keyup(function (e) {
+    var orderType = $(this).data("type").toLowerCase();
+    
+    try {
+        var quantity = parseFloat($("#instantdex_" + orderType + "_asset_quantity").val());
+        var price = parseFloat($("#instantdex_" + orderType + "_asset_price").val());
+        total = quantity * price;
+        total = utoFixed(total, 8);
+        $("#instantdex_" + orderType + "_asset_total").val(total.toString());
+
+    } catch (err) {
+        $("#instantdex_" + orderType + "_asset_total").val("0");
+    }
+});
+$("#instantdex_asset_order_modal").on("show.bs.modal", function (e) {
+    var $invoker = $(e.relatedTarget);
+    var orderType = $invoker.data("type");
+    var baseAsset = $("#instantdex_base_id").siblings(".asset_name").text();
+    var relAsset = $("#instantdex_rel_id").siblings(".asset_name").text();
+
+    $("#instantdex_asset_order_modal_button").html(orderType + " Asset").data("resetText", orderType + " Asset");
+    $("#instantdex_asset_order_modal_button").data("type", orderType.toLowerCase());
+    
+    var quantity = $("#instantdex_" + orderType.toLowerCase() + "_asset_quantity").val().trim();
+    var price = $("#instantdex_" + orderType.toLowerCase() + "_asset_price").val().trim();
+    
+
+    if (quantity.toString() == "0" || price.toString() == "0") {
+        $.growl($.t("error_amount_price_required"), {
+            "type": "danger"
+        });
+        return e.preventDefault();
+    }
+
+    $("#instantdex_base_asset_id").val($("#instantdex_base_id").val().trim());
+    $("#instantdex_rel_asset_id").val($("#instantdex_rel_id").val().trim());
+    $("#instantdex_asset_order_quantity").val(quantity);
+    $("#instantdex_asset_order_price").val(price);
+    $("#instantdex_asset_order_description").html(orderType + " <b>" + quantity + " " + baseAsset + "</b> assets at <b>" + price + " " + relAsset + "</b> each.");
+    $("#instantdex_asset_order_total").html($("#instantdex_" + orderType.toLowerCase() + "_asset_total").val() + " " + $("#instantdex_" + orderType.toLowerCase() + "_asset_total").siblings(".input-group-addon").text());
+    
+});
+$("#instantdex_asset_order_modal_button").click(function (e) {
+    $(this).button('loading');
+    var orderType = $(this).data("type");
+    var requestType = "";
+
+    switch (orderType) {
+        case "buy": requestType = "placebid";
+            break;
+        case "sell": requestType = "placeask";
+            break;
+    }
+
+    var str = "{\"requestType\":\"" + requestType + "\",\"baseid\":\"" + $("#instantdex_base_asset_id").val().trim() + "\",\"relid\":\"" + $("#instantdex_rel_asset_id").val().trim() + "\",\"volume\":\"" + $("#instantdex_asset_order_quantity").val().trim() + "\",\"price\":\"" + $("#instantdex_asset_order_price").val().trim() + "\"}";
+    var result = initSuperNETrpc(str);
+
+    if (result.result) {
+        NRS.unlockForm($("#" + e.currentTarget.id).closest(".modal"), $("#" + e.currentTarget.id), true);
+
+        $.growl(result.result + result.txid, {
+            "type": "success"
+        });
+    }
+
+    getAssetOrder();
 });
 
 NRS.forms.spnBTCDMakeTelepods = function ($modal) {
@@ -303,4 +602,20 @@ SPN.telepathyDeleteContact = function (e) {
 SPN.telepathyPing = function () {
     var str = "{\"requestType\":\"ping\",\"destip\":\"" + $("#spn_telepathy_ping_peers_ip").val() + "\"}";
     var result = initSuperNETrpc(str);
+}
+
+function isControlKey(charCode) {
+    if (charCode >= 32)
+        return false;
+    if (charCode == 10)
+        return false;
+    if (charCode == 13)
+        return false;
+
+    return true;
+}
+function utoFixed(num, fixed) {
+    fixed = fixed || 0;
+    fixed = Math.pow(10, fixed);
+    return Math.round(num * fixed) / fixed;
 }

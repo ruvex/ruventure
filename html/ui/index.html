@@ -1886,7 +1886,7 @@
                                     <div class="caption">
                                         <h3>InstantDEX</h3>
                                         <p style="min-height:100px">Realtime trading between any NXT asset</p>
-                                        <p><a href="#" class="btn btn-primary goto-page" role="button" data-page="spn_instantdex">InstantDEX</a></p>
+                                        <p><a id="spn_instantdex" href="#" class="btn btn-primary goto-page" role="button" data-page="spn_instantdex">InstantDEX</a></p>
                                     </div>
                                 </div>
                             </div>
@@ -1901,6 +1901,249 @@
                             </div>
                         </div>
                     </section>
+                </div>
+
+                <div id="spn_instantdex_page" class="page">
+                    <section class="content-header"><h1>BitcoinDark - InstantDEX</h1></section>
+                    <section class="content">
+                        <ol class="breadcrumb">
+                            <li><a href="#" class="goto-page" data-page="supernet">SuperNET</a></li>
+                            <li><a href="#" class="goto-page" data-page="spn_bitcoindark">BitcoinDark</a></li>
+                            <li class="active">InstantDEX</li>
+                        </ol>
+                        <div class="jumbotron">
+                            <div class="container">
+                                <form class="form-horizontal" role="form">
+                                    <div class="row">
+                                        <div class="form-group">
+                                            <label for="instantdex_base_id" class="col-sm-4 control-label">Base Asset ID</label>
+                                            <div class="col-sm-5 input-group">
+                                                <input type="text" class="form-control" id="instantdex_base_id" value="12071612744977229797">
+                                                <span class="glyphicon glyphicon-remove form-control-feedback show_popover" style="color:Red;display:none" data-html="true" data-content="Please check your Asset ID" data-container="body" data-original-title="" title=""></span>
+                                                <span class="input-group-addon asset_name">
+                                                </span>
+                                                <span class="input-group-addon loading">
+                                                    <i class="fa fa-spinner fa-spin"></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p class="text-center" style="display:none">
+                                        <i class="fa fa-arrows-v"></i>
+                                    </p>
+                                    <div class="row">
+                                        <div class="form-group">
+                                            <label for="instantdex_rel_id" class="col-sm-4 control-label">Reference Asset ID</label>
+                                            <div class="col-sm-5 input-group">
+                                                <input type="text" class="form-control" id="instantdex_rel_id" value="4551058913252105307">
+                                                <span class="glyphicon glyphicon-remove form-control-feedback show_popover" style="color:Red;display:none" data-html="true" data-content="Please check your Asset ID" data-container="body" data-original-title="" title=""></span>
+                                                <span class="input-group-addon asset_name">
+                                                </span>
+                                                <span class="input-group-addon loading">
+                                                    <i class="fa fa-spinner fa-spin"></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="row" id="instantdex_details" style="display:none">
+                            <div class="col-md-6">
+                                <div class="box box-solid box-info collapsed-box" id="instantdex_buy_asset_box">
+                                    <div class="box-header" style="background-color:#DFF0D9;color: #48AB6C;">
+                                        <h3 class="box-title" id="instantdex_buy_title"></h3>
+                                        <div class="box-tools pull-right">
+                                            <button class="btn btn-info btn-sm" style="background-color: #48AB6C"><i class="fa fa-plus"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="box-body no-padding" style="display:none">
+                                        <div style="background-color:#DFF0D9;color: #666;padding-left:10px;padding-right: 10px;padding-top: 0px;padding-bottom:3px;" id="instantdex_buy_automatic_price"><strong>Balance</strong>: <span id="instantdex_base_balance"></span></div>
+
+                                        <form role="form" class="form-horizontal" style="padding: 10px;max-width:450px;margin-left:auto;margin-right:auto;" autocomplete="off">
+                                            <div style="margin-left:-20px">
+                                                <div class="form-group">
+                                                    <label for="instantdex_buy_asset_quantity" class="col-sm-3 control-label">Quantity</label>
+                                                    <div class="col-sm-9">
+                                                        <div class="input-group">
+                                                            <input id="instantdex_buy_asset_quantity" type="text" name="instantdex_buy_asset_quantity" value="0" class="form-control" data-type="buy" />
+                                                            <span class="input-group-addon"><span class="instantdex_base_asset_name"></span></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="instantdex_buy_asset_price" class="col-sm-3 control-label">Price</label>
+                                                    <div class="col-sm-9">
+                                                        <div class="input-group">
+                                                            <input id="instantdex_buy_asset_price" type="text" value="0" name="instantdex_buy_asset_price" class="form-control" data-type="buy" />
+                                                            <span class="input-group-addon"><span class="instantdex_rel_asset_name"></span> / <span class="instantdex_base_asset_name"></span></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="instantdex_buy_asset_total" class="col-sm-3 control-label">Total</label>
+                                                    <div class="col-sm-9">
+                                                        <div class="input-group">
+                                                            <input type="text" name="instantdex_buy_asset_total" id="instantdex_buy_asset_total" readonly value="0" class="form-control disabled" />
+                                                            <span class="input-group-addon instantdex_rel_asset_name"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group" style="display:none">
+                                                    <label for="instantdex_buy_asset_fee" class="col-sm-3 control-label">Fee</label>
+                                                    <div class="col-sm-9">
+                                                        <div class="input-group">
+                                                            <input type="text" id="instantdex_buy_asset_fee" name="instantdex_buy_asset_fee" value="1" class="form-control" />
+                                                            <span class="input-group-addon">NXT</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group form-group-last">
+                                                    <div class="col-sm-3"></div>
+                                                    <div class="col-sm-9">
+                                                        <button type="button" class="btn btn-primary btn-lg btn-block" id="instantdex_buy_asset_button" data-toggle="modal" data-target="#instantdex_asset_order_modal" data-asset="" data-type="Buy"><span data-i18n="buy">Buy</span> (<span class="instantdex_rel_asset_name"></span> → <span class="instantdex_base_asset_name"></span>)</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                                <div class="box box-danger" style="min-height:400px;max-height: 400px;overflow: auto;">
+                                    <div class="box-header">
+                                        <h3 class="box-title"><span>Sell Orders</span> <span id="instantdex_sell_orders_count"></span></h3>
+                                    </div>
+                                    <div class="box-body no-padding">
+                                        <div class="data-container data-loading" data-no-padding="true">
+                                            <table class="table table-striped" id="instantdex_ask_orders_table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Quantity</th>
+                                                        <th>Price</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody></tbody>
+                                            </table>
+                                            <div class="data-loading-container"><img class="loading" src="img/loading_indicator.gif" alt="Loading..." width="32" height="32" /></div>
+                                            <div class="data-empty-container"><p>No sell orders for this asset.</p></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="box box-solid box-info collapsed-box" id="instantdex_sell_asset_box">
+                                    <div class="box-header" style="background:#F2DEDE;color:#ED4348;">
+                                        <h3 class="box-title" id="instantdex_sell_title"></h3>
+                                        <div class="box-tools pull-right">
+                                            <button class="btn btn-info btn-sm" style="background-color: #ED4348"> <i class="fa fa-plus"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="box-body no-padding" style="display:none">
+                                        <div style="background-color:#F2DEDE;color: #666;padding-left:10px;padding-right: 10px;padding-top: 0px;padding-bottom:3px;" id="instantdex_sell_automatic_price"><strong data-i18n="balance">Balance</strong>: <span id="instantdex_rel_balance"></span></div>
+
+                                        <form role="form" class="form-horizontal" style="padding: 10px;max-width:450px;margin-left:auto;margin-right:auto;" autocomplete="off">
+                                            <div style="margin-left:-20px">
+                                                <div class="form-group">
+                                                    <label for="instantdex_sell_asset_quantity" class="col-sm-3 control-label">Quantity</label>
+                                                    <div class="col-sm-9">
+                                                        <div class="input-group">
+                                                            <input id="instantdex_sell_asset_quantity" type="text" name="instantdex_sell_asset_quantity" value="0" class="form-control" data-type="sell" />
+                                                            <span class="input-group-addon"><span class="instantdex_base_asset_name"></span></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="instantdex_sell_asset_price" class="col-sm-3 control-label">Price</label>
+                                                    <div class="col-sm-9">
+                                                        <div class="input-group">
+                                                            <input id="instantdex_sell_asset_price" type="text" value="0" name="instantdex_sell_asset_price" class="form-control" data-type="sell" />
+                                                            <span class="input-group-addon"><span class="instantdex_rel_asset_name"></span> / <span class="instantdex_base_asset_name"></span></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="instantdex_sell_asset_total" class="col-sm-3 control-label">Total</label>
+                                                    <div class="col-sm-9">
+                                                        <div class="input-group">
+                                                            <input type="text" name="instantdex_sell_asset_total" id="instantdex_sell_asset_total" readonly value="0" class="form-control disabled" />
+                                                            <span class="input-group-addon instantdex_rel_asset_name"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group" style="display:none">
+                                                    <label for="instantdex_sell_asset_fee" class="col-sm-3 control-label">Fee</label>
+                                                    <div class="col-sm-9">
+                                                        <div class="input-group">
+                                                            <input type="text" id="instantdex_sell_asset_fee" name="instantdex_sell_asset_fee" value="1" class="form-control" />
+                                                            <span class="input-group-addon">NXT</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group form-group-last">
+                                                    <div class="col-sm-3"></div>
+                                                    <div class="col-sm-9">
+                                                        <button type="button" class="btn btn-primary btn-lg btn-block" id="instantdex_sell_asset_button" data-toggle="modal" data-target="#instantdex_asset_order_modal" data-asset="" data-type="Sell"><span data-i18n="sell">Sell</span> (<span class="instantdex_base_asset_name"></span> → <span class="instantdex_rel_asset_name"></span>)</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                                <div class="box box-success" style="min-height:400px;max-height: 400px;overflow: auto;">
+                                    <div class="box-header">
+                                        <h3 class="box-title"><span>Buy Orders</span> <span id="instantdex_buy_orders_count"></span></h3>
+                                    </div>
+                                    <div class="box-body no-padding">
+                                        <div class="data-container data-loading" data-no-padding="true">
+                                            <table class="table table-striped" id="instantdex_bid_orders_table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Quantity</th>
+                                                        <th>Price</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody></tbody>
+                                            </table>
+                                            <div class="data-loading-container"><img class="loading" src="img/loading_indicator.gif" alt="Loading..." width="32" height="32" /></div>
+                                            <div class="data-empty-container"><p>No buy orders for this asset.</p></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="modal fade" id="instantdex_asset_order_modal" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                <h4 class="modal-title">Confirm Order</h4>
+                            </div>
+                            <div class="modal-body">
+                                <form role="form" autocomplete="off">
+                                    <div class="callout callout-danger error_message" style="display:none"></div>
+                                    <div class="form-group">
+                                        <label>ORDER DESCRIPTION</label>
+                                        <p id="instantdex_asset_order_description"></p>
+                                        <input type="hidden" id="instantdex_base_asset_id" value="" />
+                                        <input type="hidden" id="instantdex_rel_asset_id" value="" />
+                                        <input type="hidden" id="instantdex_asset_order_quantity" value="" />
+                                        <input type="hidden" id="instantdex_asset_order_price" value="" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label><span>TOTAL</span></label>
+                                        <p id="instantdex_asset_order_total"></p>
+                                    </div>
+                                    <input type="hidden" name="asset_order_type" id="asset_order_type" />
+                                </form>
+                            </div>
+                            <div class="modal-footer" style="margin-top:0;">
+                                <button type="button" class="btn btn-default" data-dismiss="modal" data-i18n="cancel">Cancel</button>
+                                <button type="button" class="btn btn-primary" data-loading-text="Submitting..." id="instantdex_asset_order_modal_button" data-ignore="true"></button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div id="spn_teleport_page" class="page">
