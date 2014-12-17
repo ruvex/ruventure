@@ -1914,36 +1914,56 @@
                         <div class="jumbotron">
                             <div class="container">
                                 <form class="form-horizontal" role="form">
-                                    <div class="row">
-                                        <div class="form-group">
-                                            <label for="instantdex_base_id" class="col-sm-4 control-label">Base Asset ID</label>
-                                            <div class="col-sm-5 input-group">
-                                                <input type="text" class="form-control" id="instantdex_base_id" value="12071612744977229797">
-                                                <span class="glyphicon glyphicon-remove form-control-feedback show_popover" style="color:Red;display:none" data-html="true" data-content="Please check your Asset ID" data-container="body" data-original-title="" title=""></span>
-                                                <span class="input-group-addon asset_name">
-                                                </span>
-                                                <span class="input-group-addon loading">
-                                                    <i class="fa fa-spinner fa-spin"></i>
-                                                </span>
+                                    <ul class="nav nav-tabs">
+                                        <li role="presentation" class="active" data-tab="instantdex_assets"><a href="#"><i class="fa fa-home"></i> Assets</a></li>
+                                        <li role="presentation" data-tab="instantdex_markets"><a href="#" id="instantdex_markets"><i class="fa fa-bar-chart"></i> Markets</a></li>
+                                    </ul>
+                                    <br />
+                                    <div id="spn_instantdex_page_instantdex_assets" class="tab-content">
+                                        <div class="row">
+                                            <div class="form-group">
+                                                <label for="instantdex_base_id" class="col-sm-4 control-label">Base Asset ID</label>
+                                                <div class="col-sm-5 input-group">
+                                                    <input type="text" class="form-control" id="instantdex_base_id" value="11060861818140490423">
+                                                    <span class="glyphicon glyphicon-remove form-control-feedback show_popover" style="color:Red;display:none" data-html="true" data-content="Please check your Asset ID" data-container="body" data-original-title="" title=""></span>
+                                                    <span class="input-group-addon asset_name">
+                                                    </span>
+                                                    <span class="input-group-addon loading">
+                                                        <i class="fa fa-spinner fa-spin"></i>
+                                                    </span>
+                                                </div>
                                             </div>
+                                        </div>
+                                        <p class="text-center" style="display:none">
+                                            <i class="fa fa-arrows-v"></i>
+                                        </p>
+                                        <div class="row">
+                                            <div class="form-group">
+                                                <label for="instantdex_rel_id" class="col-sm-4 control-label">Reference Asset ID</label>
+                                                <div class="col-sm-5 input-group">
+                                                    <input type="text" class="form-control" id="instantdex_rel_id" value="4551058913252105307">
+                                                    <span class="glyphicon glyphicon-remove form-control-feedback show_popover" style="color:Red;display:none" data-html="true" data-content="Please check your Asset ID" data-container="body" data-original-title="" title=""></span>
+                                                    <span class="input-group-addon asset_name">
+                                                    </span>
+                                                    <span class="input-group-addon loading">
+                                                        <i class="fa fa-spinner fa-spin"></i>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="alert-success alert alert-no-icon" style="padding: 5px; margin-bottom: 15px; display: none;">
+                                            Recommended Rates :
+                                            <span id="instantdex_conversion_rate"> </span>
                                         </div>
                                     </div>
-                                    <p class="text-center" style="display:none">
-                                        <i class="fa fa-arrows-v"></i>
-                                    </p>
-                                    <div class="row">
-                                        <div class="form-group">
-                                            <label for="instantdex_rel_id" class="col-sm-4 control-label">Reference Asset ID</label>
-                                            <div class="col-sm-5 input-group">
-                                                <input type="text" class="form-control" id="instantdex_rel_id" value="4551058913252105307">
-                                                <span class="glyphicon glyphicon-remove form-control-feedback show_popover" style="color:Red;display:none" data-html="true" data-content="Please check your Asset ID" data-container="body" data-original-title="" title=""></span>
-                                                <span class="input-group-addon asset_name">
-                                                </span>
-                                                <span class="input-group-addon loading">
-                                                    <i class="fa fa-spinner fa-spin"></i>
-                                                </span>
-                                            </div>
+                                    <div id="spn_instantdex_page_instantdex_markets" style="display:none" class="tab-content">
+                                        <div style="float: right;margin-bottom:20px">
+                                            <select id="instantdex_exchange" style="width:200px">
+                                                <option value="bter">Bter</option>
+                                            </select>
                                         </div>
+                                        <div id="instantdex_chart" style="height: 400px; min-width: 310px;display:none"></div>
+                                        <div class="data-loading-container"><img src="img/loading_indicator.gif" alt="Loading..." width="32" height="32" /></div>
                                     </div>
                                 </form>
                             </div>
@@ -6533,6 +6553,8 @@
         <script src="js/3rdparty/select2.js" type="text/javascript"></script>
         <script src="js/3rdparty/bootstrap-tour.min.js" type="text/javascript"></script>
         <script src="js/3rdparty/URI.js" type="text/javascript"></script>
+        <script src="js/3rdparty/highcharts/highstock.js" type="text/javascript"></script>
+        <script src="js/3rdparty/highcharts/modules/exporting.js" type="text/javascript"></script>
 
         <script src="js/util/extensions.js" type="text/javascript"></script>
         <script src="js/util/converters.js" type="text/javascript"></script>

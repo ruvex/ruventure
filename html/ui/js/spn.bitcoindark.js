@@ -19,8 +19,19 @@ function initSuperNETrpc(params) {
             alert(t);
         }
     });
-    return JSON.parse(result);
+
+    if (JSON.parse(params).requestType != "pricedb") {
+        return JSON.parse(result);
+    } 
 }
+
+$(document).ready(function () {
+    $("#instantdex_exchange").select2({
+        formatResult: format,
+        formatSelection: format,
+        escapeMarkup: function (m) { return m; }
+    });
+});
 
 $("#spn_teleport").click(function () {
     setTimeout(function () { getTeleportFund(); }, 3000);
@@ -91,6 +102,7 @@ function getAssetDetails(id) {
 
         $("#" + id).siblings().hide();
         $("#" + id).siblings(".loading").show();
+        $("#" + id).siblings(".asset_name").text('');
 
         NRS.sendRequest("getAssets", {
             "assets": assetid
@@ -101,9 +113,10 @@ function getAssetDetails(id) {
                 $("#" + id).siblings(".asset_name").text(response.assets[0].name).show();
                 $("#" + id).parent().removeClass("has-feedback has-error");
 
-                if ($("#instantdex_base_id").siblings(".asset_name").text() && $("#instantdex_rel_id").siblings(".asset_name").text()) {
+                if ($("#instantdex_base_id").siblings(".asset_name").text().trim() != '' && $("#instantdex_rel_id").siblings(".asset_name").text().trim() != '') {
                     loadInstantDEXDetails();
                     $("#instantdex_details").show();
+                    getRecommendedRates();
                 }
             } else {
                 $("#" + id).removeData("decimals");
@@ -112,6 +125,7 @@ function getAssetDetails(id) {
                 $("#" + id).siblings(".asset_name").text('');
                 $("#" + id).parent().addClass("has-feedback has-error");
                 $("#instantdex_details").hide();
+                $("#spn_instantdex_page_instantdex_assets .alert-success").hide();
             }
         });
     }
@@ -209,6 +223,120 @@ function getAssetOrder() {
     $("#instantdex_ask_orders_table").parent().removeClass("data-loading");
     $("#instantdex_bid_orders_table").parent().removeClass("data-loading");
 }
+function getCharts() {
+    
+    
+    var dataHighBid = [];
+    var dataLowAsk = [];
+    var title = $("#instantdex_base_id").siblings(".asset_name").text() + "/" + $("#instantdex_rel_id").siblings(".asset_name").text();
+
+    var baseAssetName, relAssetName;
+    
+    if ($("#instantdex_base_id").siblings(".asset_name").text().substr(0, 3).toLowerCase() == "mgw") {
+        baseAssetName = $("#instantdex_base_id").siblings(".asset_name").text().substr(3);
+    } else {
+        baseAssetName == $("#instantdex_base_id").siblings(".asset_name").text();
+    }
+    if ($("#instantdex_rel_id").siblings(".asset_name").text().substr(0, 3).toLowerCase() == "mgw") {
+        relAssetName = $("#instantdex_rel_id").siblings(".asset_name").text().substr(3);
+    } else {
+        relAssetName == $("#instantdex_rel_id").siblings(".asset_name").text();
+    }
+
+    var result = initSuperNETrpc("{\"requestType\":\"getquotes\",\"exchange\":\"" + $("#instantdex_exchange").select2("val") + "\",\"base\":\"" + baseAssetName + "\",\"rel\":\"" + relAssetName + "\",\"oldest\":\"0\"}");
+    
+    $.each(result.hbla, function (i, obj) {
+        var objHighBid = [];
+        var objLowAsk = [];
+        objHighBid[0] = obj[0] * 1000;
+        objHighBid[1] = obj[1];
+
+        objLowAsk[0] = obj[0] * 1000;
+        objLowAsk[1] = obj[2];
+
+        dataHighBid.push(objHighBid);
+        dataLowAsk.push(objLowAsk);
+    });
+
+    dataHighBid.sort(function (a, b) { return a[0] - b[0] });
+    dataLowAsk.sort(function (a, b) { return a[0] - b[0] });
+    
+    var seriesOptions = [];
+    seriesOptions[0] = { name: "Low Ask", data: dataLowAsk };
+    seriesOptions[1] = { name: "High Bid", data: dataHighBid };
+    
+
+    setTimeout(function () {
+        $("#instantdex_chart").show();
+        $("#spn_instantdex_page_instantdex_markets .data-loading-container").hide();
+
+        $('#instantdex_chart').highcharts('StockChart', {
+
+
+            rangeSelector: {
+                selected: 1
+            },
+
+            title: {
+                text: title
+            },
+
+            series: seriesOptions
+        });
+    }, 5000);
+}
+function getRecommendedRates() {
+    $("#instantdex_conversion_rate").html("");
+    $("#spn_instantdex_page_instantdex_assets .alert-success").show();
+
+    NRS.sendRequest("getTrades", {
+        "asset": $("#instantdex_base_id").val().trim(),
+        "lastIndex": 0
+    }, function (base) {
+        if (base) {
+            NRS.sendRequest("getTrades", {
+                "asset": $("#instantdex_rel_id").val().trim(),
+                "lastIndex": 0
+            }, function (rel) {
+                if (rel) {
+                    if (base.trades.length > 0 && rel.trades.length > 0) {
+                        var basePrice = NRS.calculateOrderPricePerWholeQNT(new BigInteger(base.trades[0].priceNQT), base.trades[0].decimals);
+                        var relPrice = NRS.calculateOrderPricePerWholeQNT(new BigInteger(rel.trades[0].priceNQT), rel.trades[0].decimals);
+                        var recommendPrice = utoFixed(basePrice / relPrice, 4);
+
+                        $("#instantdex_conversion_rate").html("1 " + base.trades[0].name + " = " + recommendPrice + " " + rel.trades[0].name);
+                    }
+                    else {
+                        $("#instantdex_conversion_rate").html("There is no trade history found");
+                    }
+                }
+                else {
+                    $("#spn_instantdex_page_instantdex_assets .alert-success").hide();
+                }
+            });
+        }
+        else {
+            $("#spn_instantdex_page_instantdex_assets .alert-success").hide();
+        }
+    });
+}
+function startDataCollect() {
+    var baseAssetName, relAssetName;
+
+    if ($("#instantdex_base_id").siblings(".asset_name").text().substr(0, 3).toLowerCase() == "mgw") {
+        baseAssetName = $("#instantdex_base_id").siblings(".asset_name").text().substr(3);
+    } else {
+        baseAssetName == $("#instantdex_base_id").siblings(".asset_name").text();
+    }
+    if ($("#instantdex_rel_id").siblings(".asset_name").text().substr(0, 3).toLowerCase() == "mgw") {
+        relAssetName = $("#instantdex_rel_id").siblings(".asset_name").text().substr(3);
+    } else {
+        relAssetName == $("#instantdex_rel_id").siblings(".asset_name").text();
+    }
+
+    var result = initSuperNETrpc("{\"requestType\":\"pricedb\",\"exchange\":\"" + $("#instantdex_exchange").select2("val") + "\",\"base\":\"" + baseAssetName + "\",\"rel\":\"" + relAssetName + "\",\"stop\":\"0\"}");
+}
+
 $('#spn_telepathy_info_modal').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget);
     var type = button.data('info');
@@ -280,12 +408,13 @@ $("#instantdex_buy_asset_box .box-header, #instantdex_sell_asset_box .box-header
 $("#instantdex_sell_automatic_price, #instantdex_buy_automatic_price").on("click", function (e) {
     //TODO
 });
-$("#instantdex_base_id, #instantdex_rel_id").bind("paste keyup", function (e) {
-    setTimeout(function () {
+$("#instantdex_base_id, #instantdex_rel_id").bind("keyup paste", function (e) {
+    clearTimeout($(this).data('timeout'));
+    $(this).data('timeout', setTimeout(function () {
         if ($("#" + e.currentTarget.id).val().trim()) {
             getAssetDetails(e.currentTarget.id);
         }
-    }, 200);
+    }, 200));
 });
 $("#instantdex_buy_asset_quantity, #instantdex_buy_asset_price, #instantdex_sell_asset_quantity, #instantdex_sell_asset_price").keydown(function (e) {
     var maxFractionLength;
@@ -429,6 +558,21 @@ $("#instantdex_asset_order_modal_button").click(function (e) {
     }
 
     getAssetOrder();
+});
+$("#spn_instantdex_page ul.nav li").click(function (e) {
+    var tab = $(this).data("tab");
+    $(this).siblings().removeClass("active");
+    $(this).addClass("active");
+    $(this).parent().siblings("div").hide();
+    $("#spn_instantdex_page_" + tab).show();
+});
+$("#instantdex_markets").click(function (e) {
+    $("#instantdex_chart").hide();
+    $("#spn_instantdex_page_instantdex_markets .data-loading-container").show();
+
+    startDataCollect();
+
+    setTimeout(function () { getCharts(); }, 5000);
 });
 
 NRS.forms.spnBTCDMakeTelepods = function ($modal) {
@@ -618,4 +762,7 @@ function utoFixed(num, fixed) {
     fixed = fixed || 0;
     fixed = Math.pow(10, fixed);
     return Math.round(num * fixed) / fixed;
+}
+function format(exchange) {
+    return exchange.text;
 }
