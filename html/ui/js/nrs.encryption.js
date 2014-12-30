@@ -551,7 +551,7 @@ var NRS = (function(NRS, $, undefined) {
 				try {
 					data = NRS.decryptNote(encrypted, {
 						"nonce": nonce,
-						"account": accountToDecrypt
+						"account": otherAccount
 					}, password);
 
 					decryptedFields[key] = data;
