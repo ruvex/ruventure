@@ -4,6 +4,17 @@ var NSV = (function(NSV, $, undefined) {
 	var NSV_votes_arr = [];
 	var NSV_vote_poll_account = "";
 
+	$('#nsv_vote_cast_modal').on('hidden.bs.modal', function (e) {
+		NSV.vote_cast_init();		
+	})	
+	
+	$('#nsv_vote_create_modal').on('hidden.bs.modal', function (e) {
+		NSV.vote_create_init();		
+	})
+
+	$('#nsv_vote_check_modal').on('hidden.bs.modal', function (e) {
+		NSV.vote_check_init();		
+	})	
 	
 	NSV.vote_create_init = function () {
 		$('#nsv_vote_create_error_message').hide();
@@ -23,9 +34,7 @@ var NSV = (function(NSV, $, undefined) {
 			return;
 		}	
 		
-		$('#nsv_vote_create_error_message').hide();
-		$('#nsv_vote_create_succ_message').hide();
-		//var recipient_secret = "shf;we943jr2432k";
+		NSV.vote_create_init();
 		var recipient_secret = NSV.random_secret_simple();
 
 		var err_message = "";
@@ -136,6 +145,7 @@ var NSV = (function(NSV, $, undefined) {
 		document.getElementById("nsv_vote_create_account").value = poll_RS;
 	};
 
+	
 	NSV.vote_cast_init = function () {
 		$('#nsv_vote_cast_error_message').hide();
 		$('#nsv_vote_cast_succ_message').hide();
@@ -180,7 +190,6 @@ var NSV = (function(NSV, $, undefined) {
 		document.getElementById("nsv_vote_cast_option8").checked=false;		
 		document.getElementById("nsv_vote_cast_option8").style.display = 'inline';
 		document.getElementById("nsv_vote_cast_option8_lb").style.display = 'inline';		
-		
 	};
 	
 	NSV.vote_check_activate = function () {
@@ -193,9 +202,8 @@ var NSV = (function(NSV, $, undefined) {
 			$("#nsv_vote_check_error_message").html("The blockchain is currently being rescanned. Please wait a minute and then try submitting again.");
 			$("#nsv_vote_check_error_message").show();
 			return;
-		}	
-		$('#nsv_vote_check_error_message').hide();
-		$('#nsv_vote_check_succ_message').hide();
+		}
+		NSV.vote_check_init()		
 		
 		NSV_vote_create_poll_arr = [];
 		NSV_votes_arr = [];
@@ -386,8 +394,7 @@ var NSV = (function(NSV, $, undefined) {
 			$("#nsv_vote_create_error_message").show();
 			return;
 		}	
-		$('#nsv_vote_check_error_message').hide();
-		$('#nsv_vote_check_succ_message').hide();
+		NSV.vote_cast_init();
 			
 		NSV_vote_create_poll_arr = [];
 		var poll_account = $.trim(document.getElementById("nsv_vote_cast_account").value);
@@ -490,7 +497,6 @@ var NSV = (function(NSV, $, undefined) {
 		$('#nsv_vote_cast_error_message').hide();
 		$('#nsv_vote_cast_succ_message').hide();
 
-	
 		var secret;	
 		var option_choosen = "";
 		var err_message = "";
@@ -510,7 +516,6 @@ var NSV = (function(NSV, $, undefined) {
 			secret = NRS._password;
 		}
 		poll_account = $.trim(document.getElementById("nsv_vote_cast_account").value);
-		//var poll_account = "NXT-22ET-QA68-G4PU-2XK8G";		
 		
 		poll_details = NSV_vote_create_poll_arr[0];
 		if (document.getElementById("nsv_vote_cast_option1").checked) {
