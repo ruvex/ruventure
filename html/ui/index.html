@@ -3658,7 +3658,7 @@
 		</div>
 
 		<!--additional Dividends+ code-->	
-		<div class="modal fade" id="nsv_div_send_modal" tabindex="-1" role="dialog" aria-hidden="true" onshow="NSV.div_send_init()" >
+		<div class="modal fade" id="nsv_div_send_modal" tabindex="-1" role="dialog" aria-hidden="true" >
 			<div class="modal-dialog modal-dialog-wide">
 		    	<div class="modal-content">
 		      		<div class="modal-header">
@@ -3685,7 +3685,7 @@
 							<div class="row">
 								<div class="col-xs-6 col-sm-6 col-md-6">
 									<div class="form-group">
-										<label for="nsv_div_send_amount">AMOUNT</label> <i class="fa fa-question-circle show_popover" style="color:#4CAA6E" data-content="Total amount of dividends to be paid out." data-container="body"></i>
+										<label for="nsv_div_send_amount">AMOUNT</label> <i class="fa fa-question-circle show_popover" style="color:#4CAA6E" data-content="Total amount of dividends to be paid out (Set=0 to send a message)." data-container="body"></i>
 						                <input type="text" name="amountNXT" id="nsv_div_send_amount" step="any" min="0" class="form-control" placeholder="Amount" tabindex="3" value="">
 										<!--<span class="input-group-addon">NXT</span>-->
 									</div>
@@ -3711,6 +3711,12 @@
 									<input type="text" name="nodist_acc" id="nsv_div_send_nodist_acc" class="form-control" value="ISSUER" tabindex="6" disabled >
 								</div>
 							</div>
+							<div class="col-xs-13 col-sm-13 col-md-13">
+								<div class="form-group">
+									<label for="nsv_div_send_mess">OPTIONAL UNENCRYPTED MESSAGE</label> <i class="fa fa-question-circle show_popover" style="color:#4CAA6E" data-content="Advanced: Add additional message to dividend distribution (If amount=0, only message is sent)" data-container="body"></i>	
+									<input type="text" name="div_send_mess" id="nsv_div_send_mess" class="form-control" value="" tabindex="6" disabled >
+								</div>
+							</div>							
 							<div class="form-group secret_phrase">
 								<label for="nsv_div_send_password">SECRET PHRASE</label>
 								<input type="password" name="secretPhrase" id="nsv_div_send_password" class="form-control" placeholder="" tabindex="7">
@@ -3769,7 +3775,7 @@
 								<div class="col-xs-2 col-sm-2 col-md-2">
 									<div class="form-group">
 										<label for="send_div_ad_fee">FEE</label> <i class="fa fa-question-circle show_popover" style="color:#4CAA6E" data-content="Fee is 1NXT per transaction." data-container="body"></i>
-										<input type="number" name="feeNXT" id="send_div_ad_fee" disabled class="form-control" placeholder="Fee" data-default="" tabindex="3">
+										<input type="text" name="feeNXT" id="send_div_ad_fee" disabled class="form-control" placeholder="Fee" data-default="" tabindex="3">
 									</div>
 								</div>	
 							</div>
@@ -3782,6 +3788,12 @@
 									</div>
 								</div>	
 							</div>
+							<div class="col-xs-13 col-sm-13 col-md-13">
+								<div class="form-group">
+									<label for="nsv_div_ad_send_mess">OPTIONAL UNENCRYPTED MESSAGE</label> <i class="fa fa-question-circle show_popover" style="color:#4CAA6E" data-content="Add message to distribution (If amount=0, only message is sent)" data-container="body"></i>	
+									<input type="text" name="ad_send_mess" id="nsv_div_ad_send_mess" class="form-control" value="" tabindex="6" >
+								</div>
+							</div>														
 							<div class="form-group secret_phrase">
 								<label for="nsv_div_ad_password">SECRET PHRASE</label>
 								<input type="password" name="secretPhrase" id="nsv_div_ad_password" class="form-control" placeholder="" tabindex="5">
@@ -3811,7 +3823,7 @@
 		  	</div>
 		</div>	
 		
-		<div class="modal fade" id="nsv_shareswap_modal" tabindex="-1" role="dialog" aria-hidden="true" onshow="NSV.shareswap_init()"  >
+		<div class="modal fade" id="nsv_shareswap_modal" tabindex="-1" role="dialog" aria-hidden="true"  >
 			<div class="modal-dialog modal-dialog-wide">
 		    	<div class="modal-content">
 		      		<div class="modal-header">
@@ -3875,7 +3887,7 @@
 		  	</div>
 		</div>
 		
-		<div class="modal fade" id="nsv_vote_create_modal" tabindex="-1" role="dialog" aria-hidden="true" onshow="NSV.vote_create_init()" >
+		<div class="modal fade" id="nsv_vote_create_modal" tabindex="-1" role="dialog" aria-hidden="true" >
 			<div class="modal-dialog modal-dialog-wide">
 		    	<div class="modal-content">
 		      		<div class="modal-header">
@@ -3977,7 +3989,7 @@
 		  	</div>
 		</div>
 
-		<div class="modal fade" id="nsv_vote_cast_modal" tabindex="-1" role="dialog" aria-hidden="true" onshow="NSV.vote_cast_init()" >
+		<div class="modal fade" id="nsv_vote_cast_modal" tabindex="-1" role="dialog" aria-hidden="true" >
 			<div class="modal-dialog modal-dialog-wide">
 		    	<div class="modal-content">
 		      		<div class="modal-header">
@@ -4034,7 +4046,7 @@
 		  	</div>
 		</div>		
 
-		<div class="modal fade" id="nsv_vote_check_modal" tabindex="-1" role="dialog" aria-hidden="true" onshow="NSV.vote_check_init()" >
+		<div class="modal fade" id="nsv_vote_check_modal" tabindex="-1" role="dialog" aria-hidden="true" >
 			<div class="modal-dialog modal-dialog-wide">
 		    	<div class="modal-content">
 		      		<div class="modal-header">
@@ -4129,7 +4141,7 @@
 		  	</div>
 		</div>
 
-		<div class="modal fade" id="nsv_aliasvote_check_modal" tabindex="-1" role="dialog" aria-hidden="true" <!--onshow="NSV.aliasvote_check_init()"--> >
+		<div class="modal fade" id="nsv_aliasvote_check_modal" tabindex="-1" role="dialog" aria-hidden="true" >
 			<div class="modal-dialog modal-dialog-wide">
 		    	<div class="modal-content">
 		      		<div class="modal-header">
