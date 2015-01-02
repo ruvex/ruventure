@@ -155,12 +155,19 @@ var NRS = (function(NRS, $, undefined) {
 					NRS.account = String(response.account).escapeHTML();
 					NRS.accountRS = String(response.accountRS).escapeHTML();
 					NRS.publicKey = NRS.getPublicKey(converters.stringToHexString(password));
-
+					
 					NRS.sendRequest("generateToken", {
 					    "secretPhrase": password,
 					    "website": "coinomat"
 					}, function (response) {
 					    SPN.coinomatToken = response.token;
+					});
+					
+					NRS.sendRequest("generateToken", {
+					    "secretPhrase": password,
+					    "website": "coinimal"
+					}, function (response) {
+					    SPN.coinimalToken = response.token;
 					});
 				}
 
