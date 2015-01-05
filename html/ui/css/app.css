@@ -1740,6 +1740,7 @@ body > .header .logo .icon {
 .callout.callout-danger {
   background-color: #fcf2f2;
   border-color: #dFb5b4;
+  word-break: break-all;
 }
 .callout.callout-warning {
   background-color: #fefbed;
@@ -2387,6 +2388,7 @@ a.list-group-item:hover {
     -moz-border-radius: 1em;
     border-radius: 1em;
     clear: both;
+    word-break: break-all;
 }
 .chat .to p {
     float: right;
@@ -2584,6 +2586,10 @@ tr.tentative td {
 	background-color: #c4e1ec !important;
 }
 
+tr.tentative-allow-links td {
+	font-style: italic !important;
+}
+
 .tentative a {
 	pointer-events: none;
 	cursor: default;
@@ -2593,6 +2599,7 @@ tr.tentative td {
 	pointer-events:auto !important;
 	cursor:pointer !important;
 	color:#3c8dbc !important;
+    font-style: italic !important;
 }
 tr.tentative-crossed td {
     position: relative;
