@@ -32,3 +32,5 @@ select2.js - GPL - https://github.com/ivaynberg/select2
 bootstrap-tour.min.js - APL - https://github.com/sorich87/bootstrap-tour/
 URI.js - MIT - https://github.com/medialize/URI.js
 highlight.js - BSD - https://github.com/isagalaev/highlight.js/
+jquery.number.js - https://github.com/customd/jquery-number
+d3.js - https://github.com/mbostock/d3
