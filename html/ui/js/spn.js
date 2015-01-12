@@ -6,7 +6,8 @@ var SPN = (function (SPN, $, undefined) {
     var isCoinAddressOwn = false;
 
     $("#spn_landing").click(function () {
-        verifyBlockchainStatus();
+        verifyVersion();
+		verifyBlockchainStatus();
     });
 
     $("#spn_dashboard").click(function () {
