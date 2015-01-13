@@ -66,7 +66,7 @@ app.callChain = function(options, callback) {
     		var data = JSON.parse(responseText), error;
 	        if (data.errorCode && data.errorCode > 0) {
 	            error = data.errorCode;
-	            console.error('Chain error', error);
+//	            console.error('Chain error', error);
 	        }
 	        if (typeof data == 'string') {
 	            data = JSON.parse(data);
@@ -103,9 +103,13 @@ app.updateBalance = function() {
 			var precise = 100000000;
 			return parseInt(value*precise)/precise;
 		}
-		var confirmed = pluckBalance(response.assetBalances, 'balanceQNT');
-		var unconfirmed = pluckBalance(response.unconfirmedAssetBalances, 'unconfirmedBalanceQNT');
-		balance = confirmed;
+		if (response.assetBalances) {
+			var confirmed = pluckBalance(response.assetBalances, 'balanceQNT');
+			var unconfirmed = pluckBalance(response.unconfirmedAssetBalances, 'unconfirmedBalanceQNT');
+			balance = confirmed + ' NC';
+		} else {
+			balance = 'n/a';
+		}
 /*
 		if (unconfirmed == 0) {
 			balance = confirmed;
