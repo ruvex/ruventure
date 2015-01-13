@@ -1,0 +1,25 @@
+body {
+	padding: 1em;
+}
+
+.page {
+	display: none;
+	padding: 1em;
+}
+
+#topAlert {
+	display: none;
+}
+
+.modal {
+	display: none;
+}
+
+#loadingWindow .modal-body {
+	height: 300px;
+}
+
+.nav .balance {
+	font-size: 2em;
+	margin-left: 1em;
+}

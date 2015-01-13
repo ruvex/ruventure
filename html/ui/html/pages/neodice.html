@@ -1,0 +1,155 @@
+<div id="spn_neodice_page" class="page">
+    <section class="content-header">
+        <h1>NeoDICE</h1>
+    </section>
+    <section class="content">
+        <ol class="breadcrumb">
+            <li><a href="#" class="goto-page" data-page="supernet">SuperNET</a></li>
+            <li class="active">NeoDICE</li>
+        </ol>
+
+        <noscript id="slide-template">
+            <div class='slide'>
+                <div class='horizLine'></div>
+                <div class='ball'></div>
+                <div class="abs numLeft" style="left:5px;bottom:50%"></div>
+                <div class="abs textLeft" style="left:5px;top:50%"></div>
+                <div class="abs numRight" style="right:5px;bottom:50%"></div>
+                <div class="abs textRight" style="right:5px;top:50%"></div>
+            </div>
+        </noscript>
+        <noscript id="chance-to-win-template">
+            <div style='text-align:center;font-size:11px;margin-top:3px;color:black;line-height:1.1;'>
+                chance<br>to win<br><span class='value'></span>
+            </div>
+        </noscript>
+        <noscript id="gain-template">
+            <div style='text-align:center;font-size:14px;margin-top:6px;color:black;line-height:1.1;'>
+                <span class='value'></span><br />gain
+            </div>
+        </noscript>
+
+        <ul class="nav nav-pills">
+            <li role="presentation" class="active"><a href="#" data-url="gamble">Play</a></li>
+            <li role="presentation"><a href="#" data-url="getNC">Get NC</a></li>
+            <li role="presentation"><a href="#" data-url="getNXT">Cash out</a></li>
+            <li role="presentation"><a href="#">History</a></li>
+            <li role="presentation"><a href="#">Verify</a></li>
+            <li role="presentation"><a href="#">Info</a></li>
+            <li role="presentation" class="balance"><span class="amount"></span> NC</li>
+        </ul>
+        <br />
+        <div class="alert alert-danger" role="alert" id="topAlert"></div>
+
+        <div class="page" id="page-gamble">
+            <div>
+                Bet size: <input type="number" min=4 style="color:black" class="betSize" id="betSize" />
+                <input type="hidden" class="oddSize" />
+                <a onclick="increaseBet()">(+)</a> <a onclick="decreaseBet()">(-)</a>
+                <br />
+                profit: <span class="profit"></span><br />
+                <div class='slideWrapper1'></div>
+                <div class='slideWrapper2'></div>
+            </div>
+            <div>
+                <button type="button" class="btn btn-primary btn-lg">ROLL</button>
+            </div>
+        </div>
+        <div class="page" id="page-login">
+            <form>
+                <div class="form-group">
+                    <label for="secretPhrase">Your secret phrase</label>
+                    <input type="password" class="form-control" id="secretPhrase">
+                    <input type="checkbox" id="secretPhraseSave" value="1">
+                    <label for="secretPhraseSave">Remember passphrase during session</label>
+                </div>
+                <button type="button" class="btn btn-primary btn-lg">Authorize</button>
+            </form>
+        </div>
+        <div class="page" id="page-getNC">
+            <form>
+                <p>Get a few NC (NeoChips) to play with</p>
+                <div class="form-group">
+                    <label for="amountNXT">Amount</label>
+                    <input type="text" class="form-control" id="amountNXT">
+                </div>
+                <button type="button" class="btn btn-primary btn-lg">BUY</button>
+            </form>
+        </div>
+        <div class="page" id="page-getNXT">
+            <form>
+                <p>Exchange NC to NXT</p>
+                <div class="form-group">
+                    <label for="amountNC">Amount</label>
+                    <input type="text" class="form-control" id="amountNC">
+                </div>
+                <button type="button" class="btn btn-primary btn-lg">Cash Out</button>
+            </form>
+        </div>
+        <div class="modal" id="loadingWindow">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Neodice</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p></p>
+                        <div class="text-center loading">
+                            <div class="loader" title="2">
+                                <svg version="1.1" id="loader-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                                     width="40px" height="40px" viewBox="0 0 50 50" style="enable-background:new 0 0 50 50;" xml:space="preserve">
+                                <path fill="#000" d="M43.935,25.145c0-10.318-8.364-18.683-18.683-18.683c-10.318,0-18.683,8.365-18.683,18.683h4.068c0-8.071,6.543-14.615,14.615-14.615c8.072,0,14.615,6.543,14.615,14.615H43.935z">
+                                <animateTransform attributeType="xml"
+                                                  attributeName="transform"
+                                                  type="rotate"
+                                                  from="0 25 25"
+                                                  to="360 25 25"
+                                                  dur="0.6s"
+                                                  repeatCount="indefinite" />
+			    </path>
+			  </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal" id="betResultWindow">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Neodice</h4>
+                    </div>
+                    <div class="modal-body text-center">
+                        <p>Lucky number: <span class="luckyNumber"></span></p>
+                        <h1 class="result">Your bet won!</h1>
+                        <p>Your Neodice balance: <span class="balance"></span> NeoChips</p>
+                    </div>
+                    <div class="modal-footer center-block">
+                        <button type="button" class="btn btn-primary btn-lg" data-dismiss="modal">OK</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal" id="getNCResultWindow">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Neodice</h4>
+                    </div>
+                    <div class="modal-body text-center">
+                        <h1 class="result">You got <span class="amount"></span> NeoChips!</h1>
+                        <p>Your Neodice balance: <span class="balance"></span> NeoChips</p>
+                    </div>
+                    <div class="modal-footer center-block">
+                        <button type="button" class="btn btn-primary btn-lg" data-dismiss="modal">OK</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
