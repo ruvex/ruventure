@@ -1,5 +1,5 @@
 app.config = {
-	apiUrl: 'http://localhost:6876/nxt',
+	apiUrl: '/nxt',
 	banker: '8268894973734388848',
 	deadline: 10,
 	chipNQT: 100000000,
