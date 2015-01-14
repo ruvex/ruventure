@@ -13,7 +13,8 @@ app.showPage = function(page, params) {
 
 /* Should be changed when integrating with the proper client */
 app.getUserAccount = function() {
-	return '11752402018584872999';
+    //return '11752402018584872999';
+    return NRS.account;
 }
 
 /* Poll chain till test callback return true or exceed maxTries */ 
