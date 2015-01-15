@@ -58,21 +58,7 @@ var Utils={
 
 
 function afterFloatPoint(num,howMuch){
-
-	var result = num.toFixed(howMuch)+"";
-
-    var fp = result.indexOf(".");
-
-    if(fp>=0){
-    	
-        result=result.replace(/\.[0]+$/g,'');
-
-        result=result.replace(/[0]+$/g,'');
-    }
-
-    return result;
-
-    
+	return Number((num).toFixed(howMuch));
 }
 
 
