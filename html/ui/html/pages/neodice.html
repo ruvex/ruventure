@@ -81,7 +81,7 @@
                     <label for="amountNC">Amount</label>
                     <input type="text" class="form-control" id="amountNC">
                 </div>
-                <button type="button" class="btn btn-primary btn-lg">Cash Out</button>
+                <button type="button" class="btn btn-primary btn-lg btn-get-nxt">Cash Out</button>
             </form>
         </div>
         <div class="modal" id="loadingWindow">
@@ -140,6 +140,23 @@
                     </div>
                     <div class="modal-body text-center">
                         <h1 class="result">You got <span class="amount"></span> NeoChips!</h1>
+                        <p>Your Neodice balance: <span class="balance"></span> NeoChips</p>
+                    </div>
+                    <div class="modal-footer center-block">
+                        <button type="button" class="btn btn-primary btn-lg" data-dismiss="modal">OK</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal" id="getNXTResultWindow">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Neodice</h4>
+                    </div>
+                    <div class="modal-body text-center">
+                        <h1 class="result">You've got <span class="amount"></span> NXT!</h1>
                         <p>Your Neodice balance: <span class="balance"></span> NeoChips</p>
                     </div>
                     <div class="modal-footer center-block">
