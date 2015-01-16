@@ -33,19 +33,7 @@ app.getNC = function(secretPhrase) {
 		}
 		app.loadingWindowShow({ text: 'Getting NeoChips.<br/>It&apos;ll take a minute...' });
 		app.pollForResult({
-			options: { 
-				requestType: 'getUnconfirmedTransactions',
-				account: app.getUserAccount()
-			},
-			test: function(pollResponse) {
-				if (pollResponse) {
-					return _.find(pollResponse.unconfirmedTransactions, function(tx) {
-						return tx.referencedTransactionFullHash === response.fullHash;
-					}); 
-				}
-				else 
-					return false;
-			},
+			transaction: response,
 			success: function(response) {
     		    app.loadingWindowHide();
     		    app.showGetNCResult(response);
