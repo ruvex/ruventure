@@ -39,11 +39,11 @@ app.pollForResult = function(options) {
 
 /* Initialize top navigation */
 app.initNavigation = function() {
-	$('.nav a').each(function() {
+	$('.neodice.nav a').each(function() {
 		var $nav = $(this), url = $nav.data('url');
 		$nav.click(function() {
 		    $('.page').hide();
-			$('.nav li').removeClass('active');
+			$('.neodice.nav li').removeClass('active');
 			$nav.parent().addClass('active');
 			app.showPage(url, { rerender: true });
 		});
@@ -118,6 +118,6 @@ app.updateBalance = function() {
 			balance = confirmed + ' (+' + (unconfirmed - confirmed) + ')';
 		}
 */		
-		$('.nav .amount').html(balance);
+		$('.neodice.nav .amount').html(balance);
 	});
 }
