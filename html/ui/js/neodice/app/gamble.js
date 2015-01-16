@@ -43,31 +43,7 @@ app.gamble = function(secretPhrase) {
 		}
     	app.loadingWindowShow({ text: 'Rolling NeoDice<br/>It might take a minute...' });
 		app.pollForResult({
-			options: { 
-				requestType: 'getUnconfirmedTransactions',
-				account: app.getUserAccount()
-			},
-			test: function(pollResponse) {
-				if (pollResponse) {
-					return _.find(pollResponse.unconfirmedTransactions, function(tx) {
-						if (!tx.attachment || !tx.attachment.message) {
-							return null;
-						}
-						var message = tx.attachment.message;
-						var originalTx = new RegExp(/Betting TX ID: (\d+)/).exec(message);
-						originalTx = (originalTx && originalTx[1])? originalTx[1]: 0;
-
-						if (tx.referencedTransactionFullHash) {
-							return tx.referencedTransactionFullHash === response.fullHash;
-						} else {
-  						    return originalTx === response.transaction;
-						}
-
-					}); 
-				}
-				else 
-					return false;
-			},
+			transaction: response,
 			success: function(response) {
                 app.loadingWindowHide();
     		    app.showBetResults(response);

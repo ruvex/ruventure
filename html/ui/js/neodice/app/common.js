@@ -5,6 +5,7 @@ app.showPage = function(page, params) {
 	$activePage.show();	
 	if (!app.pages[page]) {
 		console.error('Page %s is not defined', page);
+		return;
 	}
 	app.pages[page](params);
 
@@ -19,18 +20,34 @@ app.getUserAccount = function() {
 
 /* Poll chain till test callback return true or exceed maxTries */ 
 app.pollForResult = function(options) {
-	var opts = options.options, tries = 0, maxTries = 600, interval = 1000;
+	var opts = options.options || {}, tries = 0, maxTries = 600, interval = 1000;
+
+    opts.requestType = options.requestType || 'getUnconfirmedTransactions';
+	opts.account = options.account || app.getUserAccount();
+	opts.transaction = options.transaction;
+
+	var defaultTest = function(pollResponse, transaction) {
+		if (pollResponse) {
+			return _.find(pollResponse.unconfirmedTransactions, function(tx) {
+				return tx.referencedTransactionFullHash === transaction.fullHash;
+			}); 
+		}
+		else 
+			return false;
+	};
+
+	var testFn = options.test || defaultTest;
 
 	var poll = app.callChain.bind(null, opts, function(err, response) {
 		tries++;
-		if (err || tries > maxTries || options.test(response)) {
+		if (err || tries > maxTries || testFn(response)) {
 			clearInterval(timer);
 		}
 		if (tries > maxTries) {
 			options.error('maxTries exceed');
 		}
-		if (options.test(response)) {
-			options.success(options.test(response));
+		if (testFn(response)) {
+			options.success(testFn(response));
 		}
 	});	
 
