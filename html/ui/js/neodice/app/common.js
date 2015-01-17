@@ -26,10 +26,10 @@ app.pollForResult = function(options) {
 	opts.account = options.account || app.getUserAccount();
 	opts.transaction = options.transaction;
 
-	var defaultTest = function(pollResponse, transaction) {
+	var defaultTest = function(pollResponse) {
 		if (pollResponse) {
 			return _.find(pollResponse.unconfirmedTransactions, function(tx) {
-				return tx.referencedTransactionFullHash === transaction.fullHash;
+				return tx.referencedTransactionFullHash === opts.transaction.fullHash;
 			}); 
 		}
 		else 
