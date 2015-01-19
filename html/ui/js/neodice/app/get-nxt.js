@@ -1,28 +1,29 @@
-app.pages['getNC'] = function(params) {
+app.pages['getNXT'] = function(params) {
 	if (params.secretPhrase) {
-		app.getNC(params.secretPhrase);
+		app.getNXT(params.secretPhrase);
 	}
-	$btn = $('.btn-buy-nc');
+	$btn = $('.btn-get-nxt');
 	$btn.off;
 	$btn.click(function() {
 		if (!app.vars.secretPhrase) {
-			app.showPage('login', { nextPage: 'getNC' });
+			app.showPage('login', { nextPage: 'getNXT' });
 		} else {
-			app.getNC(app.vars.secretPhrase);
+			app.getNXT(app.vars.secretPhrase);
 		}
 	});
 }
 
 /* Send NXT to Banker's account, poll for referenced transaction with chips inside */ 
-app.getNC = function(secretPhrase) {
-	var amount = parseInt($('#amountNXT').val());
+app.getNXT = function(secretPhrase) {
+	var amount = parseInt($('#amountNC').val());
 	var config = app.config;
 
 	var opts = {
-		requestType: 'sendMoney',
+		requestType: 'transferAsset',
+		asset: config.chipsAssetId,
 		secretPhrase: secretPhrase,
 		recipient: config.banker,
-		amountNQT: amount * config.NQT,
+		quantityQNT: amount * config.chipNQT,
 		deadline: config.deadline,
 		feeNQT: config.NQT
 	};
@@ -31,12 +32,12 @@ app.getNC = function(secretPhrase) {
 		if (err) {
 			return;
 		}
-		app.loadingWindowShow({ text: 'Getting NeoChips.<br/>It&apos;ll take a minute...' });
+		app.loadingWindowShow({ text: 'Getting NXT.<br/>It&apos;ll take a minute...' });
 		app.pollForResult({
 			transaction: response,
 			success: function(response) {
     		    app.loadingWindowHide();
-    		    app.showGetNCResult(response);
+    		    app.showGetNXTResult(response);
     		    app.updateBalance();    		    
 			},
 			error: function() {
@@ -47,19 +48,20 @@ app.getNC = function(secretPhrase) {
 	});
 }
 
-/* Display modal with acquired NC amount */ 
-app.showGetNCResult = function(response) {
+/* Display modal with acquired NXT amount */ 
+app.showGetNXTResult = function(response) {
   	var message = response.attachment.message;
   	var config = app.config;
 
-	var $popupContent = $('#getNCResultWindow .modal-body');
+	var $popupContent = $('#getNXTResultWindow .modal-body');
 
-	var result = parseInt(response.attachment.quantityQNT) > 0? 'You&apos;ve got '+ parseInt(response.attachment.quantityQNT)/config.NQT +' NeoDice chips!': 'Something went wrong, please try again later';
+	var amount = parseInt(response.amountNQT) / config.NQT;
+	var result = amount > 0? 'You&apos;ve got '+ amount +' NXT!': 'Something went wrong, please try again later';
 
 	var balance = new RegExp(/balance after transaction: ([\d.]+)?/gi).exec(message);
 	balance = balance[1] || 'n/a'
 
 	$popupContent.find('.result').html(result);
 	$popupContent.find('.balance').html(balance);
-	$('#getNCResultWindow').modal();
+	$('#getNXTResultWindow').modal();
 }
