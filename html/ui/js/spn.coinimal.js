@@ -111,8 +111,15 @@ var SPN = (function (SPN, $, undefined) {
 		});
 	}
    
-	function coinimalOrderNow()
+	function coinimalOrderNow(evt)
 	{
+		if (!$('#coinimalCheckboxFinalAccept').is(':checked'))
+		{
+                  evt.preventDefault();
+                  alert("Please check the checkbox!");
+                  return false;
+		}
+		
 		$("#divCoinimalOrderSummary").html('<p style="text-align: center; margin: 30px; font-weight: bold;">Ordering...</p>');
 		$("#divCoinimalTradeButtons").hide();
 		
