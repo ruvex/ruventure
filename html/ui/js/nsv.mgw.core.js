@@ -214,9 +214,13 @@ var MGW = (function (MGW, $, undefined) {
                         dataType: 'json',
                         async: false,
                         success: function (result) {
-                            $.each(result["transactionIds"], function (txidIndex, txidValue) {
-                                resultTXID.push(txidValue);
-                            });
+                            if (result["transactionIds"]) {
+                                $.each(result["transactionIds"], function (txidIndex, txidValue) {
+                                    resultTXID.push(txidValue);
+                                });
+                            } else {
+                                console.log(result);
+                            }
                         }
                     });
                 });

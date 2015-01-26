@@ -1,197 +1,185 @@
-
-
 //====================================================
 
 //define models & logic
 
-var slideOffsets = new Model(); //sliders percentage
+app.models.slideOffsets = new Model(); //sliders percentage
 
-var result = new Model();   //bet results
+app.models.result = new Model();   //bet results
 
-var settings = new Model();
+app.models.settings = new Model();
 
-function checkBetSize(){
+function checkBetSize () {
+	var result = app.models.result;
+	var betSize = result.get("betSize");
 
-    var betSize = result.get("betSize");
+	var newBetSize = betSize;
 
-    var newBetSize=betSize;
+	if (betSize < result.get("minBet")) {
+		newBetSize = Math.ceil(result.get("minBet"));
+	}
 
-    if(betSize<result.get("minBet")){
-        newBetSize=Math.ceil(result.get("minBet"));
-    }
+	if (betSize > result.get("maxBet")) {
+		newBetSize = Math.floor(result.get("maxBet"));
+	}
 
-    if(betSize>result.get("maxBet")){
-        newBetSize=Math.floor(result.get("maxBet"));
-    }
-
-    if(betSize!=newBetSize){
-
-         setTimeout(function(){
-
-
-
-
-            result.set("betSize",newBetSize);
-
-
-        },10);
-    }
+	if (betSize != newBetSize) {
+		setTimeout(function() {
+			result.set("betSize", newBetSize);
+		}, 10);
+	}
 }
 
-function sliderInit(){
+function sliderInit () {
+	var settings = app.models.settings;
+	var slideOffsets = app.models.slideOffsets;
+	var result = app.models.result;
 
-    settings.set("leastChance",1);
-    settings.set("bestChance",98);
+	settings.set("leastChance", 1);
+	settings.set("bestChance", 98);
 
-/*
-    Utils.getServerData(function(data){
-        //settings.set("serverData",data);
+	/*
+	 Utils.getServerData(function(data){
+	 //settings.set("serverData",data);
 
-        settings.set("minBet",data.bankrol.minbet);
-        settings.set("maxBet",data.bankrol.maxbet);
-        settings.set("yesterdaySecret",data.secret.yesterday);
-        settings.set("todaySecret",data.secret.todayhash);
-    });
-*/
+	 settings.set("minBet",data.bankrol.minbet);
+	 settings.set("maxBet",data.bankrol.maxbet);
+	 settings.set("yesterdaySecret",data.secret.yesterday);
+	 settings.set("todaySecret",data.secret.todayhash);
+	 });
+	 */
 
-    slideOffsets.on("percent1",function(percent){
-         slideOffsets.set("percent2",100-percent);
-     });
-
-
-    slideOffsets.on("percent2",function(percent){
-         slideOffsets.set("percent1",100-percent);
-     });
-
-     slideOffsets.on("percent1",function(percent){
+	slideOffsets.on("percent1", function(percent) {
+		slideOffsets.set("percent2", 100 - percent);
+	});
 
 
-        var leastChance = settings.get("leastChance");
-        var bestChance = settings.get("bestChance");
+	slideOffsets.on("percent2", function(percent) {
+		slideOffsets.set("percent1", 100 - percent);
+	});
 
-        var odds=Utils.calcOdds(percent,leastChance, bestChance);
+	slideOffsets.on("percent1", function(percent) {
+		var leastChance = settings.get("leastChance");
+		var bestChance = settings.get("bestChance");
 
-        var bestGain = Utils.calcGain(odds);
+		var odds = Utils.calcOdds(percent, leastChance, bestChance);
 
-         result.set("odds",  odds);
+		var bestGain = Utils.calcGain(odds);
 
-         result.set("bestGain", bestGain);
+		result.set("odds", odds);
 
-
-        result.set("minBet", Utils.calcMinBet(odds) );
-
-        result.set("maxBet", Utils.calcMaxBet(odds) );
-
-
-        result.set("minBetUI", afterFloatPoint(result.get("minBet"),0) );
-
-        result.set("maxBetUI", afterFloatPoint(result.get("maxBet"),0)  );
-
-        checkBetSize();
-
-     });
-
-     result.on("betSize",function(betSize){
+		result.set("bestGain", bestGain);
 
 
-        checkBetSize();
+		result.set("minBet", Utils.calcMinBet(odds));
 
-        betSize=result.get("betSize");
-
-        var bestGain = result.get("bestGain");
-
-        var profit = (betSize*bestGain);
-
-        result.set("profit",profit);
-        
-     });
-
-     result.on("bestGain",function(bestGain){
-
-        var betSize = result.get("betSize");
-
-        var profit = (betSize*bestGain);
-
-        result.set("profit",profit);
-        
-     });
-
-     result.on("profit",function(val){
-
-        result.set("profitUI",afterFloatPoint(val,1));
-     });
-
-     result.on("odds",function(val){
-
-        result.set("oddsUI",afterFloatPoint(val,0));
-
-     });
+		result.set("maxBet", Utils.calcMaxBet(odds));
 
 
-    //====================================================
+		result.set("minBetUI", afterFloatPoint(result.get("minBet"), 0));
 
-    //define views
+		result.set("maxBetUI", afterFloatPoint(result.get("maxBet"), 0));
 
-    var slider1 = new SlideBar(slideOffsets,"percent1","#chance-to-win-template",function (percent){
-        
-        var leastChance = settings.get("leastChance");
-        var bestChance = settings.get("bestChance");
+		checkBetSize();
+	});
 
-        var odds=Utils.calcOdds(percent,leastChance, bestChance);
+	result.on("betSize", function(betSize) {
+		checkBetSize();
 
-        return afterFloatPoint(odds,0)+"%";
-    },"least chance","best chance");
+		betSize = result.get("betSize");
 
-    var slider2 = new SlideBar(slideOffsets,"percent2","#gain-template",function (percent){
+		var bestGain = result.get("bestGain");
 
-        percent=100-percent;
+		var profit = (betSize * bestGain);
 
-        var leastChance = settings.get("leastChance");
-        var bestChance = settings.get("bestChance");
+		result.set("profit", profit);
+	});
 
-        var odds=Utils.calcOdds(percent,leastChance, bestChance);
+	result.on("bestGain", function(bestGain) {
+		var betSize = result.get("betSize");
 
-        var bestGain = Utils.calcGain(odds);
+		var profit = (betSize * bestGain);
 
-        return "x"+afterFloatPoint(bestGain,2);
+		result.set("profit", profit);
+	});
 
-    },"least gain","best gain");
+	result.on("profit", function(val) {
+		result.set("profitUI", afterFloatPoint(val, 1));
+	});
 
-
-    $(".slideWrapper1").append(slider1.el);
-
-    $(".slideWrapper2").append(slider2.el);
-
-
-
-    $(".minBet").bindText(result,"minBetUI");
-    $(".maxBet").bindText(result,"maxBetUI");
-    $(".yesterdaySecret").bindText(settings,"yesterdaySecret");
-    $(".todaySecret").bindText(settings,"todaySecret");
+	result.on("odds", function(val) {
+		result.set("oddsUI", afterFloatPoint(val, 0));
+	});
 
 
-    $(".betSize").bindText(result,"betSize");
-    $(".oddSize").bindText(result,"oddsUI");
-    $(".profit").bindText(result,"profitUI");
-    $(".chanceToWin").bindText(result,"oddsUI");
+	//====================================================
 
-//====================================================
-    
-    //set start ui settings
+	//define views
 
-    slideOffsets.set("percent1",50);
+	var slider1 = new SlideBar(slideOffsets, "percent1", "#chance-to-win-template", function(percent) {
+		var leastChance = settings.get("leastChance");
+		var bestChance = settings.get("bestChance");
 
-    result.set("betSize",3);
+		var odds = Utils.calcOdds(percent, leastChance, bestChance);
+
+		return afterFloatPoint(odds, 0) + "%";
+	}, "least chance", "best chance");
+
+	var slider2 = new SlideBar(slideOffsets, "percent2", "#gain-template", function(percent) {
+		percent = 100 - percent;
+
+		var leastChance = settings.get("leastChance");
+		var bestChance = settings.get("bestChance");
+
+		var odds = Utils.calcOdds(percent, leastChance, bestChance);
+
+		var bestGain = Utils.calcGain(odds);
+
+		return "x" + afterFloatPoint(bestGain, 2);
+
+	}, "least gain", "best gain");
 
 
+	$(".slideWrapper1").append(slider1.el);
+
+	$(".slideWrapper2").append(slider2.el);
+
+
+	$(".minBet").bindText(result, "minBetUI");
+	$(".maxBet").bindText(result, "maxBetUI");
+	$(".gain-ui").bindText(result, "gainUI");
+	$(".yesterdaySecret").bindText(settings, "yesterdaySecret");
+	$(".todaySecret").bindText(settings, "todaySecret");
+
+
+	$(".betSize").bindText(result, "betSize");
+	$(".oddSize").bindText(result, "oddsUI");
+	$(".profit").bindText(result, "profitUI");
+	$(".chanceToWin").bindText(result, "oddsUI");
+
+	$('.increase').click(function(e) {
+		increaseBet();
+	});
+
+	$('.decrease').click(function(e) {
+		decreaseBet();
+	});
+
+	//====================================================
+
+	//set start ui settings
+
+	slideOffsets.set("percent1", 50);
+
+	result.set("betSize", 100);
 }
 
 
-function increaseBet(){
-    result.set("betSize",result.get("betSize")+1);
-};
+function increaseBet () {
+	var result = app.models.result;
+	result.set("betSize", result.get("betSize") + 1);
+}
 
-function decreaseBet(){
-    result.set("betSize",result.get("betSize")-1);
-};
-
+function decreaseBet () {
+	var result = app.models.result;
+	result.set("betSize", result.get("betSize") - 1);
+}

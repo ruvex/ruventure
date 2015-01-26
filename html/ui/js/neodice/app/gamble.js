@@ -8,16 +8,16 @@ app.pages['gamble'] = function(params) {
 		app.gamble(params.secretPhrase);		
 	}
 
-	$btn = $('.btn-roll');
+	$btn = $('.btn_roll');
 	$btn.off();
 	$btn.click(function() {
 		if (!app.vars.secretPhrase) {
-			app.showPage('login', { nextPage: 'gamble' });
+			app.showLoginModal({ nextPage: 'gamble' });
 		} else {
 			app.gamble(app.vars.secretPhrase);
 		}
 	});
-}
+};
 
 /* Take bet size and odds, send API call, poll for result */ 
 app.gamble = function(secretPhrase) {
@@ -45,18 +45,21 @@ app.gamble = function(secretPhrase) {
 		app.pollForResult({
 			transaction: response,
 			success: function(response) {
-                app.loadingWindowHide();
+             app.loadingWindowHide();
     		    app.showBetResults(response);
     		    app.updateBalance();
 			},
 			error: function() {
-                app.loadingWindowHide();
+             app.loadingWindowHide();
     		    console.error('Error while polling');
 			},
+			test: function() {
+				return 'testHash_jadkflkadjfkladkjaldkjldkgjakdjg';
+			}
 		});
 	});
 
-}
+};
 
 /* Display modal with bet result based on transaction's message */ 
 app.showBetResults = function(response) {
@@ -68,11 +71,11 @@ app.showBetResults = function(response) {
 
 	var result = response.attachment.quantityQNT > 0? 'Your bet has WON!': 'Your bet has lost';
 
-	var balance = new RegExp(/balance after transaction: ([\d.]+)?/gi).exec(message)
-	balance = balance[1] || 'n/a'
+	var balance = new RegExp(/balance after transaction: ([\d.]+)?/gi).exec(message);
+	balance = balance[1] || 'n/a';
 
 	$popupContent.find('.luckyNumber').html(luckyNumber);
 	$popupContent.find('.result').html(result);
 	$popupContent.find('.balance').html(balance);
 	$('#betResultWindow').modal();
-}
+};
