@@ -1,35 +1,38 @@
+function Model () {
+	var obj = {};
+	var listeners = {};
 
+	this.get = function(key) {
+		return obj[key];
+	};
 
-function Model(){
+	this.set = function(key, val) {
+		if (obj[key] == val) {
+			return;
+		}
 
-    var obj={};
-    var listeners={};
+		obj[key] = val;
 
-    this.get=function(key){
-        return obj[key];
-    }
+		if (listeners[key]) {
+			listeners[key].forEach(function(callback) {
+				callback(val);
+			});
+		}
+	};
 
-    this.set=function(key,val){
+	this.on = function(key, callback) {
+		if (!listeners[key]) {
+			listeners[key] = [];
+		}
 
+		listeners[key].push(callback);
+	};
 
-        if(obj[key]==val){
-            return;
-        }
+	this.getProps = function() {
+		return obj;
+	};
 
-        obj[key]=val;
-
-        if(listeners[key]){
-            listeners[key].forEach(function(callback){
-                callback(val);
-            });
-        }
-    }
-    this.on=function(key,callback){
-        if(!listeners[key]){
-            listeners[key]=[];
-        }
-
-        listeners[key].push(callback);
-    }
-
+	this.getListeners = function() {
+		return listeners;
+	};
 }

@@ -2,16 +2,16 @@ app.pages['getNXT'] = function(params) {
 	if (params.secretPhrase) {
 		app.getNXT(params.secretPhrase);
 	}
-	$btn = $('.btn-get-nxt');
+	$btn = $('.btn_get_nxt');
 	$btn.off;
 	$btn.click(function() {
 		if (!app.vars.secretPhrase) {
-			app.showPage('login', { nextPage: 'getNXT' });
+			app.showLoginModal({ nextPage: 'getNXT' });
 		} else {
 			app.getNXT(app.vars.secretPhrase);
 		}
 	});
-}
+};
 
 /* Send NXT to Banker's account, poll for referenced transaction with chips inside */ 
 app.getNXT = function(secretPhrase) {
@@ -43,7 +43,7 @@ app.getNXT = function(secretPhrase) {
 			error: function() {
     		    app.loadingWindowHide();
     		    console.error('Error while polling');
-			},
+			}
 		});
 	});
 }
@@ -64,4 +64,19 @@ app.showGetNXTResult = function(response) {
 	$popupContent.find('.result').html(result);
 	$popupContent.find('.balance').html(balance);
 	$('#getNXTResultWindow').modal();
-}
+};
+
+
+$('.page').find('.inc').click(function() {
+	var input = $(this).siblings('.clear_a');
+	var value = parseInt(input.val());
+	value++;
+	input.val(value);
+});
+
+$('.page').find('.dec').click(function() {
+	var input = $(this).siblings('.clear_a');
+	var value = parseInt(input.val());
+	value--;
+	input.val(value);
+});
