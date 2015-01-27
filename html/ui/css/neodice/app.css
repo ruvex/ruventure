@@ -51,6 +51,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 #spn_neodice_page .logo {
     float: left;
     margin: 35px 0 0 50px;
+    background: transparent;
 }
 
 /*#spn_neodice_page .logo img {
@@ -218,6 +219,7 @@ label {
 .clear_a {
     cursor: default;
     height: 70px;
+    padding: 0 !important;
 }
 
 .clear_a:hover {
