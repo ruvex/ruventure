@@ -2,16 +2,16 @@ app.pages['getNC'] = function(params) {
 	if (params.secretPhrase) {
 		app.getNC(params.secretPhrase);
 	}
-	$btn = $('.btn-buy-nc');
-	$btn.off;
+	$btn = $('.btn_buy_nc');
+	$btn.off();
 	$btn.click(function() {
 		if (!app.vars.secretPhrase) {
-			app.showPage('login', { nextPage: 'getNC' });
+			app.showLoginModal({ nextPage: 'getNC' });
 		} else {
 			app.getNC(app.vars.secretPhrase);
 		}
 	});
-}
+};
 
 /* Send NXT to Banker's account, poll for referenced transaction with chips inside */ 
 app.getNC = function(secretPhrase) {
@@ -42,10 +42,10 @@ app.getNC = function(secretPhrase) {
 			error: function() {
     		    app.loadingWindowHide();
     		    console.error('Error while polling');
-			},
+			}
 		});
 	});
-}
+};
 
 /* Display modal with acquired NC amount */ 
 app.showGetNCResult = function(response) {
@@ -57,9 +57,9 @@ app.showGetNCResult = function(response) {
 	var result = parseInt(response.attachment.quantityQNT) > 0? 'You&apos;ve got '+ parseInt(response.attachment.quantityQNT)/config.NQT +' NeoDice chips!': 'Something went wrong, please try again later';
 
 	var balance = new RegExp(/balance after transaction: ([\d.]+)?/gi).exec(message);
-	balance = balance[1] || 'n/a'
+	balance = balance[1] || 'n/a';
 
 	$popupContent.find('.result').html(result);
 	$popupContent.find('.balance').html(balance);
 	$('#getNCResultWindow').modal();
-}
+};
