@@ -49,9 +49,9 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 }
 
 #spn_neodice_page .logo {
+    background: none repeat scroll 0 0 transparent;
     float: left;
-    margin: 35px 0 0 50px;
-    background: transparent;
+    margin: 35px 10px 0 35px;
 }
 
 /*#spn_neodice_page .logo img {
@@ -79,7 +79,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     color: #f5f5f5;
     font-size: 14px !important;
     font-weight: 100;
-    margin: 0 0 0 15px !important;
+    margin: 0px !important;
     text-shadow: 0 0 0;
 }
 
@@ -133,18 +133,15 @@ label {
     margin: 0;
     /*max-width: 960px;*/
 }
-
-.bg_nav .span3 h1 {
+/*.bg_nav .span3 h1*/.bg_nav .span4 h1 {
     color: #fff;
     float: right;
     font-size: 50px;
-    margin: 24px 0 3px;
-    padding-right: 50px;
+    margin: 24px 50px 0 3px;
     text-align: right;
     width: 100%;
 }
-
-.bg_nav .span3 p {
+/*.bg_nav .span3 p*/.bg_nav .span4 p {
     color: #35a8e0;
     float: right;
     margin: 0 54px 10px 0;
@@ -154,6 +151,9 @@ label {
     background: #35a8e0;
     text-align: center;
     color: #162d4d;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    user-select: none; 
 }
 
 .bg_blue p {
@@ -177,9 +177,9 @@ label {
 .line .btn-group, .slideWrapper1, .slideWrapper2 {
     float: left;
     left: 50%;
-    margin-left: -138px;
+    margin-left: -150px;
     position: relative;
-    width: 274px;
+    width: 300px;
 }
 
 .bg_blue h3 {
@@ -206,7 +206,7 @@ label {
     font-family: "robotoblack";
     font-size: 50px !important;
     margin: 0 !important;
-    padding: 22px 0 27px;
+    padding: 21px 0 27px;
     /*width: 56%;*/
     text-shadow: none;
 }
@@ -215,11 +215,16 @@ label {
     box-shadow: 0 0 5px #000 inset;
     text-decoration: none !important;
 }
+#testnet_warning {z-index: 9999;}
 
 .clear_a {
     cursor: default;
     height: 70px;
+    width: 205px;
     padding: 0 !important;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
 }
 
 .clear_a:hover {
@@ -239,10 +244,6 @@ label {
     border-left: 4px solid #1d70b7;
     border-top-right-radius: 20px;
     width: 47px;
-}
-
-.line .btn-group .btn-default {
-    width: 172px;
 }
 
 .logo2 {
@@ -269,7 +270,6 @@ label {
 .p_bottom {
     margin-bottom: 50px;
 }
-
 .btn.btn-default.btn_roll {
     background: none repeat scroll 0 0 #162d4d;
     border: medium none;
@@ -281,7 +281,7 @@ label {
     padding: 22px 0 27px;
     position: relative;
     text-shadow: none;
-    width: 275px;
+    width: 300px;
 }
 
 /*.logo2_box {margin-left: 37px !important;}*/
@@ -545,12 +545,15 @@ label {
     }
 
     #spn_neodice_page .logo img {
-        margin-left: -16px;
+        /*margin-left: -16px;*/
+        margin: 10px 0 0;
     }
 
     .bg_nav .btn-group {
         /*top: 24px;*/
-        margin-left: 18%;
+        /*margin-left: 18%;*/
+        margin-left: 0%;
+        text-align: center;
     }
 
     .bg_nav .btn-group li {
@@ -562,13 +565,17 @@ label {
 @media(max-width: 768px) {
     .bg_nav .btn-group {
         /*top: 24px;*/
-        margin-left: 7%;
+        /*margin-left: 7%;*/
+        margin-left: 0%;
+        text-align: center;
     }
 }
 
 @media(max-width: 580px) {
     .bg_nav .btn-group {
-        margin-left: 5%;
+        /*margin-left: 5%;*/
+        margin-left: 0%;
+        text-align: center;
     }
 
     .bg_nav .btn-group li {
@@ -578,10 +585,20 @@ label {
 
 @media(max-width: 540px) {
     #spn_neodice_page .logo {
-        top: 20px;
+        top: 18px;
     }
     .bg_nav .btn-group {
         margin-left: 0;
         /*padding-top: 5px;*/
     }
+}
+
+#spn_neodice_page input[type=number]::-webkit-outer-spin-button,
+#spn_neodice_page input[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+#spn_neodice_page input[type=number] {
+    -moz-appearance:textfield;
 }

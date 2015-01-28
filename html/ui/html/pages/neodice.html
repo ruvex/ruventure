@@ -10,13 +10,17 @@
 
         <noscript id="slide-template">
             <div class='slide'>
-                <div class='horizLine'></div>
-                <div class='overlayLine'></div>
-                <div class='ball'></div>
-                <div class="abs numLeft" style="left:5px;bottom:50%"></div>
-                <div class="abs textLeft" style="left:5px;top:50%"></div>
-                <div class="abs numRight" style="right:5px;bottom:50%"></div>
-                <div class="abs textRight" style="right:5px;top:50%"></div>
+                <div class="ball_line">
+                    <div class='horizLine'></div>
+                    <div class='overlayLine'></div>
+                    <div class='ball'></div>
+                </div>
+                <div class="ball_text_line">
+                    <div class="abs numLeft" style="left:5px;bottom:50%"></div>
+                    <div class="abs textLeft" style="left:5px;top:50%"></div>
+                    <div class="abs numRight" style="right:5px;bottom:50%"></div>
+                    <div class="abs textRight" style="right:5px;top:50%"></div>
+                </div>
             </div>
         </noscript>
         <noscript id="chance-to-win-template">
@@ -99,7 +103,7 @@
 
         <div class="neodice nav bg_nav">
             <div class="row-fluid">
-                <div class="span9">
+                <div class="span8">
                     <span class="logo"><img src="/img/neodice/logo.png"></span>
                     <ul class="btn-group">
                         <li class="btn"><a href="#" class="active_a_btn" data-url="gamble">Play</a></li>
@@ -107,12 +111,12 @@
                         <li class="btn"><a href="#" data-url="getNXT">Cash out</a></li>
                         <li class="btn">Stats</li>
                         <li class="btn">Verify</li>
-                        <li class="btn"><a href="http://neodice.com" target="_blank">About</a></li>
+                        <li class="btn"><a href="http://neodice.com" data-url="about" target="_blank">About</a></li>
                     </ul>
                 </div>
-                <div class="span3">
+                <div class="span4">
                     <h1 class="amount">
-                        10000.00
+                        1234567890
                     </h1><br/>
                     <p class="color_blue">
                         NeoDICE chips

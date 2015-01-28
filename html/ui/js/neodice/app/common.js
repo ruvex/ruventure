@@ -66,12 +66,14 @@ app.pollForResult = function(options) {
 app.initNavigation = function() {
 	var links = $('.neodice.nav a');
 	links.click(function() {
-		$('.page').hide();
 		var link = $(this);
 		var url = link.data('url');
 		links.removeClass('active_a_btn');
 		link.addClass('active_a_btn');
-		app.showPage(url, { rerender: true });
+		var preventAbout = url.indexOf('about') === -1;
+		if (preventAbout) {
+			app.showPage(url, { rerender: true });
+		}
 	});
 };
 
@@ -150,4 +152,8 @@ app.updateBalance = function() {
 		nav.find('.amount').html(balance);
 		nav.find('.color_blue').html(text);
 	});
+};
+
+app.validateInputs = function() {
+	$('.clear_a').numeric();
 };
