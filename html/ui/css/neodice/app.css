@@ -602,3 +602,12 @@ label {
 #spn_neodice_page input[type=number] {
     -moz-appearance:textfield;
 }
+
+#spn_neodice_page *::selection, #spn_neodice_page *::-moz-selection {
+    background: transparent !important;
+}
+
+#spn_neodice_page .clear_a::selection, #spn_neodice_page .clear_a::-moz-selection {
+    background: #1d70b7 !important;
+    color: #fff !important;
+}
