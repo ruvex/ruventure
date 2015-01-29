@@ -24,23 +24,17 @@
 
 }
 
-body {
-  margin: 0;
-  padding: 0;
-  font-family: 'robotolight';
-}
-
-html, body, p, a {
-  font-family: 'robotolight';
-}
-
-h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
-  font-family: 'robotoblack';
-}
-
 /* Neodice app namespace */
 
 #spn_neodice_page {
+
+  * {
+    font-family: 'robotolight';
+  }
+
+  h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+    font-family: 'robotoblack';
+  }
 
   .bg_nav {
     background: #000;
