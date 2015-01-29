@@ -176,10 +176,12 @@ function sliderInit () {
 
 function increaseBet () {
 	var result = app.models.result;
-	result.set("betSize", result.get("betSize") + 1);
+	var bet = Number(result.get("betSize")) + 1;
+	result.set("betSize", bet);
 }
 
 function decreaseBet () {
 	var result = app.models.result;
-	result.set("betSize", result.get("betSize") - 1);
+	var bet = Number(result.get("betSize")) - 1;
+	result.set("betSize", bet);
 }
