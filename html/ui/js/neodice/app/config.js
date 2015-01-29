@@ -1,8 +1,8 @@
 app.config = {
 	apiUrl: '/nxt',
-	banker: '8268894973734388848',
+	banker: '5702214292673415565',
 	deadline: 10,
 	chipNQT: 100000000,
 	NQT: 100000000,
-	chipsAssetId: '8589758091919934283'
+	chipsAssetId: '10731570866581759185'
 };

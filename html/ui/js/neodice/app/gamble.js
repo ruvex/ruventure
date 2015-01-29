@@ -37,8 +37,16 @@ app.gamble = function(secretPhrase) {
 		messageToEncryptIsText: true
 	};
 
+	if (app.validateOptions() === false) {
+		console.error('Cannod send, one or several options are empty or of invalid format', opts);
+	}
+
 	app.callChain(opts, function(err, response) {
 		if (err) {
+			var error = response.errorDescription || 'Unknown error';
+			app.warningWindowShow({
+				text: error
+			});
 			return;
 		}
     	app.loadingWindowShow({ text: 'Rolling NeoDice<br/>It might take a minute...' });
@@ -50,12 +58,12 @@ app.gamble = function(secretPhrase) {
     		    app.updateBalance();
 			},
 			error: function() {
-             app.loadingWindowHide();
+	            app.loadingWindowHide();
     		    console.error('Error while polling');
-			},
+			}/*,
 			test: function() {
 				return 'testHash_jadkflkadjfkladkjaldkjldkgjakdjg';
-			}
+			}*/
 		});
 	});
 

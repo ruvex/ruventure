@@ -12,7 +12,7 @@ app.showPage = function(page, params) {
 	$("#spn_neodice_page").show();
 };
 
-/* Should be changed when integrating with the proper client */
+/* Get user account from NRS config */
 app.getUserAccount = function() {
 	if (app.vars.debug) {
 		return '11752402018584872999';
@@ -88,7 +88,9 @@ app.callChain = function(options, callback) {
 	if (options.account && typeof options.account !='string') {
 		console.error('Wrong account id in chain call (%s)', options.account);
 	}
-	console.log('POST:/', options);
+	if (app.vars.debug) {
+		console.log('POST:/', options);
+    }
 	$.ajax({
 		url: config.apiUrl,
 		type: 'POST',
@@ -117,6 +119,12 @@ app.loadingWindowShow = function(opts) {
 
 app.loadingWindowHide = function() {
 	$('#loadingWindow').modal('hide');
+};
+
+app.warningWindowShow = function(opts) {
+	$modal = $('#warningWindow');
+	$modal.find('.modal-body').html(opts.text);
+	$modal.modal();
 };
 
 app.updateBalance = function() {
@@ -157,3 +165,7 @@ app.updateBalance = function() {
 app.validateInputs = function() {
 	$('.clear_a').numeric();
 };
+
+app.validateOptions = function(options) {
+    return _.every(_.values(options)); // all values of the dictionary are not-empty
+}
