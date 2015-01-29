@@ -352,8 +352,6 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
     width: 400px;
     /*display: none;*/ }
   @media (min-width: 980px), (max-width: 767px) {
-    #spn_neodice_page .logo2_box {
-      margin-left: 35px; }
     #spn_neodice_page .logo2 {
       margin: 0; } }
   @media (max-width: 767px) {
