@@ -38,6 +38,7 @@
                             <option value="OKPAY">OKPAY - OK Pay USD</option>
                             <option value="VISAMASTER">VISAMASTER - withdrawal to Visa/Mastercard</option>
                             <option value="COINO">COINO - CoinoUSD NXT asset</option>
+                            <option value="USD">USD - Bank Wire</option>
                         </select>
                     </div>
                 </div>
@@ -67,7 +68,26 @@
                             <option value="OKPAY">OKPAY - OK Pay USD</option>
                             <option value="VISAMASTER">VISAMASTER - withdrawal to Visa/Mastercard</option>
                             <option value="COINO">COINO - CoinoUSD NXT asset</option>
+                            <option value="USD">USD - Bank Wire</option>
                         </select>
+                    </div>
+                </div>
+            </div>
+            <div id="spn_coinomat_wallet_addr_fr_div" class="row show-grid" style="display:none">
+                <div class="col-md-6 col-sm-6 col-xs-6">
+                    <form role="form" class="form-horizontal">
+                        <div class="form-group" id="spn_coinomat_usd_balance_div">
+                            <label class="col-sm-4 control-label">USD Balance</label>
+                            <div class="col-sm-8">
+                                <h5 id="spn_coinomat_usd_balance"></h5>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div id="spn_coinomat_usd_verify_div" class="col-md-3 col-xs-6" style="display:none">
+                    <div>
+                        <h5 style="display:inline-block"></h5>
+                        <a href="#" class="btn btn-primary" role="button" style="margin-left:10px" onclick="SPN.verifyUSD();">Verify</a>
                     </div>
                 </div>
             </div>

@@ -346,15 +346,17 @@ var SPN = (function (SPN, $, undefined) {
     }
     function get_tunnel(id, k1, k2) {
         var t = $("#spn_coinomat_to").select2("val");
+        var f = $("#spn_coinomat_fr").select2("val");
         $("#spn_coinomat_in_address_qr_code").hide();
-        var getTunnelURL
-        if (t == "VISAMASTER") {
+        $("#spn_coinomat_main_exchange").removeAttr('disabled');
+        var getTunnelURL;
+        if (t == "VISAMASTER" || f == "USD") {
             getTunnelURL = "get_tunnel.php?xt_id=" + id + "&k1=" + k1 + "&k2=" + k2 + "&history=1&nxt=" + SPN.coinomatToken;
         }
         else {
             getTunnelURL = "get_tunnel.php?xt_id=" + id + "&k1=" + k1 + "&k2=" + k2 + "&history=1";
         }
-
+        
         $.ajax({
             url: URL + getTunnelURL,
             dataType: 'jsonp',
@@ -431,6 +433,25 @@ var SPN = (function (SPN, $, undefined) {
                         }
                         case "PERFECT": case "EGOPAY": case "OKPAY": case "COINO": {
                             fcurrencyunits = " USD";
+                            break;
+                        }
+                        case "USD": {
+                            if (data.tunnel.balance) {
+                                var refresh = "<span class='glyphicon glyphicon-refresh' style='float:right;color:green;cursor:pointer' onclick='SPN.refreshUSD()'></span>";
+
+                                $("#spn_coinomat_usd_balance").html("$ " + data.tunnel.balance.amount + " " + refresh);
+                            }
+
+                            if (data.tunnel.balance.need_verification) {
+                                $("#spn_coinomat_usd_verify_div h5").css("color","red").html("Not Verified");
+                                $("#spn_coinomat_usd_verify_div").show();
+                                $("#spn_coinomat_main_exchange").attr('disabled', 'disabled');
+                            } else {
+                                $("#spn_coinomat_usd_verify_div h5").css("color","green").html("Verified");
+                                $("#spn_coinomat_usd_verify_div").show();
+                                $("#spn_coinomat_usd_verify_div a").hide();
+                                $("#spn_coinomat_main_exchange").removeAttr('disabled');
+                            }
                             break;
                         }
                     }
@@ -606,6 +627,7 @@ var SPN = (function (SPN, $, undefined) {
 
         if (isExchangeRate) {
             var t = $("#spn_coinomat_to").select2("val");
+            var f = $("#spn_coinomat_fr").select2("val");
 
             if (t == "NXT" || t == "COINO") {
                 $("#spn_coinomat_wallet_addr_to_div").hide();
@@ -629,8 +651,15 @@ var SPN = (function (SPN, $, undefined) {
                         break;
                 }
             }
+
+            if (f == "USD") {
+                $("#spn_coinomat_wallet_addr_fr_div").show();
+            } else {
+                $("#spn_coinomat_wallet_addr_fr_div").hide();
+            }
         } else {
             $("#spn_coinomat_wallet_addr_to_div").hide();
+            $("#spn_coinomat_wallet_addr_fr_div").hide();
         }
     }
     function setDefaultCoinomatExchangePair() {
@@ -716,7 +745,13 @@ var SPN = (function (SPN, $, undefined) {
     SPN.manageBankCards = function () {
         window.open(webURL + "login.php?redir=/settings.php%23cards&logout=1&nxt=" + SPN.coinomatToken);
     }
+    SPN.verifyUSD = function () {
+        window.open(webURL + "login.php?redir=/settings.php%23verification&logout=1&nxt=" + SPN.coinomatToken);
+    }
     SPN.refreshBankCards = function () {
+        refreshCoinomat();
+    }
+    SPN.refreshUSD = function () {
         refreshCoinomat();
     }
     SPN.rdBankCard_OnClick = function (e) {
