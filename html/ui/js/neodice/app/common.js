@@ -55,12 +55,25 @@ app.pollForResult = function(options) {
 			options.error('maxTries exceed');
 		}
 		if (testFn(response)) {
-			options.success(testFn(response));
+			var tx = testFn(response);
+
+			if (tx && tx.attachment && tx.attachment.message) {
+				var $rightPage = $('.page-details .content');
+				$rightPage.find('.slider-comments').hide();
+				$rightPage.find('.response').html(app.nl2br(tx.attachment.message)).show();
+			}
+
+			options.success(tx);
 		}
 	});	
 
 	var timer = setInterval(poll, interval); 
 };
+
+/* Convert newlines to BRs */
+app.nl2br = function(str) {
+    return str.replace(/(?:\r\n|\r|\n)/g, '<br />');
+}
 
 /* Initialize top navigation */
 app.initNavigation = function() {

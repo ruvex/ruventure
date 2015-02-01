@@ -21,6 +21,12 @@ app.pages['gamble'] = function(params) {
 
 /* Take bet size and odds, send API call, poll for result */ 
 app.gamble = function(secretPhrase) {
+
+	var $rightPage = $('.page-details .content');
+	$rightPage.show();
+	$rightPage.find('.response').hide();
+	$rightPage.find('.slider-comments').show();
+
 	var amount = $('#betSize').val();
 	var odds = $('.oddSize').val(); 
 	var config = app.config;
@@ -53,7 +59,7 @@ app.gamble = function(secretPhrase) {
 		app.pollForResult({
 			transaction: response,
 			success: function(response) {
-             app.loadingWindowHide();
+	            app.loadingWindowHide();
     		    app.showBetResults(response);
     		    app.updateBalance();
 			},
