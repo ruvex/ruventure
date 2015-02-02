@@ -333,6 +333,8 @@ var SPN = (function (SPN, $, undefined) {
                     get_tunnel(data.tunnel_id, data.k1, data.k2);
                     $("#spn_coinomat_open_web_a").data("coinomat-tunnelid", data.tunnel_id);
                     $("#spn_coinomat_open_web_a").data("coinomat-k", data.k1 + data.k2);
+                    $("#spn_coinomat_pay_USD").data("coinomat-tunnelid", data.tunnel_id);
+                    $("#spn_coinomat_pay_USD").data("coinomat-k", data.k1 + data.k2);
                 }
                 else {
                     if (data.error) {
@@ -348,6 +350,7 @@ var SPN = (function (SPN, $, undefined) {
         var t = $("#spn_coinomat_to").select2("val");
         var f = $("#spn_coinomat_fr").select2("val");
         $("#spn_coinomat_in_address_qr_code").hide();
+        $("#spn_coinomat_usd_div").hide();
         $("#spn_coinomat_main_exchange").removeAttr('disabled');
         var getTunnelURL;
         if (t == "VISAMASTER" || f == "USD") {
@@ -411,6 +414,14 @@ var SPN = (function (SPN, $, undefined) {
                     
                     var fcurrencyunits = "";
                     var tcurrencyunits = "";
+
+                    switch (data.tunnel.currency_to) {
+                        case "PERFECT": case "EGOPAY": case "OKPAY": case "COINO": {
+                            tcurrencyunits = " USD";
+                            break;
+                        }
+                    }
+
                     switch (data.tunnel.currency_from) {
                         case "BTC": case "LTC": case "PPC": {
                             var strText;
@@ -440,6 +451,7 @@ var SPN = (function (SPN, $, undefined) {
                                 var refresh = "<span class='glyphicon glyphicon-refresh' style='float:right;color:green;cursor:pointer' onclick='SPN.refreshUSD()'></span>";
 
                                 $("#spn_coinomat_usd_balance").html("$ " + data.tunnel.balance.amount + " " + refresh);
+                                $("#spn_coinomat_usd_balance").data("balance", data.tunnel.balance.amount);
                             }
 
                             if (data.tunnel.balance.need_verification) {
@@ -451,13 +463,13 @@ var SPN = (function (SPN, $, undefined) {
                                 $("#spn_coinomat_usd_verify_div").show();
                                 $("#spn_coinomat_usd_verify_div a").hide();
                                 $("#spn_coinomat_main_exchange").removeAttr('disabled');
+                                check_USD_fund();
                             }
-                            break;
-                        }
-                    }
-                    switch (data.tunnel.currency_to) {
-                        case "PERFECT": case "EGOPAY": case "OKPAY": case "COINO": {
-                            tcurrencyunits = " USD";
+
+                            $("#spn_coinomat_usd_div").show();
+                            $("#spn_coinomat_in_address_label").text("Exchange Description");
+                            $("#spn_coinomat_in_address").html("Pay <b>" + $("#spn_coinomat_amount_fr").val() + " " + data.tunnel.currency_from + fcurrencyunits + "</b> for <b>" + $("#spn_coinomat_amount_to").val() + " " + data.tunnel.currency_to + tcurrencyunits + "</b>");
+
                             break;
                         }
                     }
@@ -498,7 +510,7 @@ var SPN = (function (SPN, $, undefined) {
         toggleTransactionHistoryLoading(false,true);
     }
     function check_exchange_limits() {
-        var a_val = parseFloat($("#spn_coinomat_amount_fr").val())
+        var a_val = parseFloat($("#spn_coinomat_amount_fr").val());
 
         $("#spn_coinomat_amount_fr_fail").attr('data-content', "Mininum : " + xrate.in_min + " " + $("#spn_coinomat_fr").select2("val") + " <br> Maximum : " + utoFixed(xrate.in_max,xrate.in_prec.dec) + " " + $("#spn_coinomat_fr").select2("val"));
 
@@ -507,6 +519,32 @@ var SPN = (function (SPN, $, undefined) {
         }
         else {
             toggleAmountFromValidation(false);
+        }
+
+        check_USD_fund();
+    }
+    function check_USD_fund() {
+        var f = $("#spn_coinomat_fr").select2("val");
+        var status = $("#spn_coinomat_usd_verify_div h5").text();
+        if (f == "USD" ) {
+            if(status == "Verified"){
+                var a_val = parseFloat($("#spn_coinomat_amount_fr").val());
+                var balance = $("#spn_coinomat_usd_balance").data("balance");
+
+                if (a_val > balance) {
+                    $("#spn_coinomat_amount_fr_fail").attr('data-content', "You don't have enough fund");
+                    toggleAmountFromValidation(false);
+                    $("#spn_coinomat_main_exchange").addClass('disabled');
+                }
+                else {
+                    toggleAmountFromValidation(true);
+                    $("#spn_coinomat_main_exchange").removeClass('disabled');
+                }
+            } else {
+                toggleAmountFromValidation(false);
+                $("#spn_coinomat_amount_fr_fail").attr('data-content', "You are not verified yet");
+                $("#spn_coinomat_main_exchange").addClass('disabled');
+            }
         }
     }
     function update_to_val() {
@@ -524,6 +562,8 @@ var SPN = (function (SPN, $, undefined) {
             $("#spn_coinomat_amount_to").val(0);
             toggleAmountFromValidation(false);
         }
+
+
     }
     function toggleAmountFromValidation(isTrue) {
         if (isTrue) {
@@ -748,6 +788,26 @@ var SPN = (function (SPN, $, undefined) {
     SPN.verifyUSD = function () {
         window.open(webURL + "login.php?redir=/settings.php%23verification&logout=1&nxt=" + SPN.coinomatToken);
     }
+    $("#spn_coinomat_pay_USD").click(function () {
+        var $btn = $(this);
+        $btn.button('loading');
+        
+        $.ajax({
+            url: URL + 'pay_from_balance.php?nxt=' + SPN.coinomatToken + '&xt=' + $("#spn_coinomat_pay_USD").data("coinomat-tunnelid") + '&amount=' + $("#spn_coinomat_amount_fr").val(),
+            dataType: 'jsonp',
+            type: 'GET',
+            timeout: 30000,
+            crossDomain: true,
+            success: function (data) {
+
+            }
+        });
+
+
+        setTimeout(function () {
+            $btn.button('reset');
+        }, 1000);
+    });
     SPN.refreshBankCards = function () {
         refreshCoinomat();
     }
