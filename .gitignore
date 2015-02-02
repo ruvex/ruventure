@@ -19,3 +19,5 @@
 /compile.bat
 /test/classes/
 *.csv
+/html/node_modules
+/html/.sass-cache

@@ -12,7 +12,7 @@ app.showPage = function(page, params) {
 	$("#spn_neodice_page").show();
 };
 
-/* Should be changed when integrating with the proper client */
+/* Get user account from NRS config */
 app.getUserAccount = function() {
 	if (app.vars.debug) {
 		return '11752402018584872999';
@@ -55,23 +55,38 @@ app.pollForResult = function(options) {
 			options.error('maxTries exceed');
 		}
 		if (testFn(response)) {
-			options.success(testFn(response));
+			var tx = testFn(response);
+
+			if (tx && tx.attachment && tx.attachment.message) {
+				var $rightPage = $('.page-details .content');
+				$rightPage.find('.slider-comments').hide();
+				$rightPage.find('.response').html(app.nl2br(tx.attachment.message)).show();
+			}
+
+			options.success(tx);
 		}
 	});	
 
 	var timer = setInterval(poll, interval); 
 };
 
+/* Convert newlines to BRs */
+app.nl2br = function(str) {
+    return str.replace(/(?:\r\n|\r|\n)/g, '<br />');
+}
+
 /* Initialize top navigation */
 app.initNavigation = function() {
 	var links = $('.neodice.nav a');
 	links.click(function() {
-		$('.page').hide();
 		var link = $(this);
 		var url = link.data('url');
 		links.removeClass('active_a_btn');
 		link.addClass('active_a_btn');
-		app.showPage(url, { rerender: true });
+		var preventAbout = url.indexOf('about') === -1;
+		if (preventAbout) {
+			app.showPage(url, { rerender: true });
+		}
 	});
 };
 
@@ -86,7 +101,9 @@ app.callChain = function(options, callback) {
 	if (options.account && typeof options.account !='string') {
 		console.error('Wrong account id in chain call (%s)', options.account);
 	}
-	console.log('POST:/', options);
+	if (app.vars.debug) {
+		console.log('POST:/', options);
+    }
 	$.ajax({
 		url: config.apiUrl,
 		type: 'POST',
@@ -115,6 +132,12 @@ app.loadingWindowShow = function(opts) {
 
 app.loadingWindowHide = function() {
 	$('#loadingWindow').modal('hide');
+};
+
+app.warningWindowShow = function(opts) {
+	$modal = $('#warningWindow');
+	$modal.find('.modal-body').html(opts.text);
+	$modal.modal();
 };
 
 app.updateBalance = function() {
@@ -151,3 +174,11 @@ app.updateBalance = function() {
 		nav.find('.color_blue').html(text);
 	});
 };
+
+app.validateInputs = function() {
+	$('.clear_a').numeric();
+};
+
+app.validateOptions = function(options) {
+    return _.every(_.values(options)); // all values of the dictionary are not-empty
+}

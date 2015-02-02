@@ -98,12 +98,19 @@ function sliderInit () {
 		var betSize = result.get("betSize");
 
 		var profit = (betSize * bestGain);
-
 		result.set("profit", profit);
+
+		var payout = profit + betSize;
+		result.set("payout", payout);
+
 	});
 
 	result.on("profit", function(val) {
 		result.set("profitUI", afterFloatPoint(val, 1));
+	});
+
+	result.on("payout", function(val) {
+		result.set("payoutUI", afterFloatPoint(val, 1));
 	});
 
 	result.on("odds", function(val) {
@@ -154,6 +161,7 @@ function sliderInit () {
 	$(".betSize").bindText(result, "betSize");
 	$(".oddSize").bindText(result, "oddsUI");
 	$(".profit").bindText(result, "profitUI");
+	$(".payout").bindText(result, "payoutUI");
 	$(".chanceToWin").bindText(result, "oddsUI");
 
 	$('.increase').click(function(e) {
@@ -176,10 +184,12 @@ function sliderInit () {
 
 function increaseBet () {
 	var result = app.models.result;
-	result.set("betSize", result.get("betSize") + 1);
+	var bet = Number(result.get("betSize")) + 1;
+	result.set("betSize", bet);
 }
 
 function decreaseBet () {
 	var result = app.models.result;
-	result.set("betSize", result.get("betSize") - 1);
+	var bet = Number(result.get("betSize")) - 1;
+	result.set("betSize", bet);
 }
