@@ -9,20 +9,18 @@ var SPN = (function(SPN, $){
         var pubKey = NRS.publicKey;
 
         $.ajax({
-            url: URL + "/" + pubKey,
+            url: URL,
             dataType: 'json',
             contentType: 'application/json; charset=UTF-8',
-            type: 'GET',
+            type: 'POST',
             timeout: 30000,
             crossDomain: true,
+            data: JSON.stringify({cmd: "getAccountByLinkedPubKey", pubKey: NRS.publicKey}),
             success: function (data) {
                 $("#spn_nxtvault_link, #spn_nxtvault_fund_amount").removeAttr('disabled', 'disabled');
 
-                if (data === "Fail" || isDebug){
-
-                }
-                else{
-                    $("#linkedMessage").text("Account is locked and protected by: " + data);
+                if (data.errorCode == 0){
+                    $("#linkedMessage").text("Account is locked and protected by: " + NRS.convertNumericToRSAccountFormat(NRS.getAccountIdFromPublicKey(data.data.masterPubKey)));
                     $("#linkedMessage").show();
                     $("#spn_nxtvault_link, #spn_nxtvault_fund_amount").attr('disabled', 'disabled');
                     $("#spn_nxtvault_loading").hide();
@@ -31,6 +29,8 @@ var SPN = (function(SPN, $){
             error: function(data){
                 $("#linkedMessage").text("There was an error. Please check your verification code and try again").show();
                 $("#linkedMessage").show();
+                $("#linkedMessage").show();
+                $("#spn_nxtvault_link, #spn_nxtvault_fund_amount").attr('disabled', 'disabled');
                 $("#spn_nxtvault_loading").hide();
             }
         });
@@ -80,10 +80,10 @@ var SPN = (function(SPN, $){
             crossDomain: true,
             data: JSON.stringify({cmd: "verify", code: linkCode, accountId: nxtAccountId}),
             success: function (data) {
-                if (data.result === "Success"){
+                if (data.errorCode === 0){
 
                     //Send the required initial funding money to the master account
-                    NRS.sendRequest("sendMoney", {"secretPhrase":secret,feeNQT:"100000000",deadline:"1440","recipient":nxtAccountId,"amountNXT":fundAmount}, function(response, input) {
+                    NRS.sendRequest("sendMoney", {"secretPhrase":secret,feeNQT:"100000000",deadline:"1440",recipient:data.data.masterRs,publicKey:data.data.masterPubKey,amountNXT:fundAmount}, function(response, input) {
                         if (!response.errorCode == 1){
                             $("#linkedMessage").show();
                         }
@@ -96,7 +96,7 @@ var SPN = (function(SPN, $){
                     },false);
                 }
                 else{
-                    showError();
+                    showError(data.errorText);
                 }
             },
             error: function(data){
@@ -104,8 +104,14 @@ var SPN = (function(SPN, $){
             }
         });
 
-        function showError(){
-            $("#linkedMessage").text("There was an error. Please check your verification code and try again").show();
+        function showError(text){
+            if (!text){
+                $("#linkedMessage").text("There was an error. Please check your verification code and try again").show();
+            }
+            else{
+                $("#linkedMessage").text(text).show();
+            }
+
             $("#linkedMessage").show();
             $("#spn_nxtvault_loading").hide();
         }
