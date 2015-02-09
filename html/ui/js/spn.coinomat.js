@@ -799,14 +799,27 @@ var SPN = (function (SPN, $, undefined) {
             timeout: 30000,
             crossDomain: true,
             success: function (data) {
-
+                if (data.ok) {
+                    $('#spn_coinomat_exchanger_modal').modal('hide');
+                    $.growl("Your exchange request has been submitted.", {
+                        "type": "success"
+                    });
+                } else {
+                    $('#spn_coinomat_exchanger_modal').modal('hide');
+                    $.growl("Your exchange request failed.", {
+                        "type": "danger"
+                    });
+                }
+                $btn.button('reset');
+            },
+            error: function (data) {
+                $('#spn_coinomat_exchanger_modal').modal('hide');
+                $.growl("Your exchange request failed.", {
+                    "type": "danger"
+                });
+                $btn.button('reset');
             }
         });
-
-
-        setTimeout(function () {
-            $btn.button('reset');
-        }, 1000);
     });
     SPN.refreshBankCards = function () {
         refreshCoinomat();
