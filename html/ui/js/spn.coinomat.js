@@ -457,11 +457,14 @@ var SPN = (function (SPN, $, undefined) {
                             if (data.tunnel.balance.need_verification) {
                                 $("#spn_coinomat_usd_verify_div h5").css("color","red").html("Not Verified");
                                 $("#spn_coinomat_usd_verify_div").show();
+                                $("#usd_verify").show();
+                                $("#usd_add").hide();
                                 $("#spn_coinomat_main_exchange").attr('disabled', 'disabled');
                             } else {
                                 $("#spn_coinomat_usd_verify_div h5").css("color","green").html("Verified");
                                 $("#spn_coinomat_usd_verify_div").show();
-                                $("#spn_coinomat_usd_verify_div a").hide();
+                                $("#usd_verify").hide();
+                                $("#usd_add").show();
                                 $("#spn_coinomat_main_exchange").removeAttr('disabled');
                                 check_USD_fund();
                             }
@@ -788,6 +791,9 @@ var SPN = (function (SPN, $, undefined) {
     }
     SPN.verifyUSD = function () {
         window.open(webURL + "login.php?redir=/settings.php%23verification&logout=1&nxt=" + SPN.coinomatToken);
+    }
+    SPN.addUSD = function () {
+        window.open(webURL + "login.php?redir=/deposit.php?w=USD&logout=1&nxt=" + SPN.coinomatToken);
     }
     $("#spn_coinomat_pay_USD").click(function () {
         var $btn = $(this);
