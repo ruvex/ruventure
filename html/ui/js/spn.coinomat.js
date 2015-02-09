@@ -486,7 +486,8 @@ var SPN = (function (SPN, $, undefined) {
         var rows = "";
 
         if (data.history.length > 0) {
-            $("#spn_coinomat_history_in").html("In, " + data.history[0].currency_in);
+            //$("#spn_coinomat_history_in").html("In, " + data.history[0].currency_in);
+            $("#spn_coinomat_history_in").html("In, " + data.tunnel.currency_from);
             $("#spn_coinomat_history_out").html("Out, " + currency_to);
 
             $.each(data.history, function (i, v) {
