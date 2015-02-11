@@ -320,6 +320,10 @@ var SPN = (function (SPN, $, undefined) {
                 }
                 break;
             }
+            case "USD": {
+                tunnelURL += "&nxt=" + SPN.coinomatToken;
+                break;
+            }
         }
 
         $.ajax({
@@ -353,7 +357,7 @@ var SPN = (function (SPN, $, undefined) {
         $("#spn_coinomat_usd_div").hide();
         $("#spn_coinomat_main_exchange").removeAttr('disabled');
         var getTunnelURL;
-        if (t == "VISAMASTER" || f == "USD") {
+        if (t == "VISAMASTER" || f == "USD" || t == "USD") {
             getTunnelURL = "get_tunnel.php?xt_id=" + id + "&k1=" + k1 + "&k2=" + k2 + "&history=1&nxt=" + SPN.coinomatToken;
         }
         else {
@@ -406,6 +410,9 @@ var SPN = (function (SPN, $, undefined) {
                             break;
                         case "VISAMASTER":
                             $("#spn_coinomat_out_address").text("Visa/Mastercard : " + data.tunnel.wallet_to.bknum);
+                            break;
+                        case "USD":
+                            $("#spn_coinomat_out_address").text("Coinomat USD account : " + data.tunnel.wallet_to.to_account);
                             break;
                         default:
                             $("#spn_coinomat_out_address").text(data.tunnel.wallet_to);
@@ -501,8 +508,7 @@ var SPN = (function (SPN, $, undefined) {
                 if (v.state_in_text == "unconfirmed") status = "waiting for confirmation";
 
                 if (status == "") status = v.state_out_text;
-                rows += "<tr><td>" + v.added + "</td><td>" + v.amount_in + "</td><td>" + ex_rate + "</td><td>" + out + "</td><td>" + status + "</td></tr>";
-
+                rows += "<tr><td>" + v.op_id + "</td><td>" + v.added + "</td><td>" + v.amount_in + "</td><td>" + ex_rate + "</td><td>" + out + "</td><td>" + status + "</td></tr>";
             });
             $("#spn_coinomat_history").removeClass('data-empty');
             $("#spn_coinomat_history table tbody").empty().append(rows);
@@ -613,6 +619,7 @@ var SPN = (function (SPN, $, undefined) {
             {
                 (f == "NXT" ? $("#spn_coinomat_send_nxt_div").show() : $("#spn_coinomat_send_nxt_div").hide());
                 (f == "COINO" ? $("#spn_coinomat_send_coinousd_div").show() : $("#spn_coinomat_send_coinousd_div").hide());
+                (f == "USD" ? $("#spn_coinomat_usd_div").show() : $("#spn_coinomat_usd_div").hide());
                 $("#spn_coinomat_exchanger_error_message").hide();
             }
 
@@ -638,7 +645,7 @@ var SPN = (function (SPN, $, undefined) {
 
                 $("#spn_coinomat_tx_history_header").html("Transactions History");
                 if (f != t) {
-                    if (t == "NXT" || t == "COINO") {
+                    if (t == "NXT" || t == "COINO" || t == "USD") {
                         $("#spn_coinomat_tx_history_header").html($("#spn_coinomat_tx_history_header").html() + ": " + f + "/" + t + ": " + NRS.accountRS);
                     }
                     else if (t == "VISAMASTER") {
@@ -673,7 +680,7 @@ var SPN = (function (SPN, $, undefined) {
             var t = $("#spn_coinomat_to").select2("val");
             var f = $("#spn_coinomat_fr").select2("val");
 
-            if (t == "NXT" || t == "COINO") {
+            if (t == "NXT" || t == "COINO" || t == "USD") {
                 $("#spn_coinomat_wallet_addr_to_div").hide();
             } else {
                 $("#spn_coinomat_wallet_addr_to_div").show();
@@ -742,7 +749,7 @@ var SPN = (function (SPN, $, undefined) {
     SPN.coinomatExchange = function () {
         var t = $("#spn_coinomat_to").select2("val");
 
-        if (t == "NXT" || t == "COINO") {
+        if (t == "NXT" || t == "COINO" || t == "USD") {
             $('#spn_coinomat_exchanger_modal').modal('show');
         }
         else
@@ -794,6 +801,16 @@ var SPN = (function (SPN, $, undefined) {
     }
     SPN.addUSD = function () {
         window.open(webURL + "login.php?redir=/deposit.php?w=USD&logout=1&nxt=" + SPN.coinomatToken);
+    }
+    SPN.reverseCoin = function () {
+        var f = $("#spn_coinomat_fr").select2("val");
+        var t = $("#spn_coinomat_to").select2("val");
+
+        $("#spn_coinomat_fr").select2("val", t);
+        $("#spn_coinomat_to").select2("val", f);
+
+        getExchangeRate(true);
+        create_tunnel();
     }
     $("#spn_coinomat_pay_USD").click(function () {
         var $btn = $(this);
