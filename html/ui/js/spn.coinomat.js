@@ -5,6 +5,7 @@ var SPN = (function (SPN, $, undefined) {
     var xrate;
     var hasPublicKey = false;
     var exchangerWalletFrom;
+    var timer;
 
     $(document).ready(function () {
         $("#spn_coinomat_fr").select2({
@@ -25,7 +26,11 @@ var SPN = (function (SPN, $, undefined) {
         getExchangeRate(true);
         create_tunnel();
 
-        setInterval(function () {
+        if (timer) {
+            clearInterval(timer);
+        }
+
+        timer = setInterval(function () {
             refreshCoinomat();
         }, 60000);
     });
