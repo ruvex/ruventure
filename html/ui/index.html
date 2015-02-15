@@ -65,6 +65,7 @@
         <script src="js/3rdparty/pako.js" type="text/javascript"></script>
         <script src="js/3rdparty/maskedinput.js" type="text/javascript"></script>
         <script src="js/3rdparty/qrcode.js" type="text/javascript"></script>
+        <script src="js/3rdparty/handlebars.js" type="text/javascript"></script>
         <script src="js/nrs.sitebuild.js" type="text/javascript"></script>
         <script src="js/3rdparty/select2.js" type="text/javascript"></script>
         <script src="js/3rdparty/bootstrap-tour.min.js" type="text/javascript"></script>
@@ -85,7 +86,6 @@
             NRS.loadPageHTML("html/pages/asset_exchange.html");
             NRS.loadPageHTML("html/pages/monetary_system.html");
             NRS.loadPageHTML("html/pages/dgs.html");
-            NRS.loadPageHTML("html/pages/polls.html");
             NRS.loadPageHTML("html/pages/contacts.html");
             NRS.loadPageHTML("html/pages/messages.html");
             NRS.loadPageHTML("html/pages/aliases.html");
@@ -98,22 +98,23 @@
             NRS.loadPageHTML("html/pages/coinomat.html");
             NRS.loadPageHTML("html/pages/coinimal.html");
             NRS.loadPageHTML("html/pages/neodice.html");
-
+			NRS.loadPageHTMLTemplates();
             NRS.loadModalHTML("html/modals/nrs.html");
             NRS.loadModalHTML("html/modals/transactions.html");
             NRS.loadModalHTML("html/modals/balanceleasing.html");
             NRS.loadModalHTML("html/modals/forging.html");
             NRS.loadModalHTML("html/modals/asset_exchange.html");
             NRS.loadModalHTML("html/modals/monetary_system.html");
-            NRS.loadModalHTML("html/modals/voting_system.html");
             NRS.loadModalHTML("html/modals/dgs.html");
             NRS.loadModalHTML("html/modals/contacts.html");
             NRS.loadModalHTML("html/modals/messages.html");
             NRS.loadModalHTML("html/modals/aliases.html");
+            NRS.loadModalHTML("html/modals/peers.html");
             NRS.loadModalHTML("html/modals/supernet_modal.html");
             NRS.loadModalHTML("html/modals/multigateway_modal.html");
             NRS.loadModalHTML("html/modals/dividends_plus_modal.html");
             NRS.loadModalHTML("html/modals/coinomat_modal.html");
+            NRS.loadModalHTMLTemplates();
         </script>
 
         <script src="js/util/extensions.js" type="text/javascript"></script>
