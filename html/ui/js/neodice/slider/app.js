@@ -62,8 +62,10 @@ function sliderInit () {
 		var bestChance = settings.get("bestChance");
 
 		var odds = Utils.calcOdds(percent, leastChance, bestChance);
+		odds = afterFloatPoint(odds, 0);
 
 		var bestGain = Utils.calcGain(odds);
+		bestGain = afterFloatPoint(bestGain, 2);
 
 		result.set("odds", odds);
 
@@ -138,8 +140,10 @@ function sliderInit () {
 		var bestChance = settings.get("bestChance");
 
 		var odds = Utils.calcOdds(percent, leastChance, bestChance);
+		odds = afterFloatPoint(odds, 0);
 
 		var bestGain = Utils.calcGain(odds);
+		bestGain = afterFloatPoint(bestGain,2);
 
 		return "x" + afterFloatPoint(bestGain, 2);
 
