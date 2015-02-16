@@ -48,6 +48,7 @@ var NRS = (function(NRS, $, undefined) {
 	NRS.isLocalHost = false;
 	NRS.isForging = false;
 	NRS.isLeased = false;
+	NRS.needsAdminPassword = true;
 
 	NRS.lastBlockHeight = 0;
 	NRS.downloadingBlockchain = false;
@@ -98,6 +99,9 @@ var NRS = (function(NRS, $, undefined) {
 				}
 				if (key == "peerPort") {
 					peerPort = response[key];
+				}
+				if (key == "needsAdminPassword") {
+					NRS.needsAdminPassword = response[key];
 				}
 			}
 			
@@ -1256,6 +1260,8 @@ var NRS = (function(NRS, $, undefined) {
 						break;
 					}
 				}
+			} else {
+				onAFork = false;
 			}
 
 			if (onAFork) {
@@ -1306,7 +1312,8 @@ var NRS = (function(NRS, $, undefined) {
 							NRS.showAccountModal(response);
 						} else {
 							NRS.sendRequest("getBlock", {
-								"block": id
+								"block": id,
+                        "includeTransactions": "true"
 							}, function(response, input) {
 								if (!response.errorCode) {
 									response.block = input.block;
