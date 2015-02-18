@@ -140,6 +140,8 @@ body.fixed .wrapper {
 .content {
   padding: 20px; /*wesley*/
   background: #f9f9f9;
+  position: relative;
+  overflow: hidden;
 }
 /* Utility */
 /* H1 - H6 font */

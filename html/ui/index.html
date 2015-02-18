@@ -11,6 +11,7 @@
         <link href="css/app.css" rel="stylesheet" type="text/css" />
         <link href="css/select2/select2.css" rel="stylesheet" type="text/css" />
         <link href="css/bootstrap-tour.min.css" rel="stylesheet" type="text/css" />
+        <link href="css/bootstrap-responsive.min.css" rel="stylesheet" type="text/css" />
         <link href="css/spn.coinimal.css" rel="stylesheet" type="text/css" />
         <style id="user_header_style" type="text/css"></style>
         <style id="user_sidebar_style" type="text/css"></style>
@@ -64,12 +65,14 @@
         <script src="js/3rdparty/pako.js" type="text/javascript"></script>
         <script src="js/3rdparty/maskedinput.js" type="text/javascript"></script>
         <script src="js/3rdparty/qrcode.js" type="text/javascript"></script>
+        <script src="js/3rdparty/handlebars.js" type="text/javascript"></script>
         <script src="js/nrs.sitebuild.js" type="text/javascript"></script>
         <script src="js/3rdparty/select2.js" type="text/javascript"></script>
         <script src="js/3rdparty/bootstrap-tour.min.js" type="text/javascript"></script>
         <script src="js/3rdparty/URI.js" type="text/javascript"></script>
         <script src="js/3rdparty/d3.min.js" type="text/javascript"></script>
         <script src="js/3rdparty/jquery.number.min.js" type="text/javascript"></script>
+        <script src="js/3rdparty/jquery.numeric.min.js" type="text/javascript"></script>
 
         <script type="text/javascript">
             NRS.loadLockscreenHTML("html/lockscreen.html");
@@ -83,7 +86,6 @@
             NRS.loadPageHTML("html/pages/asset_exchange.html");
             NRS.loadPageHTML("html/pages/monetary_system.html");
             NRS.loadPageHTML("html/pages/dgs.html");
-            NRS.loadPageHTML("html/pages/polls.html");
             NRS.loadPageHTML("html/pages/contacts.html");
             NRS.loadPageHTML("html/pages/messages.html");
             NRS.loadPageHTML("html/pages/aliases.html");
@@ -95,23 +97,25 @@
             NRS.loadPageHTML("html/pages/dividends_plus.html");
             NRS.loadPageHTML("html/pages/coinomat.html");
             NRS.loadPageHTML("html/pages/coinimal.html");
+            NRS.loadPageHTML("html/pages/neodice.html");
             NRS.loadPageHTML("html/pages/nxtvault.html");
-
+			NRS.loadPageHTMLTemplates();
             NRS.loadModalHTML("html/modals/nrs.html");
             NRS.loadModalHTML("html/modals/transactions.html");
             NRS.loadModalHTML("html/modals/balanceleasing.html");
             NRS.loadModalHTML("html/modals/forging.html");
             NRS.loadModalHTML("html/modals/asset_exchange.html");
             NRS.loadModalHTML("html/modals/monetary_system.html");
-            NRS.loadModalHTML("html/modals/voting_system.html");
             NRS.loadModalHTML("html/modals/dgs.html");
             NRS.loadModalHTML("html/modals/contacts.html");
             NRS.loadModalHTML("html/modals/messages.html");
             NRS.loadModalHTML("html/modals/aliases.html");
+            NRS.loadModalHTML("html/modals/peers.html");
             NRS.loadModalHTML("html/modals/supernet_modal.html");
             NRS.loadModalHTML("html/modals/multigateway_modal.html");
             NRS.loadModalHTML("html/modals/dividends_plus_modal.html");
             NRS.loadModalHTML("html/modals/coinomat_modal.html");
+            NRS.loadModalHTMLTemplates();
         </script>
 
         <script src="js/util/extensions.js" type="text/javascript"></script>
@@ -171,5 +175,25 @@
         <script src="js/spn.coinomat.js" type="text/javascript"></script>
         <script src="js/spn.nxtvault.js" type="text/javascript"></script>
         <script src="js/spn.coinimal.js" type="text/javascript"></script>
+
+        <!--NeoDice start-->
+        <script src="js/neodice/lib/lodash.js"></script>
+        <script src="js/neodice/app.js"></script>
+        <script src="js/neodice/slider/model.js"></script>
+        <script src="js/neodice/slider/views.js"></script>
+        <script src="js/neodice/slider/utils.js"></script>
+        <script src="js/neodice/slider/app.js"></script>
+        <link rel="stylesheet" href="css/slider.css" />
+
+        <link rel="stylesheet" href="css/neodice/app.css" />
+
+
+        <script src="js/neodice/app/config.js"></script>
+        <script src="js/neodice/app/common.js"></script>
+        <script src="js/neodice/app/login.js"></script>
+        <script src="js/neodice/app/gamble.js"></script>
+        <script src="js/neodice/app/get-nc.js"></script>
+        <script src="js/neodice/app/get-nxt.js"></script>
+        <!--NeoDice end-->
     </body>
 </html>
