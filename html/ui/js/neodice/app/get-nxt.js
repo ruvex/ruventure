@@ -38,7 +38,6 @@ app.getNXT = function(secretPhrase) {
 			success: function(response) {
     		    app.loadingWindowHide();
     		    app.showGetNXTResult(response);
-    		    app.updateBalance();    		    
 			},
 			error: function() {
     		    app.loadingWindowHide();

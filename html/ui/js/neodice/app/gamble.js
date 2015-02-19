@@ -61,7 +61,6 @@ app.gamble = function(secretPhrase) {
 			success: function(response) {
 	            app.loadingWindowHide();
     		    app.showBetResults(response);
-    		    app.updateBalance();
 			},
 			error: function() {
 	            app.loadingWindowHide();

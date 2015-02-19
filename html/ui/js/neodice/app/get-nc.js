@@ -37,7 +37,6 @@ app.getNC = function(secretPhrase) {
 			success: function(response) {
     		    app.loadingWindowHide();
     		    app.showGetNCResult(response);
-    		    app.updateBalance();    		    
 			},
 			error: function() {
     		    app.loadingWindowHide();
