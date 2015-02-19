@@ -157,7 +157,7 @@ var Utils = {
 
 
 function afterFloatPoint (num, howMuch) {
-	return Number((num).toFixed(howMuch));
+	return Number(num).toFixed(howMuch);
 }
 
 

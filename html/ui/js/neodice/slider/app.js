@@ -27,6 +27,7 @@ function checkBetSize () {
 			result.set("betSize", newBetSize);
 		}, 10);
 	}
+
 }
 
 function sliderInit () {
@@ -55,6 +56,7 @@ function sliderInit () {
 
 	slideOffsets.on("percent2", function(percent) {
 		slideOffsets.set("percent1", 100 - percent);
+		checkBetSize();
 	});
 
 	slideOffsets.on("percent1", function(percent) {
@@ -85,7 +87,6 @@ function sliderInit () {
 	});
 
 	result.on("betSize", function(betSize) {
-		checkBetSize();
 
 		betSize = result.get("betSize");
 
@@ -163,6 +164,8 @@ function sliderInit () {
 
 
 	$(".betSize").bindText(result, "betSize");
+	$(".betSize").blur(checkBetSize);
+
 	$(".oddSize").bindText(result, "oddsUI");
 	$(".profit").bindText(result, "profitUI");
 	$(".payout").bindText(result, "payoutUI");
