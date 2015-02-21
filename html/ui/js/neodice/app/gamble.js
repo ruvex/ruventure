@@ -80,7 +80,7 @@ app.showBetResults = function(response) {
 	var $popupContent = $('#betResultWindow .modal-body');
 
 	var luckyNumber = new RegExp(/Lucky Number: (\d+)?/gi).exec(message);
-	luckyNumber = luckyNumber[1] || 'n/a';
+	luckyNumber = (luckyNumber? luckyNumber[1]: 'n/a') || 'n/a';
 
 	var result = response.attachment.quantityQNT > 0? 'Your bet has WON!': 'Your bet has lost';
 
