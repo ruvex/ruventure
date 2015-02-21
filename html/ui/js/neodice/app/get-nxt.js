@@ -32,7 +32,9 @@ app.getNXT = function(secretPhrase) {
 		if (err) {
 			return;
 		}
-		app.loadingWindowShow({ text: 'Getting NXT.<br/>It&apos;ll take a minute...' });
+		app.warningWindowShow({ 
+			text: 'Cash out request submitted<br/>It&apos;ll take between 8-10 minutes...'
+		});
 		app.pollForResult({
 			transaction: response,
 			success: function(response) {
