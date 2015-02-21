@@ -158,6 +158,9 @@ app.pollForBalance = function() {
 		} else {
 			text = 'n/a';
 		}
+		if (!Number(confirmed)) {
+			confirmed = 0;
+		}
 		return { balance: confirmed, text: text };
 	}
 
