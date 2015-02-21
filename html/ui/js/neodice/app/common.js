@@ -120,7 +120,7 @@ app.callChain = function(options, callback) {
 			data = JSON.parse(data);
 		}
 		if (callback) {
-			callback(null, data);
+			callback(error, data);
 		}
 		return data;
 	});
@@ -174,8 +174,12 @@ app.pollForBalance = function() {
 			}
 		});
 		if (unconfirmedBalance!=0) {
-			var sign = unconfirmedBalance > 0? '+': ''; 
-			balance.balance+=' ('+ sign + afterFloatPoint(unconfirmedBalance, 2) + ')';
+			var unconfirmedBalanceFormatted = afterFloatPoint(unconfirmedBalance, 2);
+			if (unconfirmedBalance > 0) {
+				balance.balance+=' (+' + unconfirmedBalanceFormatted + ')';
+			} else {
+				balance.balance = afterFloatPoint(Number(balance.balance) + Number(unconfirmedBalanceFormatted), 2);
+			}
 		}
 		return balance;
 	}
