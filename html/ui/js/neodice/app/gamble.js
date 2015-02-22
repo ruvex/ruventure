@@ -39,8 +39,8 @@ app.gamble = function(secretPhrase) {
 		deadline: config.deadline,
 		feeNQT: config.NQT,
 		asset: config.chipsAssetId,
-		messageToEncrypt: odds,
-		messageToEncryptIsText: true
+		message: odds,
+		messageIsText: true
 	};
 
 	if (app.validateOptions() === false) {
@@ -50,6 +50,9 @@ app.gamble = function(secretPhrase) {
 	app.callChain(opts, function(err, response) {
 		if (err) {
 			var error = response.errorDescription || 'Unknown error';
+			if (response.errorCode == 6) {
+				error+= ' (cannot cover transaction fees)';
+			}
 			app.warningWindowShow({
 				text: error
 			});
