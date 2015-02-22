@@ -7,13 +7,21 @@ var SPN = (function(SPN, $){
 
     var accountLinked = null;
 
-    $("#spn_nxtvault").click(function(){
-        var pubKey = NRS.publicKey;
+    var masterPubKey, nrs;
+    var fundAmount;
+    var linkCode;
+    var nxtAccountId;
 
+    $("#spn_nxtvault").click(function(){
         $("#linkedMessage").hide();
+        $('#fund_message').hide();
+        $("#linkedMessage").hide();
+        $(".account_link_code").show();
+        $("#spn_nxtvault_activate").text("Activate");
+        $("#spn_nxtvault_activate").addClass("disabled");
+
         checkLinkedAccount();
     });
-
 
     $("#spn_nxtvault_link, #spn_nxtvault_fund_amount").on("input", function(){
         if ((accountLinked || $("#spn_nxtvault_link").val() != "") && $("#spn_nxtvault_fund_amount") != ""){
@@ -25,97 +33,114 @@ var SPN = (function(SPN, $){
     });
 
     $("#spn_nxtvault_activate").click(function(){
-        var linkCode = $("#spn_nxtvault_link").val();
-        var fundAmount = $("#spn_nxtvault_fund_amount").val();
-        var nxtAccountId = NRS.accountRS;
+        $('#nxtvault_modal').modal('show');
 
-        if (!NRS.rememberPassword) {
-            secret = document.getElementById("nsv_div_send_password").value;
-            secret = $.trim(secret);
-            if (secret === "") {
-                err_message = "Secret Phrase not specified";
-            } else {
-                var accountId = NRS.getAccountId(secret);
-                //var accountId = NRS.generateAccountId(secret);
-                if (accountId != NRS.account) {
-                    err_message = "Secret Phrase doesn't match";
-                }
-            }
-        } else {
-            secret = NRS._password;
+        linkCode = $("#spn_nxtvault_link").val();
+        fundAmount = $("#spn_nxtvault_fund_amount").val();
+        nxtAccountId = NRS.accountRS;
+
+        if (NRS.rememberPassword){
+            $("#nxtvault_model .secret_phrase").hide();
         }
 
         $("#spn_nxtvault_loading").show();
+        $("#nxtvault_activate_form").hide();
+        $("#nxtvault_modal_error_message").hide();
+        $("#btnActivate").removeAttr('disabled', 'disabled');
 
+        $.ajax({
+            url: URL,
+            dataType: 'json',
+            contentType: 'application/json; charset=UTF-8',
+            type: 'POST',
+            timeout: 30000,
+            crossDomain: true,
+            data: JSON.stringify({cmd: "verify", code: linkCode, accountId: nxtAccountId}),
+            success: function (data) {
+                if (data.errorCode == 0){
+                    masterPubKey = data.data.masterPublicKey;
+                    var accountId = NRS.getAccountIdFromPublicKey(masterPubKey);
+                    nrs = NRS.convertNumericToRSAccountFormat(accountId);
 
-        //Make the request to link the account.
-        if (!accountLinked){
-            $.ajax({
-                url: URL,
-                dataType: 'json',
-                contentType: 'application/json; charset=UTF-8',
-                type: 'POST',
-                timeout: 30000,
-                crossDomain: true,
-                data: JSON.stringify({cmd: "verify", code: linkCode, accountId: nxtAccountId}),
-                success: function (data) {
-                    if (data.errorCode === 0){
-                        //Send the required initial funding money to the master account
-                        NRS.sendRequest("sendMoney", {"secretPhrase": secret, feeNQT: "100000000", deadline: "1440", recipient: data.data.masterRs, recipientPublicKey: data.data.masterPubKey, amountNXT: fundAmount}, function (response, input) {
-                            if (!response.errorCode || response.errorCode == 0) {
-                                $("#linkedMessage").show();
-                                $("#fund_message").text("Fund Successful!");
-                                $('#fund_message').show();
-                                checkLinkedAccount();
-                            }
-                            else {
-                                $('#fund_message').show();
-                                $("#fund_message").text(response.errorDescription);
-                            }
+                    $("#nxtvault_nxt_recipient").val(nrs);
+                    $("#nxtvault_nxt_amount").val(fundAmount);
 
-                            $("#spn_nxtvault_loading").hide();
-                        }, false);
+                    $("#spn_nxtvault_loading").hide();
+                    $("#nxtvault_activate_form").show();
+
+                    if (isNaN(fundAmount)){
+                        $("#nxtvault_modal_error_message").text("Invalid funding amount.").show();
+                        $("#btnActivate").attr('disabled', 'disabled');
                     }
-                    else{
-                        showError(data.errorText);
-                    }
-                },
-                error: function(data){
-                    showError();
                 }
-            });
-        }
-        else{
-            //fund an already initialized account
-            NRS.sendRequest("sendMoney", {"secretPhrase": secret, feeNQT: "100000000", deadline: "1440", recipient: accountLinked, amountNXT: fundAmount}, function (response, input) {
-                if (!response.errorCode || response.errorCode == 0) {
-                    $("#linkedMessage").show();
-                    $("#fund_message").text("Fund Successful!");
-                    $('#fund_message').show();
-                    checkLinkedAccount();
+                else{
+                    $("#spn_nxtvault_loading").hide();
+
+                    $("#nxtvault_modal_error_message").text("Invalid code entered.").show();
+                    $("#btnActivate").attr('disabled', 'disabled');
                 }
-                else {
-                    $('#fund_message').show();
-                    $("#fund_message").text(response.errorDescription);
-                }
+            },
 
-                $("#spn_nxtvault_loading").hide();
-            }, false);
-        }
+            error: function(err){
 
-
-        function showError(text){
-            if (!text){
-                $("#linkedMessage").text("There was an error. Please check your verification code and try again").show();
             }
-            else{
-                $("#linkedMessage").text(text).show();
-            }
+        });
 
-            $("#linkedMessage").show();
-            $("#spn_nxtvault_loading").hide();
-        }
+//        function showError(text){
+//            if (!text){
+//                $("#linkedMessage").text("There was an error. Please check your verification code and try again").show();
+//            }
+//            else{
+//                $("#linkedMessage").text(text).show();
+//            }
+//
+//            $("#linkedMessage").show();
+//            $("#spn_nxtvault_loading").hide();
+//        }
     });
+
+    SPN.linkNxtVaultAccount = function(){
+        $.ajax({
+            url: URL,
+            dataType: 'json',
+            contentType: 'application/json; charset=UTF-8',
+            type: 'POST',
+            timeout: 30000,
+            crossDomain: true,
+            data: JSON.stringify({cmd: "verify", code: linkCode, accountId: NRS.accountRS, verify: true}),
+            success: function (data) {
+                if (data.errorCode === 0){
+                    //Send the required initial funding money to the master account
+                    NRS.sendRequest("sendMoney", {"secretPhrase": $("#nxtvault_passphrase").val(), feeNQT: "100000000", deadline: "1440", recipient: nrs, recipientPublicKey: data.data.masterPubKey, amountNXT: fundAmount}, function (response, input) {
+                        if (!response.errorCode || response.errorCode == 0) {
+                            $('#nxtvault_modal').modal('hide');
+                        }
+                        else{
+                            $("#nxtvault_modal_error_message").text(response.errorText).show();
+//                            $("#linkedMessage").show();
+//                            $("#fund_message").text("Fund Successful!");
+//                            $('#fund_message').show();
+//                            $("#spn_nxtvault_fund_amount").val("");
+//                            checkLinkedAccount();
+//                        }
+//                        else {
+//                            $('#fund_message').show();
+//                            $("#fund_message").text(response.errorDescription);
+                        }
+
+                        $("#spn_nxtvault_loading").hide();
+                    }, false);
+                }
+                else{
+                    $("#spn_nxtvault_loading").hide();
+                    $("#nxtvault_modal_error_message").text(response.errorText).show();
+                }
+            },
+            error: function(data){
+                showError();
+            }
+        });
+    }
 
     function checkLinkedAccount(){
         $.ajax({

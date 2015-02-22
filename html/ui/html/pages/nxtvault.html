@@ -65,9 +65,11 @@
             </div>
 
             <br />
-            <img id="spn_nxtvault_loading" src="img/loading_indicator.gif" alt="Loading..." width="32" height="32" style="display:none"/>
+
             <div id="fund_message" style="display:none">Funding Successful!</div>
             <div class="box-footer show-grid"><a id="spn_nxtvault_activate" href="#" class="btn btn-primary disabled" role="button" onclick="SPN.nxtVaultActivate()">Activate</a></div>
+
+            <button type="button" data-toggle="modal" data-target="#nxtvault_modal">Activate2</button>
 
 
 
@@ -75,4 +77,49 @@
 
         </div>
     </section>
+</div>
+
+<div class="modal fade" id="nxtvault_modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Initialize NxtVault Account</h4>
+            </div>
+            <div class="modal-body">
+                <img id="spn_nxtvault_loading" src="img/loading_indicator.gif" alt="Loading..." width="32" height="32" style="display:none"/>
+
+                <div class="alert-danger alert alert-no-icon" id="nxtvault_modal_error_message" style="display:none;padding: 5px; margin-bottom: 15px;"></div>
+
+                <form role="form" id="nxtvault_activate_form">
+                    <div class="callout callout-danger error_message" style="display:none"></div>
+                    <div class="form-group">
+                        <label for="nxtvault_nxt_recipient">MASTER ACCOUNT</label>
+                        <input type="hidden" name="message" id="nxtvault_nxt_recipient_msg" value="" />
+                        <input type="text" class="form-control" name="recipient" id="nxtvault_nxt_recipient" tabindex="1" disabled />
+                    </div>
+                    <div class="form-group">
+                        <label for="nxtvault_nxt_amount">FUND NXT TO MASTER ACCOUNT</label>
+                        <input type="hidden" name="message" id="nxtvault_nxt_amount_msg" value="" />
+                        <input type="text" class="form-control" name="recipient" id="nxtvault_nxt_amount" tabindex="1" disabled />
+                    </div>
+                    <div class="form-group secret_phrase">
+                        <label for="nxtvault_passphrase">PASSPHRASE</label>
+                        <input type="password" name="secretPhrase" id="nxtvault_passphrase" class="form-control" tabindex="4">
+                    </div>
+
+                    <div class="callout account_info" style="display:none;margin-bottom: 0;"></div>
+                    <input type="hidden" name="success_message" value="Your account has been successfully initialized and funded!" />
+                    <input type="hidden" name="failure_message" value="An unknown error occurred! Please try again later." />
+                    <input type="hidden" name="request_type" value="nxtvaultInitialize" data-default="nxtvaultInitialize" />
+                    <input type="hidden" name="converted_account_id" value="" />
+                </form>
+            </div>
+            <div class="modal-footer" style="margin-top:0;">
+                <div class="advanced_info"><strong>Fee</strong>: <span class="advanced_fee">1 NXT</span></div>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button id="btnActivate" type="button" onclick="SPN.linkNxtVaultAccount()" class="btn btn-primary" data-loading-text="Submitting...">Activate</button>
+            </div>
+        </div>
+    </div>
 </div>
