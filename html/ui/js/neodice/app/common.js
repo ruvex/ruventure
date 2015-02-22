@@ -152,11 +152,9 @@ app.pollForBalance = function() {
 			var precise = 100000000;
 			return afterFloatPoint(parseInt(value*precise)/precise, 2);
 		};
+		var confirmed, text = 'NeoDICE chips';
 		if (response.assetBalances) {
-			var confirmed = pluckBalance(response.assetBalances, 'balanceQNT');
-			text = 'NeoDICE chips';
-		} else {
-			text = 'n/a';
+			confirmed = pluckBalance(response.assetBalances, 'balanceQNT');
 		}
 		if (!Number(confirmed)) {
 			confirmed = 0;
@@ -188,7 +186,7 @@ app.pollForBalance = function() {
 	}
 
 	var displayBalance = function(result) {
-		if (!result || !result.balance || !result.text) {
+		if (!result || (!result.balance && result.balance!==0) || !result.text) {
 			return;
 		}
 		var nav = $('.neodice.nav');
