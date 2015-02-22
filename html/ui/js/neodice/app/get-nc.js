@@ -29,6 +29,10 @@ app.getNC = function(secretPhrase) {
 
 	app.callChain(opts, function(err, response) {
 		if (err) {
+			var error = response.errorDescription || 'Unknown error';
+			app.warningWindowShow({
+				text: error
+			});
 			return;
 		}
 		app.loadingWindowShow({ text: 'Getting NeoChips.<br/>It&apos;ll take a minute...' });
