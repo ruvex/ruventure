@@ -29,6 +29,7 @@ app.getNXT = function(secretPhrase) {
 	};
 
 	app.callChain(opts, function(err, response) {
+		app.logger({ type: 'Get NXT callback', data: arguments });
 		if (err) {
 			var error = response.errorDescription || 'Unknown error';
 			app.warningWindowShow({

@@ -75,8 +75,22 @@ app.nl2br = function(str) {
     return str.replace(/(?:\r\n|\r|\n)/g, '<br />');
 }
 
+app.initRaven = function() {
+	Raven.config('https://c0c43a3fdc4d4aed8bc46b9b46df9217@app.getsentry.com/38518', {
+	    whitelistUrls: ['localhost', '127.0.0.1', '0.0.0.0']
+	}).install();
+}
+
+app.logger = function(message) {
+	if (typeof Raven !='undefined') {
+		message.account = app.getUserAccount;
+		Raven.captureMessage(message.message, { tags: { data: message } });
+	}
+}
+
 /* Initialize top navigation */
 app.initNavigation = function() {
+
 	var links = $('.neodice.nav a');
 	links.removeClass('active_a_btn');
 	$(links[0]).addClass('active_a_btn');
@@ -113,6 +127,7 @@ app.callChain = function(options, callback) {
 	}).then(function(responseText, status, request) {
 		var data = JSON.parse(responseText), error;
 		if (data.errorCode && data.errorCode > 0) {
+    		app.logger({ type: 'Chain error', data: arguments });			
 			error = data.errorCode;
 			//	            console.error('Chain error', error);
 		}

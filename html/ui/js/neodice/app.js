@@ -6,6 +6,7 @@ app.pages = {};
 app.models = {};
 
 $("#spn_neodice").click(function () {
+    app.initRaven();
     app.showPage('gamble', { rerender: true });
     app.validateInputs();
     app.initNavigation();
