@@ -76,6 +76,9 @@ app.nl2br = function(str) {
 }
 
 app.initRaven = function() {
+	if (typeof Raven == 'undefined') {
+		return;
+	}
 	Raven.config('https://c0c43a3fdc4d4aed8bc46b9b46df9217@app.getsentry.com/38518', {
 	    whitelistUrls: ['localhost', '127.0.0.1', '0.0.0.0']
 	}).install();
