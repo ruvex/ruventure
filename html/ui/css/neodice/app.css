@@ -206,6 +206,7 @@
     opacity: 0.8;
     position: absolute;
     width: 100%; }
+    /*
   #spn_neodice_page .modal {
     background: none repeat scroll 0 0 #ffffff;
     border-radius: 0 0 15px 15px;
@@ -218,11 +219,26 @@
     text-align: center;
     width: 400px;
     display: none;
-    overflow: visible !important; }
+    overflow: visible !important; }*/
+    #spn_neodice_page .modal {
+    position:absolute;}
+  #spn_neodice_page .modal-content{
+    background: none repeat scroll 0 0 #ffffff;
+    width: 400px;
+    border-radius: 0 0 15px 15px;
+    position: absolute;
+    text-align: center;
+    height: 374px;
+    left: 50%;
+    margin: 40% 0 0 -220px;
+    overflow: visible !important;}
+
+
+
   #spn_neodice_page .logo3 {
     background: url("/img/neodice/logo3_top.png") no-repeat scroll 0 0/402px auto transparent;
     height: 36px;
-    margin: -36px -1px 0;
+    margin: -36px -2px 0;
     position: absolute;
     top: 0;
     width: 401px; }
