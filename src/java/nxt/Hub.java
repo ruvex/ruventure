@@ -68,7 +68,7 @@ public class Hub {
                         Hub hub = hubs.next();
                         Account account = Account.getAccount(hub.getAccountId());
                         if (account != null && account.getEffectiveBalanceNXT() >= Constants.MIN_HUB_EFFECTIVE_BALANCE
-                                && account.getPublicKey() != null) {
+                                && account.getKeyHeight() > 0) {
                             currentHits.add(new Hit(hub, Generator.getHitTime(account, block)));
                         }
                     }
@@ -107,7 +107,7 @@ public class Hub {
 
     private void save(Connection con) throws SQLException {
         try (PreparedStatement pstmt = con.prepareStatement("MERGE INTO hub (account_id, min_fee_per_byte, "
-                + "uris, height) KEY (account_id, height) VALUES (?, ?, ?, ?)")) {
+                + "uris, height, latest) KEY (account_id, height) VALUES (?, ?, ?, ?, TRUE)")) {
             int i = 0;
             pstmt.setLong(++i, this.getAccountId());
             pstmt.setLong(++i, this.getMinFeePerByteNQT());

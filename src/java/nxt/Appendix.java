@@ -87,7 +87,7 @@ public interface Appendix {
 
     public static class Message extends AbstractAppendix {
 
-        static Message parse(JSONObject attachmentData) throws NxtException.NotValidException {
+        static Message parse(JSONObject attachmentData) {
             if (attachmentData.get("message") == null) {
                 return null;
             }
@@ -258,7 +258,7 @@ public interface Appendix {
             super(buffer, transactionVersion);
         }
 
-        EncryptedMessage(JSONObject attachmentData) throws NxtException.NotValidException {
+        EncryptedMessage(JSONObject attachmentData) {
             super(attachmentData, (JSONObject)attachmentData.get("encryptedMessage"));
         }
 
@@ -304,7 +304,7 @@ public interface Appendix {
             super(buffer, transactionVersion);
         }
 
-        EncryptToSelfMessage(JSONObject attachmentData) throws NxtException.NotValidException {
+        EncryptToSelfMessage(JSONObject attachmentData) {
             super(attachmentData, (JSONObject)attachmentData.get("encryptToSelfMessage"));
         }
 
@@ -336,7 +336,7 @@ public interface Appendix {
 
     public static class PublicKeyAnnouncement extends AbstractAppendix {
 
-        static PublicKeyAnnouncement parse(JSONObject attachmentData) throws NxtException.NotValidException {
+        static PublicKeyAnnouncement parse(JSONObject attachmentData) {
             if (attachmentData.get("recipientPublicKey") == null) {
                 return null;
             }
@@ -396,14 +396,14 @@ public interface Appendix {
                 throw new NxtException.NotValidException("Public key announcements not enabled for version 0 transactions");
             }
             Account recipientAccount = Account.getAccount(recipientId);
-            if (recipientAccount != null && recipientAccount.getPublicKey() != null && ! Arrays.equals(publicKey, recipientAccount.getPublicKey())) {
+            if (recipientAccount != null && recipientAccount.getKeyHeight() > 0 && ! Arrays.equals(publicKey, recipientAccount.getPublicKey())) {
                 throw new NxtException.NotCurrentlyValidException("A different public key for this account has already been announced");
             }
         }
 
         @Override
         void apply(Transaction transaction, Account senderAccount, Account recipientAccount) {
-            if (recipientAccount.setOrVerify(publicKey, transaction.getHeight())) {
+            if (recipientAccount.setOrVerify(publicKey)) {
                 recipientAccount.apply(this.publicKey, transaction.getHeight());
             }
         }

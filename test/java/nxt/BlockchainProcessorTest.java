@@ -44,8 +44,8 @@ public class BlockchainProcessorTest extends AbstractBlockchainTest {
     public void reset() {
         debugTrace.resetLog();
         if (blockchain.getHeight() > startHeight) {
-            blockchainProcessor.fullReset();
-            Assert.assertEquals(0, blockchain.getHeight());
+            blockchainProcessor.popOffTo(startHeight);
+            Assert.assertEquals(startHeight, blockchain.getHeight());
         }
         Assert.assertTrue(blockchain.getHeight() <= startHeight);
     }
@@ -120,8 +120,7 @@ public class BlockchainProcessorTest extends AbstractBlockchainTest {
     private static void rescan(final int numBlocks) {
         int endHeight = blockchain.getHeight();
         int rescanHeight = endHeight - numBlocks;
-        blockchainProcessor.validateAtNextScan();
-        blockchainProcessor.scan(rescanHeight);
+        blockchainProcessor.scan(rescanHeight, true);
         Assert.assertEquals(endHeight, blockchain.getHeight());
         Logger.logMessage("Successfully rescanned blockchain from " + rescanHeight + " to " + endHeight);
         compareTraceFiles();

@@ -11,7 +11,7 @@ var NRS = (function(NRS, $, undefined) {
 			"block": blockID
 		}, function(response) {
 			if (response.errorCode && response.errorCode == -1) {
-				NRS.getBlock(blockID, callback, pageRequest);
+				setTimeout(function (){ NRS.getBlock(blockID, callback, pageRequest); }, 2500);
 			} else {
 				if (callback) {
 					response.block = blockID;
@@ -78,7 +78,7 @@ var NRS = (function(NRS, $, undefined) {
 			
 			var block = NRS.blocks[0];			
 			$("#nrs_current_block_time").empty().append(NRS.formatTimestamp(block.timestamp));
-			$("#nrs_current_block").empty().append(String(block.height).escapeHTML());
+			$(".nrs_current_block").empty().append(String(block.height).escapeHTML());
 
 			$("#dashboard_blocks_table tbody").empty().append(rows);
 			NRS.dataLoadFinished($("#dashboard_blocks_table"));
@@ -212,7 +212,7 @@ var NRS = (function(NRS, $, undefined) {
 
 		var block = NRS.blocks[0];			
 		$("#nrs_current_block_time").empty().append(NRS.formatTimestamp(block.timestamp));
-		$("#nrs_current_block").empty().append(String(block.height).escapeHTML());
+		$(".nrs_current_block").empty().append(String(block.height).escapeHTML());
 		
 		$("#dashboard_blocks_table tbody").prepend(rows);
 

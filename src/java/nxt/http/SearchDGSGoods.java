@@ -6,6 +6,7 @@ import nxt.db.DbIterator;
 import nxt.db.DbUtils;
 import nxt.db.FilteringIterator;
 import nxt.util.Convert;
+import nxt.util.Filter;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
@@ -38,14 +39,14 @@ public final class SearchDGSGoods extends APIServlet.APIRequestHandler {
         JSONArray goodsJSON = new JSONArray();
         response.put("goods", goodsJSON);
 
-        FilteringIterator.Filter<DigitalGoodsStore.Goods> filter = hideDelisted ?
-                new FilteringIterator.Filter<DigitalGoodsStore.Goods>() {
+        Filter<DigitalGoodsStore.Goods> filter = hideDelisted ?
+                new Filter<DigitalGoodsStore.Goods>() {
                     @Override
                     public boolean ok(DigitalGoodsStore.Goods goods) {
                         return ! goods.isDelisted();
                     }
                 } :
-                new FilteringIterator.Filter<DigitalGoodsStore.Goods>() {
+                new Filter<DigitalGoodsStore.Goods>() {
                     @Override
                     public boolean ok(DigitalGoodsStore.Goods goods) {
                         return true;
@@ -56,9 +57,9 @@ public final class SearchDGSGoods extends APIServlet.APIRequestHandler {
         try {
             DbIterator<DigitalGoodsStore.Goods> goods;
             if (sellerId == 0) {
-                goods = DigitalGoodsStore.searchGoods(query, inStockOnly, 0, -1);
+                goods = DigitalGoodsStore.Goods.searchGoods(query, inStockOnly, 0, -1);
             } else {
-                goods = DigitalGoodsStore.searchSellerGoods(query, sellerId, inStockOnly, 0, -1);
+                goods = DigitalGoodsStore.Goods.searchSellerGoods(query, sellerId, inStockOnly, 0, -1);
             }
             iterator = new FilteringIterator<>(goods, filter, firstIndex, lastIndex);
             while (iterator.hasNext()) {

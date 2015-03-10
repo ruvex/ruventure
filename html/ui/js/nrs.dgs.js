@@ -251,14 +251,21 @@ var NRS = (function(NRS, $, undefined) {
 				$("#dgs_user_purchase_count").html(response.purchases.length).removeClass("loading_dots");
 			}
 		});
-		NRS.sendRequest("getState+", {
+
+		NRS.sendRequest("getDGSGoodsCount+", {
 		}, function(response) {
 			if (response.numberOfGoods) {
 				$("#dgs_product_count").html(response.numberOfGoods).removeClass("loading_dots");
 			}
+		});
+		NRS.sendRequest("getDGSPurchaseCount+", {
+		}, function(response) {
 			if (response.numberOfPurchases) {
 				$("#dgs_total_purchase_count").html(response.numberOfPurchases).removeClass("loading_dots");
 			}
+		});
+		NRS.sendRequest("getDGSTagCount+", {
+		}, function(response) {
 			if (response.numberOfTags) {
 				$("#dgs_tag_count").html(response.numberOfTags).removeClass("loading_dots");
 			}
@@ -969,7 +976,7 @@ var NRS = (function(NRS, $, undefined) {
 				}
 
 				if (type == "dgs_purchase_modal" || type == "dgs_product_modal") {
-					output += "<tr><td colspan='2'><div style='max-height:150px;overflow:auto;'>" + String(response.description).escapeHTML().nl2br() + "</div></td></tr>";
+					output += "<tr><td colspan='2'><div style='max-height:150px;overflow:auto;'>" + String(response.description).autoLink().nl2br() + "</div></td></tr>";
 				}
 
 				output += "</table>";

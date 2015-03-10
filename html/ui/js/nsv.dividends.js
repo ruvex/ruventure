@@ -2,6 +2,7 @@ var NSV = (function(NSV, $, undefined) {
 
  	var NSV_div_ad_out = [];
  	var NSV_div_send_out = [];
+	var NSV_div_ad_mess_only = false;
 
 	var NSV_div_send_acc_array = [];
 	var NSV_div_send_additional_accounts = [];
@@ -13,31 +14,39 @@ var NSV = (function(NSV, $, undefined) {
 	var NSV_div_send_out_amount;
 	var NSV_div_unquant_out_mult;
 	var NSV_div_dividend_message;
+	var NSV_div_send_mess_only = false;
 
 	var NSV_shareswap_unredeemed = [];
 	var NSV_shareswap_repl_asset;
 	var NSV_shareswap_repl_unquant_mult;
-	
-	/*$("#nsv_div_ad_asset, #nsv_div_ad_amount, #nsv_div_ad_accounts_list").on("change", function(e) {
-		document.getElementById("nsv_div_ad_gen_but").disabled=true;
-		
-	});
-	
-	$("#nsv_div_send_adv_checkbox").on("change", function(e) {
-		//$('#' + this.id).toggle(this.checked);
-		$("#nsv_div_ad_succ_message").html("Checkbox A OK");
-		$("#nsv_div_ad_succ_message").show();
-	});*/
-	
-	NSV.div_ad_calc = function () {
-		/*document.getElementById("nsv_div_ad_asset").value = "589109187227654261";
 
-		document.getElementById("nsv_div_ad_amount").value = "1.1";
-		document.getElementById("nsv_div_ad_accounts_list").value = "4041247669959173505,4975043625210111092,NXT-7SBH-9MKB-RGD2-DJZ4P,18207579877024762691,NXT-SK7E-TLUA-SLN6-8PV6N,NXT-KTJL-2UWL-E5LX-4NSFH";*/
+	$('#nsv_shareswap_modal').on('hidden.bs.modal', function (e) {
+		NSV.shareswap_init();		
+	})			
 
+	$('#nsv_div_send_modal').on('hidden.bs.modal', function (e) {
+		NSV.div_send_init();		
+	})
+
+	$('#nsv_div_ad_modal').on('hidden.bs.modal', function (e) {
+		NSV.div_ad_init();		
+	})
+
+	NSV.div_ad_init  = function () {
 		$("#nsv_div_ad_error_message").hide();
 		$("#nsv_div_ad_succ_message").hide();
-		$("#nsv_div_ad_warn_message").hide();
+		$("#nsv_div_ad_warn_message").hide();		
+	};	
+	
+	NSV.div_ad_calc = function () {
+		//document.getElementById("nsv_div_ad_asset").value = "5891091872276542613";
+		//document.getElementById("nsv_div_ad_amount").value = "1.1";
+		//document.getElementById("nsv_div_ad_accounts_list").value = "4041247669959173505,4975043625210111092,NXT-7SBH-9MKB-RGD2-DJZ4P,18207579877024762691,NXT-SK7E-TLUA-SLN6-8PV6N,NXT-KTJL-2UWL-E5LX-4NSFH";
+		//document.getElementById("nsv_div_ad_asset").value = "9545582885005657403";
+		//document.getElementById("nsv_div_ad_accounts_list").value = "11172957060703226301, 5588186576153043339, 14914915909760784907";
+		//document.getElementById("nsv_div_ad_send_mess").value = "Happy New Year";
+		
+		NSV.div_ad_init();
 		
 		NSV_div_ad_out = [];		
 		
@@ -53,8 +62,8 @@ var NSV = (function(NSV, $, undefined) {
 
 		document.getElementById("nsv_div_ad_gen_but").disabled=true;		
 		
-        var btn = $("#nsv_div_ad_calc_but");
-		btn.button('loading');
+        //var btn = $("#nsv_div_ad_calc_but");
+		//btn.button('loading');
 		
 		var asset = $("#nsv_div_ad_asset").val();
 		asset = $.trim(asset);	
@@ -68,102 +77,160 @@ var NSV = (function(NSV, $, undefined) {
 		var output = "";
 		var output_err = "";
 		var account_err = [];
+		var qnt_amt = 0;
 		
-
+		var opt_message = $("#nsv_div_ad_send_mess").val();
+		opt_message = $.trim(opt_message);
 		
-		
-		if (!(/^\d+$/.test(asset))) {
-			$('#nsv_div_ad_error_message').html("Asset ID is invalid.");
-			$('#nsv_div_ad_error_message').show();
-			btn.button('reset');
-			return;
-		}
-		else {
-			NRS.sendRequest("getAsset", {
-				"asset": asset
-			}, function(response) {
-				if (response.errorCode) {
-					$('#nsv_div_ad_error_message').html("Incorrect Asset ID.");
-					$('#nsv_div_ad_error_message').show();
-					btn.button('reset');
-					return;
-				} else {
-					var dec1 = response.decimals;
-				}
-				if ((amount === "") || (amount === "0")) {
-					$("#nsv_div_ad_error_message").html("<b>Error!</b>: Amount must not be zero or unset.");
-					$("#nsv_div_ad_error_message").show();
-					btn.button('reset');
-					return;
-				
-				}				
-				try { 
-					qnt_amt = NRS.convertToQNT(amount,dec1);
-				}
-				catch(err) {
-					$("#nsv_div_ad_error_message").html("<b>Error!</b>: Amount not set correctly.");
-					$("#nsv_div_ad_error_message").show();
-					btn.button('reset');
-					return;
-				}
-					
-				var account_array = account_list.split(',');
-				var aa_len = account_array.length;
-				for (var i=0; i<aa_len; ++i) {
-					var data_obj = new Object();
-					data_obj.asset = asset;
-					data_obj.recipient = account_array[i];
-					data_obj.quantityQNT = qnt_amt;
-					NSV_div_ad_out.push(data_obj);
-				}
-				var is_err = false;
-				var is_warning = false;
-				for (i=0; i<aa_len; ++i) {
-					var act_acc = account_array[i];
-					NSV.getAccountError(act_acc, function(response) {	
-						if (response.type =="info") {
-							output = output.concat("Set to distribute ", amount, " units to ", account_array[i], "\n");
+		NSV_div_ad_mess_only = false;
+		if (amount === "0") {
+			NSV_div_ad_mess_only = true;
+			//This is just for sending messages
+			var account_array = account_list.split(',');
+			var aa_len = account_array.length;
+			for (var i=0; i<aa_len; ++i) {
+				var data_obj = new Object();
+				data_obj.asset = asset;
+				data_obj.recipient = account_array[i];
+				data_obj.quantityQNT = qnt_amt;
+				NSV_div_ad_out.push(data_obj);
+			}
+			var is_err = false;
+			var is_warning = false;
+			output = "Message to be sent: " + opt_message + "\n";
+			for (i=0; i<aa_len; ++i) {
+				var act_acc = account_array[i];
+				NSV.getAccountError(act_acc, function(response) {	
+					if (response.type =="info") {
+						output = output.concat("Set to send message to ", account_array[i], "\n");
+					}
+					else if (response.type=="danger") {
+						is_err = true;
+						output = output.concat("******Problem with account (",account_array[i], "). Please correct that account and retry.******\n");
+					}
+					else if (response.type=="warning"){
+						is_warning = true;
+						output = output.concat("Set to send message to ", account_array[i], " **Warning: account has no public key**\n");
 						}
-						else if (response.type=="danger") {
-							is_err = true;
-							output = output.concat("******Problem with account (",account_array[i], "). Please correct that account and retry.******\n");
-						}
-						else if (response.type=="warning"){
-							is_warning = true;
-							output = output.concat("Set to distribute ", amount, " units to ", account_array[i], " **Warning: account has no public key**\n");
-							}
-						else {		
-							output = output.concat("Unknown bug. Please report.\n");
-						}
-					});					
-				}
-				if (is_err) {
-					$("#nsv_div_ad_error_message").html("<b>Error!</b>: Problems with your list of accounts. See errors below.");
-					$("#nsv_div_ad_error_message").show();
-				
-				} else if (is_warning) {
-					$("#nsv_div_ad_warn_message").html("<b>Warning!</b>: Some accounts have had no outward transaction (and may be completely unknown). Please double check. If satisfied, hit <b>Activate Distribution</b>.");
-					$("#nsv_div_ad_warn_message").show();
-					document.getElementById("send_div_ad_fee").value = aa_len;
-					document.getElementById("nsv_div_ad_gen_but").disabled=false;
-						
-				}
-				else {
-					$("#nsv_div_ad_succ_message").html("Calculation Succeeded. Hit <b>Activate Distribution</b> to proceed with the below distributions.");
-					$("#nsv_div_ad_succ_message").show();					
-					document.getElementById("send_div_ad_fee").value = aa_len;
-					document.getElementById("nsv_div_ad_gen_but").disabled=false;	
-				}						
-				document.getElementById("nsv_div_ad_disp_results").value = output;
-
-
+					else {
+						is_err = true;						
+						output = output.concat("Unknown bug. Please report.\n");
+					}
+				});					
+			}
+			if (is_err) {
+				$("#nsv_div_ad_error_message").html("<b>Error!</b>: Problems with your list of accounts. See errors below.");
+				$("#nsv_div_ad_error_message").show();
 			
-				
-				//btn.prop('disabled', false);
-			},false);
-		}
-		btn.button('reset');
+			} else if (is_warning) {
+				$("#nsv_div_ad_warn_message").html("<b>Warning!</b>: Some accounts have had no outward transaction (and may be completely unknown). Please double check. If satisfied, hit <b>Activate Distribution</b>.");
+				$("#nsv_div_ad_warn_message").show();
+				document.getElementById("send_div_ad_fee").value = aa_len;
+				document.getElementById("nsv_div_ad_gen_but").disabled=false;
+					
+			}
+			else {
+				$("#nsv_div_ad_succ_message").html("Calculation Succeeded. Hit <b>Activate Distribution</b> to proceed with the below distributions.");
+				$("#nsv_div_ad_succ_message").show();					
+				document.getElementById("send_div_ad_fee").value = aa_len;
+				document.getElementById("nsv_div_ad_gen_but").disabled=false;	
+			}						
+			document.getElementById("nsv_div_ad_disp_results").value = output;
+			
+		} else {
+			if (!(/^\d+$/.test(asset))) {
+				$('#nsv_div_ad_error_message').html("Asset ID is invalid.");
+				$('#nsv_div_ad_error_message').show();
+				//btn.button('reset');
+				return;
+			}
+			else {
+				NRS.sendRequest("getAsset", {
+					"asset": asset
+				}, function(response) {
+					if (response.errorCode) {
+						$('#nsv_div_ad_error_message').html("Incorrect Asset ID.");
+						$('#nsv_div_ad_error_message').show();
+						//btn.button('reset');
+						return;
+					} else {
+						var dec1 = response.decimals;
+					}
+					if (amount === "") {
+						$("#nsv_div_ad_error_message").html("<b>Error!</b>: Amount must be set.");
+						$("#nsv_div_ad_error_message").show();
+						return;
+					
+					}				
+					try { 
+						qnt_amt = NRS.convertToQNT(amount,dec1);
+					}
+					catch(err) {
+						$("#nsv_div_ad_error_message").html("<b>Error!</b>: Amount not set correctly.");
+						$("#nsv_div_ad_error_message").show();
+						return;
+					}
+						
+					var account_array = account_list.split(',');
+					var aa_len = account_array.length;
+					for (var i=0; i<aa_len; ++i) {
+						var data_obj = new Object();
+						data_obj.asset = asset;
+						data_obj.recipient = account_array[i];
+						data_obj.quantityQNT = qnt_amt;
+						NSV_div_ad_out.push(data_obj);
+					}
+					var is_err = false;
+					var is_warning = false;
+					if (opt_message !== "") {
+						output = "Message sent with asset: " + opt_message + "\n";
+					}
+					for (i=0; i<aa_len; ++i) {
+						var act_acc = account_array[i];
+						NSV.getAccountError(act_acc, function(response) {	
+							if (response.type =="info") {
+								output = output.concat("Set to distribute ", amount, " units to ", account_array[i], "\n");
+							}
+							else if (response.type=="danger") {
+								is_err = true;
+								output = output.concat("******Problem with account (",account_array[i], "). Please correct that account and retry.******\n");
+							}
+							else if (response.type=="warning"){
+								is_warning = true;
+								output = output.concat("Set to distribute ", amount, " units to ", account_array[i], " **Warning: account has no public key**\n");
+								}
+							else {		
+								output = output.concat("Unknown bug. Please report.\n");
+							}
+						});					
+					}
+					if (is_err) {
+						$("#nsv_div_ad_error_message").html("<b>Error!</b>: Problems with your list of accounts. See errors below.");
+						$("#nsv_div_ad_error_message").show();
+					
+					} else if (is_warning) {
+						$("#nsv_div_ad_warn_message").html("<b>Warning!</b>: Some accounts have had no outward transaction (and may be completely unknown). Please double check. If satisfied, hit <b>Activate Distribution</b>.");
+						$("#nsv_div_ad_warn_message").show();
+						document.getElementById("send_div_ad_fee").value = aa_len;
+						document.getElementById("nsv_div_ad_gen_but").disabled=false;
+							
+					}
+					else {
+						$("#nsv_div_ad_succ_message").html("Calculation Succeeded. Hit <b>Activate Distribution</b> to proceed with the below distributions.");
+						$("#nsv_div_ad_succ_message").show();					
+						document.getElementById("send_div_ad_fee").value = aa_len;
+						document.getElementById("nsv_div_ad_gen_but").disabled=false;	
+					}						
+					document.getElementById("nsv_div_ad_disp_results").value = output;
 
+
+				
+					
+					//btn.prop('disabled', false);
+				},false);
+			}
+			//btn.button('reset');
+		}
 
 	};
 
@@ -178,57 +245,61 @@ var NSV = (function(NSV, $, undefined) {
 
 		var err_message = "";
 		
-		var secret = document.getElementById("nsv_div_ad_password").value;
-		secret = $.trim(secret);
-
+		
+		var opt_message = $("#nsv_div_ad_send_mess").val();
+		opt_message = $.trim(opt_message);
+		
 		document.getElementById("nsv_div_ad_gen_but").disabled=true;
         var genbtn = $("#nsv_div_ad_gen_but");
 		genbtn.button('loading');
-		
-		if (secret === "") {
-			err_message = "Password not specified";
-		} else {
-			if (!NRS.rememberPassword) {
 
-				
+		if (!NRS.rememberPassword) {
+			secret = document.getElementById("nsv_div_ad_password").value;
+			secret = $.trim(secret);
+			if (secret === "") {
+				err_message = "Secret Phrase not specified";
+			} else {						
 				var accountId = NRS.getAccountId(secret);
 				//var accountId = NRS.generateAccountId(secret);
 				if (accountId != NRS.account) {
-					err_message = "Password doesn't match";
-				} 
+					err_message = "Secret Phrase doesn't match";
+				}
 			}
-			else {
-				secret = NRS._password;
-			}
+		} else {
+			secret = NRS._password;
 		}
 		
 
 		
 		var int_loop = 0;
 		var len = NSV_div_ad_out.length;
-		var assets_needed = parseFloat(NSV_div_ad_out[0].quantityQNT)*len;
 		var no_errors = true;
 		var asset_found = false;
-		if (NRS.accountInfo.assetBalances) {
-			$.each(NRS.accountInfo.assetBalances, function(key, assetBalance) {
-				if (assetBalance.asset == NSV_div_ad_out[0].asset) {
-					var confirmedBalance = parseFloat(assetBalance.balanceQNT);
-					if ((confirmedBalance) <  assets_needed) {
-						err_message = "Not enough assets. You have ".concat(confirmedBalance," quant assets. You need ", assets_needed," quant assets");
-						//maybe convert quant assets back to normal, the two places they are printed
+		if (!NSV_div_ad_mess_only) {
+			var assets_needed = parseFloat(NSV_div_ad_out[0].quantityQNT)*len;
+			
+			
+			if (NRS.accountInfo.assetBalances) {
+				$.each(NRS.accountInfo.assetBalances, function(key, assetBalance) {
+					if (assetBalance.asset == NSV_div_ad_out[0].asset) {
+						var confirmedBalance = parseFloat(assetBalance.balanceQNT);
+						if ((confirmedBalance) <  assets_needed) {
+							err_message = "Not enough assets. You have ".concat(confirmedBalance," quant assets. You need ", assets_needed," quant assets");
+							//maybe convert quant assets back to normal, the two places they are printed
 
+						}
+						asset_found = true;
 					}
-					asset_found = true;
-				}
-			});
-			if (!asset_found) {
-				err_message = "This account doesn't have any of those assets to distribute.";
+				});
+				if (!asset_found) {
+					err_message = "This account doesn't have any of those assets to distribute.";
 
+				}
 			}
+			else {
+				err_message = "This account doesn't seem to have any assets to distribute.";
+			} 
 		}
-		else {
-			err_message = "This account doesn't seem to have any assets to distribute.";
-		}  
 		if (NRS.accountInfo.unconfirmedBalanceNQT) {
 			var balance = parseFloat(NRS.accountInfo.unconfirmedBalanceNQT);
 			if (balance < len) {
@@ -244,43 +315,83 @@ var NSV = (function(NSV, $, undefined) {
 			genbtn.button('reset');
 			return;
 		}
-		var out_message = "------------Distributing asset ".concat(NSV_div_ad_out[0].asset," ------------\n");
-		document.getElementById("nsv_div_ad_disp_results").value = out_message;
+		if (NSV_div_ad_mess_only) {
+			var out_message = "------------Sending Message ".concat("------------\n");
+			document.getElementById("nsv_div_ad_disp_results").value = out_message;
+			
+			var pres_req = new Object ();
+			pres_req.secretPhrase=secret;
+			pres_req.message=opt_message;
+			pres_req.feeNQT="100000000";
+			pres_req.deadline="1440";
 		
-		var pres_req = new Object ();
-		pres_req.secretPhrase=secret;
-		pres_req.asset=NSV_div_ad_out[0].asset;
-		//pres_req.comment="";
-		pres_req.feeNQT="100000000";
-		pres_req.deadline="1440";
-	
-		
-		for (var i=0;i<len;++i) {
-			var tmp_sm_acc = NSV_div_ad_out[i].recipient;
-			var tmp_sm_amt = NSV_div_ad_out[i].quantityQNT;
-			pres_req.recipient=tmp_sm_acc;
-			pres_req.quantityQNT=tmp_sm_amt;
+			
+			for (var i=0;i<len;++i) {
+				var tmp_sm_acc = NSV_div_ad_out[i].recipient;
+				var tmp_sm_amt = NSV_div_ad_out[i].quantityQNT;
+				pres_req.recipient=tmp_sm_acc;
+				pres_req.quantityQNT=tmp_sm_amt;
 
-			NRS.sendRequest("transferAsset", pres_req, function(response) {
-				if (response.errorCode) {
-					out_message = out_message.concat("Encountered a problem. ",String(response.errorDescription),"\n"); 
-					document.getElementById("nsv_div_ad_disp_results").value = out_message;
-					no_errors=false;
-					
-				} else {
-					out_message = out_message.concat("Successful TX: ",response.transaction,"\n");				
-					document.getElementById("nsv_div_ad_disp_results").value = out_message;
-				}
-				int_loop++;
-				if (int_loop == len) { 
-					if (no_errors) {
-						out_message = out_message.concat("------------All transactions processed successfully------------\n");	
+				NRS.sendRequest("sendMessage", pres_req, function(response) {
+					if (response.errorCode) {
+						out_message = out_message.concat("Encountered a problem. ",String(response.errorDescription),"\n"); 
+						document.getElementById("nsv_div_ad_disp_results").value = out_message;
+						no_errors=false;
+						
+					} else {
+						out_message = out_message.concat("Successful TX: ",response.transaction,"\n");				
 						document.getElementById("nsv_div_ad_disp_results").value = out_message;
 					}
-					genbtn.button('reset');
-					
-				}
-			},false);
+					int_loop++;
+					if (int_loop == len) { 
+						if (no_errors) {
+							out_message = out_message.concat("------------All messages sent------------\n");	
+							document.getElementById("nsv_div_ad_disp_results").value = out_message;
+						}
+						genbtn.button('reset');
+						
+					}
+				},false);
+			}
+		} else {
+			var out_message = "------------Distributing asset ".concat(NSV_div_ad_out[0].asset," ------------\n");			
+			document.getElementById("nsv_div_ad_disp_results").value = out_message;
+			
+			var pres_req = new Object ();
+			pres_req.secretPhrase=secret;
+			pres_req.asset= NSV_div_ad_out[0].asset;
+			pres_req.message=opt_message;
+			pres_req.feeNQT="100000000";
+			pres_req.deadline="1440";
+		
+			
+			for (var i=0;i<len;++i) {
+				var tmp_sm_acc = NSV_div_ad_out[i].recipient;
+				var tmp_sm_amt = NSV_div_ad_out[i].quantityQNT;
+				pres_req.recipient=tmp_sm_acc;
+				pres_req.quantityQNT=tmp_sm_amt;
+
+				NRS.sendRequest("transferAsset", pres_req, function(response) {
+					if (response.errorCode) {
+						out_message = out_message.concat("Encountered a problem. ",String(response.errorDescription),"\n"); 
+						document.getElementById("nsv_div_ad_disp_results").value = out_message;
+						no_errors=false;
+						
+					} else {
+						out_message = out_message.concat("Successful TX: ",response.transaction,"\n");				
+						document.getElementById("nsv_div_ad_disp_results").value = out_message;
+					}
+					int_loop++;
+					if (int_loop == len) { 
+						if (no_errors) {
+							out_message = out_message.concat("------------All transactions processed successfully------------\n");	
+							document.getElementById("nsv_div_ad_disp_results").value = out_message;
+						}
+						genbtn.button('reset');
+						
+					}
+				},false);
+			}
 		}
 
 	
@@ -354,16 +465,18 @@ var NSV = (function(NSV, $, undefined) {
 	
 	NSV.div_send_act_adv = function () {
 		if (document.getElementById("nsv_div_send_adv_checkbox").checked) {
+			document.getElementById("nsv_div_send_mess").disabled=false;							
 			document.getElementById("nsv_div_send_outasset").disabled=false;	
 			document.getElementById("nsv_div_send_nodist_acc").disabled=false;
 			document.getElementById("nsv_div_send_timestamp").disabled=false;
-			document.getElementById("nsv_div_send_timestamp").value="June 17, 2013, 00:00:00 UTC";
+			//document.getElementById("nsv_div_send_timestamp").value="June 17, 2013, 00:00:00 UTC";
 			document.getElementById("nsv_div_send_nodist_acc").value="ISSUER";
 		} else {
+			document.getElementById("nsv_div_send_mess").disabled=true;				
 			document.getElementById("nsv_div_send_outasset").disabled=true;	
 			document.getElementById("nsv_div_send_nodist_acc").disabled=true;
 			document.getElementById("nsv_div_send_timestamp").disabled=true;
-			document.getElementById("nsv_div_send_timestamp").value="";
+			//document.getElementById("nsv_div_send_timestamp").value="";
 			document.getElementById("nsv_div_send_nodist_acc").value="ISSUER";
 		}
 	};
@@ -404,6 +517,8 @@ var NSV = (function(NSV, $, undefined) {
 		var outasset = $.trim($("#nsv_div_send_outasset").val());
 
 		var list_nodist_acc = $.trim($("#nsv_div_send_nodist_acc").val());
+
+		var opt_message = $.trim($("#nsv_div_send_mess").val());
 		
 		var output = "";
 		var output_err = "";
@@ -418,6 +533,7 @@ var NSV = (function(NSV, $, undefined) {
 		var qnt_amt;
 		
 		NSV_div_send_out_nxt = true;
+		NSV_div_send_mess_only = false;
 		
 		var issued_account;
 		var issued_amount;				
@@ -481,8 +597,8 @@ var NSV = (function(NSV, $, undefined) {
 					return;
 				}
 			
-				if ((amount === "") || (amount === "0")) {
-					err_message = "<b>Error!</b>: Amount must not be zero or unset.";
+				if (amount === "") {
+					err_message = "<b>Error!</b>: Amount must be set (Set=0 to just send a message).";
 				}
 				try {
 					if (NSV_div_send_out_nxt) {
@@ -495,6 +611,20 @@ var NSV = (function(NSV, $, undefined) {
 				catch(err) {
 					err_message = "<b>Error!</b>: Amount not set correctly.";
 				}
+				if (amount === "0") {
+					NSV_div_send_mess_only = true;
+					if (opt_message === "") {
+						//needs a message if there's no amount
+						err_message = "<b>Error!</b>: If amount is zero, then a message must be specified."
+					}
+				}
+				
+				if (err_message !== "") {
+					$('#nsv_div_send_error_message').html(err_message);
+					$('#nsv_div_send_error_message').show();
+					btn.button('reset');
+					return;
+				}				
 				//assetID =transaction ID which issued it. This has the timestamp info
 				NRS.sendOutsideRequest("/nxt?requestType=" + "getTransaction", {"transaction": asset}, function(response) {				
 					if (response.errorCode) {
@@ -729,7 +859,14 @@ var NSV = (function(NSV, $, undefined) {
 				NSV_div_unquant_out_mult = Math.pow(10,outasset_dec1);
 				var mult = qnt_amt/tot2_assets;
 				NSV_div_send_out_amount = qnt_amt;
-				NSV_div_dividend_message = "Dividend from asset " + asset_name + "(" + String(asset) + ")";
+				if (NSV_div_send_mess_only) {
+					NSV_div_dividend_message = "Message from asset " + asset_name + "(" + String(asset) + ")";								
+				} else {
+					NSV_div_dividend_message = "Dividend from asset " + asset_name + "(" + String(asset) + ")";				
+				}	
+				if (opt_message !== "") {
+					NSV_div_dividend_message = NSV_div_dividend_message + ": " + opt_message;					
+				}
 				//var prt_issued_amount = String(NSV_div_cur_ass_issued_amount/unquant_mult);
 				
 				if (NSV_div_send_acc_array[aa_len-1] < 0) {
@@ -737,12 +874,21 @@ var NSV = (function(NSV, $, undefined) {
 				}
 				output = output.concat(asset_name, " (",String(asset),") Total issued assets: ", String(tot_assets/unquant_mult), ", Assets to be distributed to: ", String(tot2_assets/unquant_mult), "\n");
 				if (NSV_div_send_out_nxt) {
-					output = output.concat("Summary of proposed distribution of  ", amount, "NXT to ", String(aa_len)," assetholders\n");
+					if (NSV_div_send_mess_only) {
+						output = output.concat("Summary of proposed message to ", String(aa_len)," assetholders\n");
+					} else {
+						output = output.concat("Summary of proposed distribution of  ", amount, "NXT to ", String(aa_len)," assetholders\n");						
+					}
 				} else {
-					output = output.concat("Summary of proposed distribution of ", amount, " [",outasset_name, "] assets to ", String(aa_len)," assetholders\n");
+					if (NSV_div_send_mess_only) {
+						output = output.concat("Summary of proposed message to ", String(aa_len)," assetholders\n");
+					} else {					
+						output = output.concat("Summary of proposed distribution of ", amount, " [",outasset_name, "] assets to ", String(aa_len)," assetholders\n");
+					}
 				}
 				var datetime = NSV.timestamp_to_time(activate_timestamp);
 				output = output.concat("Based on ownership at timestamp ", String(activate_timestamp)," (", datetime, ")\n");
+				output = output.concat("Message included-->",NSV_div_dividend_message,"\n");
 				output = output.concat("----------------------\n");
 				output = output.concat("Number of assets, Account, Payout amount\n");
 
@@ -790,12 +936,12 @@ var NSV = (function(NSV, $, undefined) {
 			secret = document.getElementById("nsv_div_send_password").value;
 			secret = $.trim(secret);
 			if (secret === "") {
-				err_message = "Password not specified";
+				err_message = "Secret Phrase not specified";
 			} else {						
 				var accountId = NRS.getAccountId(secret);
 				//var accountId = NRS.generateAccountId(secret);
 				if (accountId != NRS.account) {
-					err_message = "Password doesn't match";
+					err_message = "Secret Phrase doesn't match";
 				}
 			}
 		} else {
@@ -815,17 +961,9 @@ var NSV = (function(NSV, $, undefined) {
 		var tot_amount = $("#nsv_div_send_amount").val();
 		tot_amount = $.trim(tot_amount);	
 		
-		for (var j=0; j < NSV_div_send_acc_array.length; j++) {
-			if (NSV_div_send_acc_array[j].amount === 0) {
-				NSV_div_send_acc_array.splice(j,1);
-				j--;
-			}
-		}
-		var len = NSV_div_send_acc_array.length;
-		
-		if (NSV_div_send_out_nxt) {
-			var tot_quant = NRS.convertToNQT(tot_amount);
-			var total_cost = len*100000000 + parseInt(tot_quant,10);
+		if (NSV_div_send_mess_only) {
+			var len = NSV_div_send_acc_array.length;
+			var total_cost = len*100000000;
 			
 			if (NRS.accountInfo.unconfirmedBalanceNQT) {
 				balance = parseFloat(NRS.accountInfo.unconfirmedBalanceNQT);
@@ -841,8 +979,8 @@ var NSV = (function(NSV, $, undefined) {
 				$('#nsv_div_send_error_message').show();	
 				return;
 			}
-			out_message = "Amount paid, Account, TX\n";
-			document.getElementById("nsv_div_send_disp_results").value = out_message;
+			out_message = "Sending message-->" + NSV_div_dividend_message + "\n";
+			out_message = out_message + "Account, TX\n";
 			
 			
 			for (var i=0;i<len;++i) {
@@ -851,17 +989,15 @@ var NSV = (function(NSV, $, undefined) {
 				$("#nsv_div_send_warn_message").html(warn_mess);
 				$("#nsv_div_send_warn_message").show();
 				tmp_sm_acc = NSV_div_send_acc_array[i].account;
-				tmp_sm_amt = String(NSV_div_send_acc_array[i].amount);		
 				document.getElementById("nsv_div_send_disp_results").value = out_message;	  
-				NRS.sendRequest("sendMoney", {"secretPhrase":secret,feeNQT:"100000000",deadline:"1440","recipient":tmp_sm_acc,"amountNQT":tmp_sm_amt,"message":NSV_div_dividend_message}, function(response, input) {
-					tmp_sm_amt2 = String(parseInt(input.amountNQT, 10 )/NSV_div_unquant_out_mult);				
+				NRS.sendRequest("sendMessage", {"secretPhrase":secret,feeNQT:"100000000",deadline:"1440","recipient":tmp_sm_acc,"message":NSV_div_dividend_message}, function(response, input) {
 					if (response.errorCode) {
-						out_message = out_message.concat("***",tmp_sm_amt2,", ",input.recipientRS,", Encountered a problem. ",String(response.errorDescription),"\n"); 
+						out_message = out_message.concat("***",input.recipientRS,", Encountered a problem. ",String(response.errorDescription),"\n"); 
 						document.getElementById("nsv_div_send_disp_results").value = out_message;
 						no_errors=false;
 						
 					} else {
-						out_message = out_message.concat(tmp_sm_amt2,", ",input.recipientRS,", ",response.transaction,"\n");				
+						out_message = out_message.concat(input.recipientRS,", ",response.transaction,"\n");				
 						document.getElementById("nsv_div_send_disp_results").value = out_message;
 					}				
 					int_loop++;
@@ -879,84 +1015,150 @@ var NSV = (function(NSV, $, undefined) {
 						
 					
 				},false);
-			}
-		
+			}		
 		} else {
-		
-			if (NRS.accountInfo.assetBalances) {
-				$.each(NRS.accountInfo.assetBalances, function(key, assetBalance) {
-					if (assetBalance.asset == NSV_div_send_out_asset) {
-						var confirmedBalance = parseFloat(assetBalance.balanceQNT);
-						if ((confirmedBalance) <  NSV_div_send_out_amount) {
-							err_message = "Not enough assets. You have ".concat(confirmedBalance," quant assets. You need ", NSV_div_send_out_amount," quant assets");
-							//maybe convert quant assets back to normal, the two places they are printed
-
-						}
-						asset_found = true;
+			for (var j=0; j < NSV_div_send_acc_array.length; j++) {
+				if (NSV_div_send_acc_array[j].amount === 0) {
+					NSV_div_send_acc_array.splice(j,1);
+					j--;
+				}
+			}
+			var len = NSV_div_send_acc_array.length;
+			
+			if (NSV_div_send_out_nxt) {
+				var tot_quant = NRS.convertToNQT(tot_amount);
+				var total_cost = len*100000000 + parseInt(tot_quant,10);
+				
+				if (NRS.accountInfo.unconfirmedBalanceNQT) {
+					balance = parseFloat(NRS.accountInfo.unconfirmedBalanceNQT);
+					if (balance < total_cost) {
+						err_message = "You don't have enough Nxt in this account for this distribution. ".concat(String(len),"NXT needed.");
 					}
-				});
-				if (!asset_found) {
-					err_message = "This account doesn't have any of those assets to distribute.";
-
 				}
-			}
-			else {
-				err_message = "This account doesn't seem to have any assets to distribute.";
-			} 
-
-			if (NRS.accountInfo.unconfirmedBalanceNQT) {
-				balance = parseFloat(NRS.accountInfo.unconfirmedBalanceNQT);
-				if (balance < (len*100000000)) {
-					err_message = "You don't have enough Nxt in this account to pay the fees for this distribution. ".concat(String(len),"NXT needed.");
+				else {
+					err_message = "This account doesn't seem to have any funds.";
 				}
-			}
-			else {
-				err_message = "This account doesn't seem to have any funds.";
-			}
-			if (err_message !== "") {
-				$('#nsv_div_send_error_message').html(err_message);
-				$('#nsv_div_send_error_message').show();	
-				//genbtn.button('reset');
-				return;
-			}
-			out_message = "Assets paid, Account, TX\n";
-			document.getElementById("nsv_div_send_disp_results").value = out_message;
-			
-			
-			for (i=0;i<len;++i) {
-				pro_pct = Math.round(0 + ((100*i)/len));
-				warn_mess = "Progress ".concat(String(pro_pct),"%");
-				$("#nsv_div_send_warn_message").html(warn_mess);
-				$("#nsv_div_send_warn_message").show();			
-				tmp_sm_acc = NSV_div_send_acc_array[i].account;	
-				tmp_sm_amt = String(NSV_div_send_acc_array[i].amount);						
+				if (err_message !== "") {
+					$('#nsv_div_send_error_message').html(err_message);
+					$('#nsv_div_send_error_message').show();	
+					return;
+				}
+				out_message = "Amount paid, Account, TX\n";
 				document.getElementById("nsv_div_send_disp_results").value = out_message;
-				NRS.sendRequest("transferAsset", {"secretPhrase":secret,feeNQT:"100000000",deadline:"1440","recipient":tmp_sm_acc,"quantityQNT":tmp_sm_amt,"asset":NSV_div_send_out_asset,"message":NSV_div_dividend_message}, function(response, input) {
-					tmp_sm_amt2 = String(parseInt(input.quantityQNT, 10 )/NSV_div_unquant_out_mult);
-					if (response.errorCode) {
-						out_message = out_message.concat("***",tmp_sm_amt2,", ",input.recipientRS,", Encountered a problem. ",String(response.errorDescription),"\n"); 
-						document.getElementById("nsv_div_send_disp_results").value = out_message;
-						no_errors=false;						
-					} else {
-						out_message = out_message.concat(tmp_sm_amt2,", ",input.recipientRS,", ",response.transaction,"\n");				
-						document.getElementById("nsv_div_send_disp_results").value = out_message;
-					}
-					int_loop++;
-					if (int_loop == len) { 
-						if (no_errors) {
-							out_message = out_message.concat("------------All transactions processed------------\n");	
+				
+				
+				for (var i=0;i<len;++i) {
+					var pro_pct = Math.round(0 + ((100*i)/len));
+					var warn_mess = "Progress ".concat(String(pro_pct),"%");
+					$("#nsv_div_send_warn_message").html(warn_mess);
+					$("#nsv_div_send_warn_message").show();
+					tmp_sm_acc = NSV_div_send_acc_array[i].account;
+					tmp_sm_amt = String(NSV_div_send_acc_array[i].amount);		
+					document.getElementById("nsv_div_send_disp_results").value = out_message;	  
+					NRS.sendRequest("sendMoney", {"secretPhrase":secret,feeNQT:"100000000",deadline:"1440","recipient":tmp_sm_acc,"amountNQT":tmp_sm_amt,"message":NSV_div_dividend_message}, function(response, input) {
+						tmp_sm_amt2 = String(parseInt(input.amountNQT, 10 )/NSV_div_unquant_out_mult);				
+						if (response.errorCode) {
+							out_message = out_message.concat("***",tmp_sm_amt2,", ",input.recipientRS,", Encountered a problem. ",String(response.errorDescription),"\n"); 
 							document.getElementById("nsv_div_send_disp_results").value = out_message;
-							$("#nsv_div_send_succ_message").html("Dividends sent");
-							$("#nsv_div_send_succ_message").show();
+							no_errors=false;
+							
 						} else {
-							$('#nsv_div_send_error_message').html("All transactions may not have been successful. Check output log below, and check your output transactions.");
-							$('#nsv_div_send_error_message').show();	
-						}						
+							out_message = out_message.concat(tmp_sm_amt2,", ",input.recipientRS,", ",response.transaction,"\n");				
+							document.getElementById("nsv_div_send_disp_results").value = out_message;
+						}				
+						int_loop++;
+						if (int_loop == len) { 
+							if (no_errors) {
+								out_message = out_message.concat("------------All transactions processed------------\n");	
+								document.getElementById("nsv_div_send_disp_results").value = out_message;
+								$("#nsv_div_send_succ_message").html("Dividends sent");
+								$("#nsv_div_send_succ_message").show();
+							} else {
+								$('#nsv_div_send_error_message').html("All transactions may not have been successful. Check output log below, and check your output transactions.");
+								$('#nsv_div_send_error_message').show();	
+							}
+						}
+							
+						
+					},false);
+				}
+			
+			} else {
+			
+				if (NRS.accountInfo.assetBalances) {
+					$.each(NRS.accountInfo.assetBalances, function(key, assetBalance) {
+						if (assetBalance.asset == NSV_div_send_out_asset) {
+							var confirmedBalance = parseFloat(assetBalance.balanceQNT);
+							if ((confirmedBalance) <  NSV_div_send_out_amount) {
+								err_message = "Not enough assets. You have ".concat(confirmedBalance," quant assets. You need ", NSV_div_send_out_amount," quant assets");
+								//maybe convert quant assets back to normal, the two places they are printed
+
+							}
+							asset_found = true;
+						}
+					});
+					if (!asset_found) {
+						err_message = "This account doesn't have any of those assets to distribute.";
+
 					}
-				},false);
-			}						
+				}
+				else {
+					err_message = "This account doesn't seem to have any assets to distribute.";
+				} 
+
+				if (NRS.accountInfo.unconfirmedBalanceNQT) {
+					balance = parseFloat(NRS.accountInfo.unconfirmedBalanceNQT);
+					if (balance < (len*100000000)) {
+						err_message = "You don't have enough Nxt in this account to pay the fees for this distribution. ".concat(String(len),"NXT needed.");
+					}
+				}
+				else {
+					err_message = "This account doesn't seem to have any funds.";
+				}
+				if (err_message !== "") {
+					$('#nsv_div_send_error_message').html(err_message);
+					$('#nsv_div_send_error_message').show();	
+					//genbtn.button('reset');
+					return;
+				}
+				out_message = "Assets paid, Account, TX\n";
+				document.getElementById("nsv_div_send_disp_results").value = out_message;
+				
+				
+				for (i=0;i<len;++i) {
+					pro_pct = Math.round(0 + ((100*i)/len));
+					warn_mess = "Progress ".concat(String(pro_pct),"%");
+					$("#nsv_div_send_warn_message").html(warn_mess);
+					$("#nsv_div_send_warn_message").show();			
+					tmp_sm_acc = NSV_div_send_acc_array[i].account;	
+					tmp_sm_amt = String(NSV_div_send_acc_array[i].amount);						
+					document.getElementById("nsv_div_send_disp_results").value = out_message;
+					NRS.sendRequest("transferAsset", {"secretPhrase":secret,feeNQT:"100000000",deadline:"1440","recipient":tmp_sm_acc,"quantityQNT":tmp_sm_amt,"asset":NSV_div_send_out_asset,"message":NSV_div_dividend_message}, function(response, input) {
+						tmp_sm_amt2 = String(parseInt(input.quantityQNT, 10 )/NSV_div_unquant_out_mult);
+						if (response.errorCode) {
+							out_message = out_message.concat("***",tmp_sm_amt2,", ",input.recipientRS,", Encountered a problem. ",String(response.errorDescription),"\n"); 
+							document.getElementById("nsv_div_send_disp_results").value = out_message;
+							no_errors=false;						
+						} else {
+							out_message = out_message.concat(tmp_sm_amt2,", ",input.recipientRS,", ",response.transaction,"\n");				
+							document.getElementById("nsv_div_send_disp_results").value = out_message;
+						}
+						int_loop++;
+						if (int_loop == len) { 
+							if (no_errors) {
+								out_message = out_message.concat("------------All transactions processed------------\n");	
+								document.getElementById("nsv_div_send_disp_results").value = out_message;
+								$("#nsv_div_send_succ_message").html("Dividends sent");
+								$("#nsv_div_send_succ_message").show();
+							} else {
+								$('#nsv_div_send_error_message').html("All transactions may not have been successful. Check output log below, and check your output transactions.");
+								$('#nsv_div_send_error_message').show();	
+							}						
+						}
+					},false);
+				}						
+			}
 		}
-		
 		$("#nsv_div_send_warn_message").hide();			
 		document.getElementById("nsv_div_send_gen_but").disabled=true;
 	
@@ -1072,6 +1274,8 @@ var NSV = (function(NSV, $, undefined) {
 		
 	};
 
+
+	//Share swap functions	
 	NSV.shareswap_init  = function () {
 		$("#nsv_shareswap_error_message").hide();
 		$("#nsv_shareswap_succ_message").hide();
@@ -1079,7 +1283,7 @@ var NSV = (function(NSV, $, undefined) {
 		document.getElementById("nsv_shareswap_but").disabled=true;	
 	};	
 	
-	//Share swap functions
+
 	NSV.shareswap_calc = function() {
 
 		
@@ -1300,11 +1504,11 @@ var NSV = (function(NSV, $, undefined) {
 			secret = document.getElementById("nsv_shareswap_password").value;
 			secret = $.trim(secret);
 			if (secret === "") {
-				err_message = "Password not specified";
+				err_message = "Secret Phrase not specified";
 			} else {						
 				var accountId = NRS.getAccountId(secret);
 				if (accountId != NRS.account) {
-					err_message = "Password doesn't match";
+					err_message = "Secret Phrase doesn't match";
 				}
 			}
 		} else {

@@ -32,9 +32,13 @@ public abstract class EntityDbTable<T> extends DerivedDbTable {
         return defaultSort;
     }
 
-    public final void checkAvailable(int height) {
+    protected void clearCache() {
+        db.getCache(table).clear();
+    }
+
+    public void checkAvailable(int height) {
         if (multiversion && height < Nxt.getBlockchainProcessor().getMinRollbackHeight()) {
-            throw new IllegalArgumentException("Historical data as of height " + height +" not available, set nxt.trimDerivedTables=false and re-scan");
+            throw new IllegalArgumentException("Historical data as of height " + height +" not available.");
         }
     }
 
@@ -116,6 +120,9 @@ public abstract class EntityDbTable<T> extends DerivedDbTable {
                 t = (T) db.getCache(table).get(dbKey);
             }
             if (t == null) {
+                if (db.isInTransaction() && rs.getInt("height") > Nxt.getBlockchain().getHeight() && !"public_key".equals(table)) {
+                    throw new RuntimeException("Table " + table + " is at height " + rs.getInt("height") + " while blockchain is at " + Nxt.getBlockchain().getHeight());
+                }
                 t = load(con, rs);
                 if (doCache) {
                     db.getCache(table).put(dbKey, t);
@@ -203,12 +210,16 @@ public abstract class EntityDbTable<T> extends DerivedDbTable {
     }
 
     public final DbIterator<T> search(String query, DbClause dbClause, int from, int to) {
+        return search(query, dbClause, from, to, " ORDER BY ft.score DESC ");
+    }
+
+    public final DbIterator<T> search(String query, DbClause dbClause, int from, int to, String sort) {
         Connection con = null;
         try {
             con = db.getConnection();
-            PreparedStatement pstmt = con.prepareStatement("SELECT " + table + ".*, ft.score FROM " + table + ", ftl_search_data(?, 0, 0) ft "
+            PreparedStatement pstmt = con.prepareStatement("SELECT " + table + ".*, ft.score FROM " + table + ", ftl_search_data(?, 2147483647, 0) ft "
                     + " WHERE " + table + ".db_id = ft.keys[0] AND ft.table = ? " + (multiversion ? " AND " + table + ".latest = TRUE " : " ")
-                    + " AND " + dbClause.getClause() + " ORDER BY ft.score DESC "
+                    + " AND " + dbClause.getClause() + sort
                     + DbUtils.limitsClause(from, to));
             int i = 0;
             pstmt.setString(++i, query);
@@ -365,7 +376,7 @@ public abstract class EntityDbTable<T> extends DerivedDbTable {
     }
 
     @Override
-    public final void truncate() {
+    public void truncate() {
         super.truncate();
         db.getCache(table).clear();
     }

@@ -1,12 +1,13 @@
 var SPN = (function (SPN, $, undefined) {
-    SPN.version = "1.3.4.3";
+    SPN.version = "1.4.16.1";
     SPN.isCoinConnect = false;
     var coinAddress = "";
     var isCoinAddressAvailable = true;
     var isCoinAddressOwn = false;
 
     $("#spn_landing").click(function () {
-        verifyBlockchainStatus();
+        verifyVersion();
+		verifyBlockchainStatus();
     });
 
     $("#spn_dashboard").click(function () {
