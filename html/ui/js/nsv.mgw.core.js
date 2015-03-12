@@ -516,10 +516,10 @@ var MGW = (function (MGW, $, undefined) {
                 var resultMGW = $.grep(mgwCoinMultigateway, function (_mgwCoin2) { return _mgwCoin2.coin == mgwCoin });
                 var resultCoinDetails = $.grep(mgwCoinDetails, function (_mgwCoin3) { return _mgwCoin3.coin == mgwCoin });
 
-                $("#mgw_withdraw_modal_address").text($("#mgw_coin_withdraw_addr").val());
+                $("#mgw_withdraw_modal_address").text($.trim($("#mgw_coin_withdraw_addr").val()));
                 $("#mgw_withdraw_modal_total_received").text($("#mgw_coin_mgw_total_received").val() + " " + mgwCoin);
-                $("#mgw_withdraw_modal_message").val('{"redeem":"' + mgwCoin + '","withdrawaddr":"' + $("#mgw_coin_withdraw_addr").val() + '","InstantDEX":""}');
-                $("#mgw_withdraw_modal_comment").val('{"redeem":"' + mgwCoin + '","withdrawaddr":"' + $("#mgw_coin_withdraw_addr").val() + '","InstantDEX":""}');
+                $("#mgw_withdraw_modal_message").val('{"redeem":"' + mgwCoin + '","withdrawaddr":"' + $.trim($("#mgw_coin_withdraw_addr").val()) + '","InstantDEX":""}');
+                $("#mgw_withdraw_modal_comment").val('{"redeem":"' + mgwCoin + '","withdrawaddr":"' + $.trim($("#mgw_coin_withdraw_addr").val()) + '","InstantDEX":""}');
                 $("#mgw_withdraw_modal_quantityQNT").val(NRS.convertToQNT($("#mgw_coin_withdraw_amount").val(), mgwCoinDecimal));
                 $("#mgw_withdraw_modal_feeNXT").val(1);
                 $("#mgw_withdraw_modal_deadline").val(24);
