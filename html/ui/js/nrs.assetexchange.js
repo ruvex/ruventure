@@ -19,87 +19,88 @@ var NRS = (function(NRS, $, undefined) {
         if (NRS.databaseSupport) {
 			NRS.assets = [];
 			NRS.assetIds = [];
+			var newAssetIds = [];
 
-			NRS.database.select("assets", null, function(error, assets) {
-				//select already bookmarked assets
-				$.each(assets, function(index, asset) {
-					NRS.cacheAsset(asset);
-				});
+			NRS.database.select("data", [{
+			    "id": "is_preload_asset"
+			}], function (error, result) {
+			    if (result && result.length == 0) {
+			        $.each(preloadAsset, function (key, assetID) {
+			            if (NRS.assetIds.indexOf(assetID) == -1) {
+			                newAssetIds.push(assetID);
+			                NRS.assetIds.push(assetID);
+			            }
+			        });
 
-				//check owned assets, see if any are not yet in bookmarked assets
-				if (NRS.accountInfo.unconfirmedAssetBalances) {
-					var newAssetIds = [];
+			        NRS.database.insert("data", {
+			            "id": "is_preload_asset",
+			            "contents": true
+			        });
+			    }
 
-					$.each(NRS.accountInfo.unconfirmedAssetBalances, function(key, assetBalance) {
-						if (NRS.assetIds.indexOf(assetBalance.asset) == -1) {
-							newAssetIds.push(assetBalance.asset);
-							NRS.assetIds.push(assetBalance.asset);
-						}
-					});
+			    NRS.database.select("assets", null, function (error, assets) {
+			        //select already bookmarked assets
+			        $.each(assets, function (index, asset) {
+			            NRS.cacheAsset(asset);
+			        });
 
-					$.each(preloadAsset, function (key, assetID) {
-					    if (NRS.assetIds.indexOf(assetID) == -1) {
-					        newAssetIds.push(assetID);
-					        NRS.assetIds.push(assetID);
-					    }
-					});
+			        //check owned assets, see if any are not yet in bookmarked assets
+			        if (NRS.accountInfo.unconfirmedAssetBalances) {
+			            $.each(NRS.accountInfo.unconfirmedAssetBalances, function (key, assetBalance) {
+			                if (NRS.assetIds.indexOf(assetBalance.asset) == -1) {
+			                    newAssetIds.push(assetBalance.asset);
+			                    NRS.assetIds.push(assetBalance.asset);
+			                }
+			            });
 
-					//add to bookmarked assets
-					if (newAssetIds.length) {
-						var qs = [];
+			            //add to bookmarked assets
+			            if (newAssetIds.length) {
+			                var qs = [];
 
-						for (var i = 0; i < newAssetIds.length; i++) {
-							qs.push("assets=" + encodeURIComponent(newAssetIds[i]));
-						}
+			                for (var i = 0; i < newAssetIds.length; i++) {
+			                    qs.push("assets=" + encodeURIComponent(newAssetIds[i]));
+			                }
 
-						qs = qs.join("&");
-						//first get the assets info
-						NRS.sendRequest("getAssets+", {
-							//special request.. ugly hack.. also does POST due to URL max length
-							"querystring": qs
-						}, function(response) {
-							if (response.assets && response.assets.length) {
-								NRS.saveAssetBookmarks(response.assets, function() {
-									NRS.loadAssetExchangeSidebar(callback);
-								});
-							} else {
-								NRS.loadAssetExchangeSidebar(callback);
-							}
-						});
-					} else {
-						NRS.loadAssetExchangeSidebar(callback);
-					}
-				} else {
-				    var newAssetIds = [];
+			                qs = qs.join("&");
+			                //first get the assets info
+			                NRS.sendRequest("getAssets+", {
+			                    //special request.. ugly hack.. also does POST due to URL max length
+			                    "querystring": qs
+			                }, function (response) {
+			                    if (response.assets && response.assets.length) {
+			                        NRS.saveAssetBookmarks(response.assets, function () {
+			                            NRS.loadAssetExchangeSidebar(callback);
+			                        });
+			                    } else {
+			                        NRS.loadAssetExchangeSidebar(callback);
+			                    }
+			                });
+			            } else {
+			                NRS.loadAssetExchangeSidebar(callback);
+			            }
+			        } else {
+			            var qs = [];
 
-				    $.each(preloadAsset, function (key, assetID) {
-				        if (NRS.assetIds.indexOf(assetID) == -1) {
-				            newAssetIds.push(assetID);
-				            NRS.assetIds.push(assetID);
-				        }
-				    });
+			            for (var i = 0; i < newAssetIds.length; i++) {
+			                qs.push("assets=" + encodeURIComponent(newAssetIds[i]));
+			            }
 
-				    var qs = [];
-
-				    for (var i = 0; i < newAssetIds.length; i++) {
-				        qs.push("assets=" + encodeURIComponent(newAssetIds[i]));
-				    }
-
-				    qs = qs.join("&");
-				    //first get the assets info
-				    NRS.sendRequest("getAssets+", {
-				        //special request.. ugly hack.. also does POST due to URL max length
-				        "querystring": qs
-				    }, function (response) {
-				        if (response.assets && response.assets.length) {
-				            NRS.saveAssetBookmarks(response.assets, function () {
-				                NRS.loadAssetExchangeSidebar(callback);
-				            });
-				        } else {
-				            NRS.loadAssetExchangeSidebar(callback);
-				        }
-				    });
-				}
+			            qs = qs.join("&");
+			            //first get the assets info
+			            NRS.sendRequest("getAssets+", {
+			                //special request.. ugly hack.. also does POST due to URL max length
+			                "querystring": qs
+			            }, function (response) {
+			                if (response.assets && response.assets.length) {
+			                    NRS.saveAssetBookmarks(response.assets, function () {
+			                        NRS.loadAssetExchangeSidebar(callback);
+			                    });
+			                } else {
+			                    NRS.loadAssetExchangeSidebar(callback);
+			                }
+			            });
+			        }
+			    });
 			});
         } else {
 			//for users without db support, we only need to fetch owned assets
@@ -110,12 +111,6 @@ var NRS = (function(NRS, $, undefined) {
 					if (NRS.assetIds.indexOf(assetBalance.asset) == -1) {
 						qs.push("assets=" + encodeURIComponent(assetBalance.asset));
 					}
-				});
-
-				$.each(preloadAsset, function (key, assetID) {
-				    if (NRS.assetIds.indexOf(assetID) == -1) {
-				        qs.push("assets=" + encodeURIComponent(assetID));
-				    }
 				});
 
 				qs = qs.join("&");
@@ -135,30 +130,7 @@ var NRS = (function(NRS, $, undefined) {
 					NRS.loadAssetExchangeSidebar(callback);
 				}
 			} else {
-			    var qs = [];
-
-			    $.each(preloadAsset, function (key, assetID) {
-			        if (NRS.assetIds.indexOf(assetID) == -1) {
-			            qs.push("assets=" + encodeURIComponent(assetID));
-			        }
-			    });
-
-			    qs = qs.join("&");
-
-			    if (qs) {
-			        NRS.sendRequest("getAssets+", {
-			            "querystring": qs
-			        }, function (response) {
-			            if (response.assets && response.assets.length) {
-			                $.each(response.assets, function(key, asset) {
-			                    NRS.cacheAsset(asset);
-			                });
-			            }
-			            NRS.loadAssetExchangeSidebar(callback);
-			        });
-			    } else {
-			        NRS.loadAssetExchangeSidebar(callback);
-			    }
+			    NRS.loadAssetExchangeSidebar(callback);
 			}
 		}
 	}
