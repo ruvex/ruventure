@@ -297,7 +297,7 @@ var SPN = (function (SPN, $, undefined) {
                 tunnelURL += "&wallet_to=" + NRS.accountRS;
                 break;
             }
-            case "BTC": case "LTC": case "PPC": {
+            case "BTC": case "LTC": case "BTCD": case "PPC": {
                 tunnelURL += "&wallet_to=" + walletAddr;
                 break;
             }
@@ -435,13 +435,16 @@ var SPN = (function (SPN, $, undefined) {
                     }
 
                     switch (data.tunnel.currency_from) {
-                        case "BTC": case "LTC": case "PPC": {
+                        case "BTC": case "LTC": case "BTCD": case "PPC": {
                             var strText;
                             if (data.tunnel.currency_from == "BTC") {
                                 strText = "bitcoin:";
                             }
                             else if (data.tunnel.currency_from == "LTC") {
                                 strText = "litecoin:";
+                            }
+                            else if (data.tunnel.currency_from == "BTCD") {
+                                strText = "bitcoindark:";
                             }
                             else if (data.tunnel.currency_from == "PPC") {
                                 strText = "peercoin:";
