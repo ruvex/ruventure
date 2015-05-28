@@ -13,7 +13,7 @@ app.pages['getNXT'] = function(params) {
 	});
 };
 
-/* Send NXT to Banker's account, poll for referenced transaction with chips inside */ 
+/* Send NXT to Banker's account, poll for referenced transaction with chips inside */
 app.getNXT = function(secretPhrase) {
 	var amount = parseInt($('#amountNC').val());
 	var config = app.config;
@@ -25,7 +25,9 @@ app.getNXT = function(secretPhrase) {
 		recipient: config.banker,
 		quantityQNT: amount * config.chipNQT,
 		deadline: config.deadline,
-		feeNQT: config.NQT
+		feeNQT: config.NQT,
+		message: 'SN1',
+		messageIsText: true
 	};
 
 	app.callChain(opts, function(err, response) {
@@ -37,7 +39,7 @@ app.getNXT = function(secretPhrase) {
 			});
 			return;
 		}
-		app.warningWindowShow({ 
+		app.warningWindowShow({
 			text: 'Cash out request submitted<br/>It&apos;ll take between 8-10 minutes...'
 		});
 		app.pollForResult({
@@ -54,7 +56,7 @@ app.getNXT = function(secretPhrase) {
 	});
 }
 
-/* Display modal with acquired NXT amount */ 
+/* Display modal with acquired NXT amount */
 app.showGetNXTResult = function(response) {
   	var message = response.attachment.message;
   	var config = app.config;

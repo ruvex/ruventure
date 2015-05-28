@@ -5,7 +5,7 @@ app.pages['gamble'] = function(params) {
 	}
 
 	if (params.secretPhrase) {
-		app.gamble(params.secretPhrase);		
+		app.gamble(params.secretPhrase);
 	}
 
 	$btn = $('.btn_roll');
@@ -19,7 +19,7 @@ app.pages['gamble'] = function(params) {
 	});
 };
 
-/* Take bet size and odds, send API call, poll for result */ 
+/* Take bet size and odds, send API call, poll for result */
 app.gamble = function(secretPhrase) {
 
 	var $rightPage = $('.page-details .content');
@@ -28,7 +28,7 @@ app.gamble = function(secretPhrase) {
 	$rightPage.find('.slider-comments').show();
 
 	var amount = $('#betSize').val();
-	var odds = $('.oddSize').val(); 
+	var odds = $('.oddSize').val();
 	var config = app.config;
 
 	var opts = {
@@ -39,7 +39,7 @@ app.gamble = function(secretPhrase) {
 		deadline: config.deadline,
 		feeNQT: config.NQT,
 		asset: config.chipsAssetId,
-		message: odds,
+		message: 'SN1 ' + odds,
 		messageIsText: true
 	};
 
@@ -78,7 +78,7 @@ app.gamble = function(secretPhrase) {
 
 };
 
-/* Display modal with bet result based on transaction's message */ 
+/* Display modal with bet result based on transaction's message */
 app.showBetResults = function(response) {
   	var message = response.attachment.message;
 	var $popupContent = $('#betResultWindow .modal-body');
