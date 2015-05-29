@@ -138,7 +138,7 @@ body.fixed .wrapper {
 }
 /* Content */
 .content {
-  padding: 0 0 30px; /*wesley*/
+  padding: 20px; /*wesley*/
   background: #f9f9f9;
   position: relative;
   overflow: hidden;
