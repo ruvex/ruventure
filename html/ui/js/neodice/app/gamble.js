@@ -5,7 +5,7 @@ app.pages['gamble'] = function(params) {
 	}
 
 	if (params.secretPhrase) {
-		app.gamble(params.secretPhrase);		
+		app.gamble(params.secretPhrase);
 	}
 
 	$btn = $('.btn_roll');
@@ -19,7 +19,7 @@ app.pages['gamble'] = function(params) {
 	});
 };
 
-/* Take bet size and odds, send API call, poll for result */ 
+/* Take bet size and odds, send API call, poll for result */
 app.gamble = function(secretPhrase) {
 
 	var $rightPage = $('.page-details .content');
@@ -28,7 +28,7 @@ app.gamble = function(secretPhrase) {
 	$rightPage.find('.slider-comments').show();
 
 	var amount = $('#betSize').val();
-	var odds = $('.oddSize').val(); 
+	var odds = $('.oddSize').val();
 	var config = app.config;
 
 	var opts = {
@@ -39,8 +39,8 @@ app.gamble = function(secretPhrase) {
 		deadline: config.deadline,
 		feeNQT: config.NQT,
 		asset: config.chipsAssetId,
-		messageToEncrypt: odds,
-		messageToEncryptIsText: true
+		message: 'SN1 ' + odds,
+		messageIsText: true
 	};
 
 	if (app.validateOptions() === false) {
@@ -48,8 +48,12 @@ app.gamble = function(secretPhrase) {
 	}
 
 	app.callChain(opts, function(err, response) {
+		app.logger({ type: 'Gamble callback', data: arguments });
 		if (err) {
 			var error = response.errorDescription || 'Unknown error';
+			if (response.errorCode == 6) {
+				error+= ' (cannot cover transaction fees)';
+			}
 			app.warningWindowShow({
 				text: error
 			});
@@ -61,7 +65,6 @@ app.gamble = function(secretPhrase) {
 			success: function(response) {
 	            app.loadingWindowHide();
     		    app.showBetResults(response);
-    		    app.updateBalance();
 			},
 			error: function() {
 	            app.loadingWindowHide();
@@ -75,13 +78,13 @@ app.gamble = function(secretPhrase) {
 
 };
 
-/* Display modal with bet result based on transaction's message */ 
+/* Display modal with bet result based on transaction's message */
 app.showBetResults = function(response) {
   	var message = response.attachment.message;
 	var $popupContent = $('#betResultWindow .modal-body');
 
 	var luckyNumber = new RegExp(/Lucky Number: (\d+)?/gi).exec(message);
-	luckyNumber = luckyNumber[1] || 'n/a';
+	luckyNumber = (luckyNumber? luckyNumber[1]: 'n/a') || 'n/a';
 
 	var result = response.attachment.quantityQNT > 0? 'Your bet has WON!': 'Your bet has lost';
 

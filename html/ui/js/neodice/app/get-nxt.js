@@ -13,7 +13,7 @@ app.pages['getNXT'] = function(params) {
 	});
 };
 
-/* Send NXT to Banker's account, poll for referenced transaction with chips inside */ 
+/* Send NXT to Banker's account, poll for referenced transaction with chips inside */
 app.getNXT = function(secretPhrase) {
 	var amount = parseInt($('#amountNC').val());
 	var config = app.config;
@@ -25,20 +25,28 @@ app.getNXT = function(secretPhrase) {
 		recipient: config.banker,
 		quantityQNT: amount * config.chipNQT,
 		deadline: config.deadline,
-		feeNQT: config.NQT
+		feeNQT: config.NQT,
+		message: 'SN1',
+		messageIsText: true
 	};
 
 	app.callChain(opts, function(err, response) {
+		app.logger({ type: 'Get NXT callback', data: arguments });
 		if (err) {
+			var error = response.errorDescription || 'Unknown error';
+			app.warningWindowShow({
+				text: error
+			});
 			return;
 		}
-		app.loadingWindowShow({ text: 'Getting NXT.<br/>It&apos;ll take a minute...' });
+		app.warningWindowShow({
+			text: 'Cash out request submitted<br/>It&apos;ll take between 8-10 minutes...'
+		});
 		app.pollForResult({
 			transaction: response,
 			success: function(response) {
     		    app.loadingWindowHide();
     		    app.showGetNXTResult(response);
-    		    app.updateBalance();    		    
 			},
 			error: function() {
     		    app.loadingWindowHide();
@@ -48,7 +56,7 @@ app.getNXT = function(secretPhrase) {
 	});
 }
 
-/* Display modal with acquired NXT amount */ 
+/* Display modal with acquired NXT amount */
 app.showGetNXTResult = function(response) {
   	var message = response.attachment.message;
   	var config = app.config;

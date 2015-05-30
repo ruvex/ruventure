@@ -75,9 +75,28 @@ app.nl2br = function(str) {
     return str.replace(/(?:\r\n|\r|\n)/g, '<br />');
 }
 
+app.initRaven = function() {
+	if (typeof Raven == 'undefined') {
+		return;
+	}
+	Raven.config('https://c0c43a3fdc4d4aed8bc46b9b46df9217@app.getsentry.com/38518', {
+	    whitelistUrls: ['localhost', '127.0.0.1', '0.0.0.0']
+	}).install();
+}
+
+app.logger = function(message) {
+	if (typeof Raven !='undefined') {
+		message.account = app.getUserAccount;
+		Raven.captureMessage(message.message, { tags: { data: message } });
+	}
+}
+
 /* Initialize top navigation */
 app.initNavigation = function() {
+
 	var links = $('.neodice.nav a');
+	links.removeClass('active_a_btn');
+	$(links[0]).addClass('active_a_btn');
 	links.click(function() {
 		var link = $(this);
 		var url = link.data('url');
@@ -104,23 +123,24 @@ app.callChain = function(options, callback) {
 	if (app.vars.debug) {
 		console.log('POST:/', options);
     }
-	$.ajax({
+	return $.ajax({
 		url: config.apiUrl,
 		type: 'POST',
-		data: options,
-		success: function(responseText, status, request) {
-			var data = JSON.parse(responseText), error;
-			if (data.errorCode && data.errorCode > 0) {
-				error = data.errorCode;
-				//	            console.error('Chain error', error);
-			}
-			if (typeof data == 'string') {
-				data = JSON.parse(data);
-			}
-			callback(error, data);
-		}, error: function(err) {
-			callback(err);
+		data: options
+	}).then(function(responseText, status, request) {
+		var data = JSON.parse(responseText), error;
+		if (data.errorCode && data.errorCode > 0) {
+    		app.logger({ type: 'Chain error', data: arguments });			
+			error = data.errorCode;
+			//	            console.error('Chain error', error);
 		}
+		if (typeof data == 'string') {
+			data = JSON.parse(data);
+		}
+		if (callback) {
+			callback(error, data);
+		}
+		return data;
 	});
 };
 
@@ -140,40 +160,77 @@ app.warningWindowShow = function(opts) {
 	$modal.modal();
 };
 
-app.updateBalance = function() {
+app.pollForBalance = function() {
 	var config = app.config, balance = 0, text = '';
-	app.callChain({
-		requestType: 'getAccount',
-		account: app.getUserAccount()
-	}, function(err, response) {
-		if (err) {
-			return;
-		}
+
+	var getAccountParse = function(response) {
 		var pluckBalance = function(array, field) {
 			var pluck = _.find(array, { asset: config.chipsAssetId });
 			var value = pluck? parseInt(pluck[field]) / config.chipNQT: 0;
 			var precise = 100000000;
-			return parseInt(value*precise)/precise;
+			return afterFloatPoint(parseInt(value*precise)/precise, 2);
 		};
+		var confirmed, text = 'NeoDICE chips';
 		if (response.assetBalances) {
-			var confirmed = pluckBalance(response.assetBalances, 'balanceQNT');
-			var unconfirmed = pluckBalance(response.unconfirmedAssetBalances, 'unconfirmedBalanceQNT');
-			balance = afterFloatPoint(confirmed, 2);
-			text = 'NeoDICE chips';
-		} else {
-			text = 'n/a';
+			confirmed = pluckBalance(response.assetBalances, 'balanceQNT');
 		}
-/*
-		if (unconfirmed == 0) {
-			balance = confirmed;
-		} else {
-			balance = confirmed + ' (+' + (unconfirmed - confirmed) + ')';
+		if (!Number(confirmed)) {
+			confirmed = 0;
 		}
-*/		var nav = $('.neodice.nav');
-		nav.find('.amount').html(balance);
-		nav.find('.color_blue').html(text);
-	});
+		return { balance: confirmed, text: text };
+	}
+
+	var getUnconfirmedTransactionsParse = function(balance, response) {
+		var txs = response.unconfirmedTransactions, unconfirmedBalance = 0;
+		txs.forEach(function(tx) {
+			if (tx.attachment && tx.attachment.quantityQNT) {
+				var chipsAmount = parseInt(tx.attachment.quantityQNT, 10) / app.config.chipNQT;
+				if (tx.recipient == app.getUserAccount()) {
+					unconfirmedBalance+= chipsAmount;
+				} else {
+					unconfirmedBalance-= chipsAmount;
+				}
+			}
+		});
+		if (unconfirmedBalance!=0) {
+			var unconfirmedBalanceFormatted = afterFloatPoint(unconfirmedBalance, 2);
+			if (unconfirmedBalance > 0) {
+				balance.balance+=' (+' + unconfirmedBalanceFormatted + ')';
+			} else {
+				balance.balance = afterFloatPoint(Number(balance.balance) + Number(unconfirmedBalanceFormatted), 2);
+			}
+		}
+		return balance;
+	}
+
+	var displayBalance = function(result) {
+		if (!result || (!result.balance && result.balance!==0) || !result.text) {
+			return;
+		}
+		var nav = $('.neodice.nav');
+		nav.find('.amount').html(result.balance);
+		nav.find('.color_blue').html(result.text);
+	}
+
+	app.callChain({
+		requestType: 'getAccount',
+		account: app.getUserAccount() 
+	})
+	.then(getAccountParse)
+	.then(function(balance) {
+		return app.callChain({
+			requestType: 'getUnconfirmedTransactions', 
+			account: app.getUserAccount()
+		}).then(getUnconfirmedTransactionsParse.bind(null, balance));
+	})
+	.then(displayBalance);
+
 };
+
+app.updateBalance = function() {
+	app.pollForBalance();
+	window.setInterval(app.pollForBalance, 3000);
+}
 
 app.validateInputs = function() {
 	$('.clear_a').numeric();

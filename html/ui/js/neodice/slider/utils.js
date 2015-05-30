@@ -149,7 +149,7 @@ var Utils = {
 	calcMaxBet: function(odds) {
 
 		var edge = 0.01;
-		var bankroll = 2000000;
+		var bankroll = app.config.bankroll;
 
 		return bankroll * (odds / 100) / ((1 - edge) * 100);
 	}
@@ -157,7 +157,7 @@ var Utils = {
 
 
 function afterFloatPoint (num, howMuch) {
-	return Number((num).toFixed(howMuch));
+	return Number(num).toFixed(howMuch);
 }
 
 

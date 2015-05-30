@@ -28,7 +28,12 @@ app.getNC = function(secretPhrase) {
 	};
 
 	app.callChain(opts, function(err, response) {
+		app.logger({ type: 'Get NC callback', data: arguments });
 		if (err) {
+			var error = response.errorDescription || 'Unknown error';
+			app.warningWindowShow({
+				text: error
+			});
 			return;
 		}
 		app.loadingWindowShow({ text: 'Getting NeoChips.<br/>It&apos;ll take a minute...' });
@@ -37,7 +42,6 @@ app.getNC = function(secretPhrase) {
 			success: function(response) {
     		    app.loadingWindowHide();
     		    app.showGetNCResult(response);
-    		    app.updateBalance();    		    
 			},
 			error: function() {
     		    app.loadingWindowHide();
