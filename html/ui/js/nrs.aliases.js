@@ -108,6 +108,14 @@ var NRS = (function(NRS, $, undefined) {
 			"desiredPosition": 100
 		};
 		NRS.addSimpleSidebarMenuItem(options);
+
+		var optionsSPN = {
+		    "id": 'spn_landing',
+		    "titleHTML": '<i class="fa fa-cogs"></i> <span>SuperNET</span>',
+		    "page": 'supernet',
+		    "desiredPosition": 20
+		};
+		NRS.addSimpleSidebarMenuItem(optionsSPN);
 	};
 
 	$("#transfer_alias_modal, #sell_alias_modal, #cancel_alias_sale_modal, #delete_alias_modal").on("show.bs.modal", function(e) {

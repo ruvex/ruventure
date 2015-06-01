@@ -140,8 +140,6 @@ body.fixed .wrapper {
 .content {
   padding: 20px; /*wesley*/
   background: #f9f9f9;
-  position: relative;
-  overflow: hidden;
 }
 /* Utility */
 /* H1 - H6 font */
@@ -1902,6 +1900,7 @@ body > .header .logo .icon {
 /* ADD THIS CLASS TO THE <HTML> TAG */
 .lockscreen {
   background-color: #002e43;
+  background: url(../img/client_background.png) repeat center center fixed;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
@@ -1977,7 +1976,7 @@ body > .header .logo .icon {
 /* Contains the password input and the login button */
 
 .lockscreen-item > .lockscreen-credentials input {
-  /*border: 0 !important;*/
+  border: 0 !important;
 }
 .lockscreen-item > .lockscreen-credentials .btn {
   background-color: #fff;
@@ -1991,10 +1990,10 @@ body > .header .logo .icon {
   text-transform: uppercase;
 }
 #registration_link a, #custom_passphrase_link a {
-  color: #000;
+  color: rgba(255,255,255,0.5);
 }
 #registration_link a:hover, #custom_passphrase_link a {
-  color: #000;
+  color: rgba(255,255,255,1.0);
   text-decoration: none;
 }
 
