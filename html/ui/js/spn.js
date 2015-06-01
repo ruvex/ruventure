@@ -1,5 +1,5 @@
 var SPN = (function (SPN, $, undefined) {
-    SPN.version = "1.4.18.2";
+    SPN.version = "1.4.18.3";
     SPN.isCoinConnect = false;
     var coinAddress = "";
     var isCoinAddressAvailable = true;
