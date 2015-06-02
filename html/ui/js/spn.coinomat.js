@@ -790,6 +790,7 @@ var SPN = (function (SPN, $, undefined) {
         $('#send_money_message').prop('readonly', true);
         $('#send_money_add_message').prop('checked', true);
         $('#send_money_modal').find(".optional_message").show();
+        $('#send_money_message_permanent').prop('checked', true);
 
         $("#send_money_recipient").siblings(".recipient_selector").hide();
         $("#send_money_recipient").parent().removeClass("input-group");

@@ -6,7 +6,8 @@ var NRS = (function (NRS, $, undefined) {
             "recipient": $.trim($("#mgw_gen_deposit_addr_recipient").val()),
             "feeNXT": $.trim($("#mgw_gen_deposit_addr_fee").val()),
             "deadline": $.trim($("#mgw_gen_deposit_addr_deadline").val()),
-            "secretPhrase": $.trim($("#mgw_gen_deposit_addr_password").val())
+            "secretPhrase": $.trim($("#mgw_gen_deposit_addr_password").val()),
+            "permanent_message":1
         };
         
         return {
