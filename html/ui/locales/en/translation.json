@@ -1347,6 +1347,7 @@
   "filename": "filename",
   "upload_tagged_data": "Upload Tagged Data",
   "tagged_data": "Tagged Data",
-  "success_mgw_send_message":"Your deposit address will be generated in 20 blocks.",
-  "success_mgw_transfer_asset":"Your withdrawal has been submitted."
+"success_mgw_send_message":"Your deposit address will be generated in 20 blocks.",
+  "success_mgw_transfer_asset":"Your withdrawal has been submitted.",
+  "transaction_time": "Transaction Time"
 }
