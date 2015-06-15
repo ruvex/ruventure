@@ -16,46 +16,56 @@
 
 package nxt.http;
 
-import nxt.Account;
-import nxt.Currency;
-import nxt.PhasingPoll;
-import nxt.Transaction;
-import nxt.VoteWeighting;
-import nxt.db.DbIterator;
-import org.json.simple.JSONArray;
+import nxt.Token;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.Part;
+import java.io.IOException;
 
-public class GetCurrencyPhasedTransactions extends APIServlet.APIRequestHandler {
-    static final GetCurrencyPhasedTransactions instance = new GetCurrencyPhasedTransactions();
+import static nxt.http.JSONResponses.*;
 
-    private GetCurrencyPhasedTransactions() {
-        super(new APITag[]{APITag.MS, APITag.PHASING}, "currency", "account", "withoutWhitelist", "firstIndex", "lastIndex");
+
+public final class GenerateFileToken extends APIServlet.APIRequestHandler {
+
+    static final GenerateFileToken instance = new GenerateFileToken();
+
+    private GenerateFileToken() {
+        super("file", new APITag[] {APITag.TOKENS}, "secretPhrase");
     }
 
     @Override
     JSONStreamAware processRequest(HttpServletRequest req) throws ParameterException {
-        Currency currency = ParameterParser.getCurrency(req);
-        Account account = ParameterParser.getAccount(req, false);
-        int firstIndex = ParameterParser.getFirstIndex(req);
-        int lastIndex = ParameterParser.getLastIndex(req);
-        boolean withoutWhitelist = "true".equalsIgnoreCase(req.getParameter("withoutWhitelist"));
-
-        long currencyId = currency.getId();
-
-        JSONArray transactions = new JSONArray();
-        try (DbIterator<? extends Transaction> iterator = PhasingPoll.getHoldingPhasedTransactions(currencyId, VoteWeighting.VotingModel.CURRENCY,
-                account, withoutWhitelist, firstIndex, lastIndex)) {
-            while (iterator.hasNext()) {
-                Transaction transaction = iterator.next();
-                transactions.add(JSONData.transaction(transaction));
-            }
+        String secretPhrase = req.getParameter("secretPhrase");
+        if (secretPhrase == null) {
+            return MISSING_SECRET_PHRASE;
         }
-        JSONObject response = new JSONObject();
-        response.put("transactions", transactions);
-        return response;
+        byte[] data;
+        try {
+            Part part = req.getPart("file");
+            if (part == null) {
+                throw new ParameterException(INCORRECT_FILE);
+            }
+            ParameterParser.FileData fileData = new ParameterParser.FileData(part).invoke();
+            data = fileData.getData();
+        } catch (IOException | ServletException e) {
+            throw new ParameterException(INCORRECT_FILE);
+        }
+        try {
+            String tokenString = Token.generateToken(secretPhrase, data);
+            JSONObject response = JSONData.token(Token.parseToken(tokenString, data));
+            response.put("token", tokenString);
+            return response;
+        } catch (RuntimeException e) {
+            return INCORRECT_TOKEN;
+        }
+    }
+
+    @Override
+    boolean requirePost() {
+        return true;
     }
 
 }
